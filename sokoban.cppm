@@ -2,16 +2,68 @@ export module sokoban;
 import casein;
 import quack;
 
-class game_grid : public quack::grid_renderer<12, 10, bool> {
+static constexpr const auto level_1 = "    XXXXX   "
+                                      "  XXX   X   "
+                                      "  X.PO  X   "
+                                      "  XXX O.X   "
+                                      "  X.XXO X   "
+                                      "  X X . XX  "
+                                      "  XO 0OO.X  "
+                                      "  X   .  X  "
+                                      "  XXXXXXXX  "
+                                      "            ";
+
+class game_grid : public quack::grid_renderer<12, 10, char> {
+  const char *m_level{};
   unsigned m_px{};
   unsigned m_py{};
 
+  void load_map() {
+    auto lvl = m_level;
+    for (auto y = 0; y < height; y++) {
+      for (auto x = 0; x < width; x++, lvl++) {
+        switch (*lvl) {
+        case 'P':
+          break;
+        default:
+          at(x, y) = *lvl;
+          break;
+        }
+      }
+    }
+    at(m_px, m_py) = 'P';
+  }
+
 public:
+  void set_level(const char *lvl) {
+    m_level = lvl;
+
+    for (auto y = 0; y < height; y++)
+      for (auto x = 0; x < width; x++, lvl++)
+        if (*lvl == 'P') {
+          m_px = x;
+          m_py = y;
+        }
+  }
+
   void render() {
     reset_grid();
-    at(m_px, m_py) = true;
-    fill_colour([](bool b) {
-      return b ? quack::colour{1, 1, 1, 1} : quack::colour{};
+    load_map();
+    fill_colour([](char b) {
+      switch (b) {
+      case 'O':
+        return quack::colour{1, 1, 0, 1};
+      case '0':
+        return quack::colour{0, 1, 0, 1};
+      case '.':
+        return quack::colour{0, 0.5, 0, 1};
+      case 'P':
+        return quack::colour{1, 0, 0, 1};
+      case 'X':
+        return quack::colour{0, 0, 1, 1};
+      default:
+        return quack::colour{};
+      }
     });
   }
 
@@ -27,6 +79,7 @@ extern "C" void casein_handle(const casein::event &e) {
   switch (e.type()) {
   case casein::CREATE_WINDOW:
     r.setup(e.as<casein::events::create_window>().native_window_handle());
+    r.set_level(level_1);
     r.render();
     break;
   case casein::REPAINT:
