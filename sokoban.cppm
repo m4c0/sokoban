@@ -34,6 +34,15 @@ class game_grid : public quack::grid_renderer<12, 10, char> {
     at(m_px, m_py) = 'P';
   }
 
+  void move(unsigned x, unsigned y) {
+    switch (at(x, y)) {
+    case 'X':
+      return;
+    }
+    m_px = x;
+    m_py = y;
+  }
+
 public:
   void set_level(const char *lvl) {
     m_level = lvl;
@@ -67,10 +76,10 @@ public:
     });
   }
 
-  void down() { m_py++; }
-  void up() { m_py--; }
-  void left() { m_px--; }
-  void right() { m_px++; }
+  void down() { move(m_px, m_py + 1); }
+  void up() { move(m_px, m_py - 1); }
+  void left() { move(m_px - 1, m_py); }
+  void right() { move(m_px + 1, m_py); }
 };
 
 extern "C" void casein_handle(const casein::event &e) {
