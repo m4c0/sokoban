@@ -2,7 +2,10 @@ export module sokoban;
 import casein;
 import quack;
 
-template <auto W, auto H> class grid : public quack::filler<quack::pos> {
+template <auto W, auto H, typename Tp>
+class grid : public quack::filler<quack::pos> {
+  Tp m_data[W * H];
+
 public:
   static constexpr const auto width = W;
   static constexpr const auto height = H;
@@ -17,6 +20,14 @@ public:
       }
     }
   }
+
+  [[nodiscard]] constexpr auto &at(unsigned x, unsigned y) noexcept {
+    return m_data[y * W + x];
+  }
+  [[nodiscard]] constexpr auto &at(unsigned idx) noexcept {
+    return m_data[idx];
+  }
+
   operator quack::params() const noexcept {
     return quack::params{
         .grid_w = grid::width,
@@ -37,11 +48,11 @@ template <typename Fn> static constexpr const auto colour_filler(Fn &&fn) {
 }
 
 extern "C" void casein_handle(const casein::event &e) {
-  static grid<10, 10> grd{};
+  static grid<10, 10, bool> grd{};
   static quack::renderer r{grd};
   static constexpr const auto painter = [&](auto *c) {
     for (auto i = 0; i < decltype(grd)::cells; i++) {
-      c[i] = {};
+      c[i] = grd.at(i) ? quack::colour{1, 1, 1, 1} : quack::colour{};
     }
   };
 
@@ -49,6 +60,9 @@ extern "C" void casein_handle(const casein::event &e) {
   case casein::CREATE_WINDOW:
     r.setup(e.as<casein::events::create_window>().native_window_handle());
     r.fill_pos(grd);
+    grd.at(1, 1) = true;
+    grd.at(2, 1) = true;
+
     r.fill_colour(colour_filler(painter));
     break;
   case casein::REPAINT:
