@@ -19,13 +19,13 @@ jobs:
           os: ${{ matrix.os }}
       - name: 🧴 Setup Casein
         uses: m4c0/casein/.github/actions/deps@main
-      - name: 🌋 Setup Vee
-        uses: m4c0/vee/.github/actions/deps@main
+      - name: 🦆 Setup Quack
+        uses: m4c0/quack/.github/actions/deps@main
       - name: 🖖 Install glslang
         uses: m4c0/vee/.github/actions/glslang@main
         with:
           os: ${{ matrix.os }}
-      - name: 🛒 Checkout Boa
+      - name: 🛒 Checkout Sokoban
         uses: actions/checkout@v3
         with:
           repository: m4c0/sokoban
