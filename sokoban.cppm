@@ -35,38 +35,12 @@ class game_grid : public quack::grid_renderer<12, 10, char> {
   unsigned m_px{};
   unsigned m_py{};
 
-  void load_map() {
-    unsigned i = 0;
-    for (auto c : m_grid) {
-      at(i++) = c;
-    }
-    at(m_px, m_py) = 'P';
-  }
-
-  void move(unsigned x, unsigned y) {
-    switch (at(x, y)) {
-    case 'X':
-      return;
-    }
-    m_px = x;
-    m_py = y;
-  }
-
-public:
-  void set_level(const char *lvl) {
-    m_grid.load(lvl);
-
-    for (auto y = 0; y < height; y++)
-      for (auto x = 0; x < width; x++, lvl++)
-        if (*lvl == 'P') {
-          m_px = x;
-          m_py = y;
-        }
-  }
-
   void render() {
-    reset_grid();
-    load_map();
+    unsigned i = 0;
+    for (auto c : m_grid)
+      at(i++) = c;
+    at(m_px, m_py) = 'P';
+
     fill_colour([](char b) {
       switch (b) {
       case 'O':
@@ -85,6 +59,30 @@ public:
     });
   }
 
+  void move(unsigned x, unsigned y) {
+    switch (at(x, y)) {
+    case 'X':
+      return;
+    }
+    m_px = x;
+    m_py = y;
+    render();
+  }
+
+public:
+  void set_level(const char *lvl) {
+    m_grid.load(lvl);
+
+    for (auto y = 0; y < height; y++)
+      for (auto x = 0; x < width; x++, lvl++)
+        if (*lvl == 'P') {
+          m_px = x;
+          m_py = y;
+        }
+
+    render();
+  }
+
   void down() { move(m_px, m_py + 1); }
   void up() { move(m_px, m_py - 1); }
   void left() { move(m_px - 1, m_py); }
@@ -98,7 +96,6 @@ extern "C" void casein_handle(const casein::event &e) {
   case casein::CREATE_WINDOW:
     r.setup(e.as<casein::events::create_window>().native_window_handle());
     r.set_level(level_1);
-    r.render();
     break;
   case casein::REPAINT:
     // if (g.tick())
@@ -121,7 +118,6 @@ extern "C" void casein_handle(const casein::event &e) {
     default:
       break;
     }
-    r.render();
     break;
   case casein::QUIT:
     r.quit();
