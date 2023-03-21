@@ -27,18 +27,22 @@ public:
 
   [[nodiscard]] constexpr auto *begin() const noexcept { return m_buf; }
   [[nodiscard]] constexpr auto *end() const noexcept { return m_end; }
+
+  [[nodiscard]] constexpr auto operator[](unsigned p) const noexcept {
+    return m_buf[p];
+  }
 };
 
 class game_grid : public quack::grid_renderer<12, 10, char> {
   grid m_grid{};
-  unsigned m_px{};
-  unsigned m_py{};
+  unsigned m_p{};
 
   void render() {
     unsigned i = 0;
     for (auto c : m_grid)
       at(i++) = c;
-    at(m_px, m_py) = 'P';
+
+    at(m_p) = 'P';
 
     fill_colour([](char b) {
       switch (b) {
@@ -58,13 +62,15 @@ class game_grid : public quack::grid_renderer<12, 10, char> {
     });
   }
 
-  void move(unsigned x, unsigned y) {
-    switch (at(x, y)) {
+  void move(unsigned p) {
+    switch (m_grid[p]) {
+    case '0':
+    case 'O':
+      break;
     case 'X':
       return;
     }
-    m_px = x;
-    m_py = y;
+    m_p = p;
     render();
   }
 
@@ -72,18 +78,15 @@ public:
   void set_level(const char *lvl) {
     m_grid.load(lvl);
 
-    for (auto y = 0; y < height; y++)
-      for (auto x = 0; x < width; x++, lvl++)
-        if (*lvl == 'P') {
-          m_px = x;
-          m_py = y;
-        }
+    m_p = 0;
+    while (lvl[m_p] != 'P')
+      m_p++;
 
     render();
   }
 
-  void down() { move(m_px, m_py + 1); }
-  void up() { move(m_px, m_py - 1); }
-  void left() { move(m_px - 1, m_py); }
-  void right() { move(m_px + 1, m_py); }
+  void down() { move(m_p + width); }
+  void up() { move(m_p - width); }
+  void left() { move(m_p - 1); }
+  void right() { move(m_p + 1); }
 };
