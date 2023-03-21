@@ -62,6 +62,13 @@ public:
       return walk;
     }
   }
+
+  constexpr void set_box(unsigned p) {
+    m_buf[p] = (m_buf[p] == target) ? target_box : box;
+  }
+  constexpr void clear_box(unsigned p) {
+    m_buf[p] = (m_buf[p] == target_box) ? target : empty;
+  }
 };
 
 class game_grid : public quack::grid_renderer<12, 10, blocks> {
@@ -99,6 +106,8 @@ class game_grid : public quack::grid_renderer<12, 10, blocks> {
     case none:
       return;
     case push:
+      m_grid.set_box(m_p + p + p);
+      m_grid.clear_box(m_p + p);
       break;
     case walk:
       break;
