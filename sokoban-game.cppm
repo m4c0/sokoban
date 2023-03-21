@@ -9,6 +9,9 @@ enum blocks : char {
   box = 'O',
   target_box = '0',
 };
+
+enum move_type { push, walk, none };
+
 static constexpr const auto level_1 = "    XXXXX   "
                                       "  XXX   X   "
                                       "  X.PO  X   "
@@ -36,8 +39,28 @@ public:
   [[nodiscard]] constexpr auto *begin() const noexcept { return m_buf; }
   [[nodiscard]] constexpr auto *end() const noexcept { return m_end; }
 
-  [[nodiscard]] constexpr auto operator[](unsigned p) const noexcept {
-    return m_buf[p];
+  [[nodiscard]] constexpr auto move_type(unsigned cur,
+                                         unsigned delta) const noexcept {
+    auto next = cur + delta;
+
+    switch (m_buf[next]) {
+    case box:
+    case target_box:
+      switch (m_buf[next + delta]) {
+      case empty:
+      case target:
+      case player:
+        return push;
+      default:
+        return none;
+      }
+    case wall:
+      return none;
+    case empty:
+    case target:
+    case player:
+      return walk;
+    }
   }
 };
 
@@ -72,28 +95,15 @@ class game_grid : public quack::grid_renderer<12, 10, blocks> {
   }
 
   void move(unsigned p) {
-    auto np = m_p + p;
-
-    switch (m_grid[np]) {
-    case box:
-    case target_box:
-      switch (m_grid[np + p]) {
-      case empty:
-      case target:
-      case player:
-        break;
-      default:
-        return;
-      }
-      break;
-    case wall:
+    switch (m_grid.move_type(m_p, p)) {
+    case none:
       return;
-    case empty:
-    case target:
-    case player:
+    case push:
+      break;
+    case walk:
       break;
     }
-    m_p = np;
+    m_p += p;
     render();
   }
 
