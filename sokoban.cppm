@@ -13,23 +13,32 @@ static constexpr const auto level_1 = "    XXXXX   "
                                       "  XXXXXXXX  "
                                       "            ";
 
+class grid {
+  char m_buf[1024]{};
+  char *m_end{};
+
+public:
+  constexpr void load(const char *l) {
+    m_end = m_buf;
+    while (*l) {
+      *m_end++ = (*l == 'P') ? ' ' : *l;
+      l++;
+    }
+  }
+
+  [[nodiscard]] constexpr auto *begin() const noexcept { return m_buf; }
+  [[nodiscard]] constexpr auto *end() const noexcept { return m_end; }
+};
+
 class game_grid : public quack::grid_renderer<12, 10, char> {
-  const char *m_level{};
+  grid m_grid{};
   unsigned m_px{};
   unsigned m_py{};
 
   void load_map() {
-    auto lvl = m_level;
-    for (auto y = 0; y < height; y++) {
-      for (auto x = 0; x < width; x++, lvl++) {
-        switch (*lvl) {
-        case 'P':
-          break;
-        default:
-          at(x, y) = *lvl;
-          break;
-        }
-      }
+    unsigned i = 0;
+    for (auto c : m_grid) {
+      at(i++) = c;
     }
     at(m_px, m_py) = 'P';
   }
@@ -45,7 +54,7 @@ class game_grid : public quack::grid_renderer<12, 10, char> {
 
 public:
   void set_level(const char *lvl) {
-    m_level = lvl;
+    m_grid.load(lvl);
 
     for (auto y = 0; y < height; y++)
       for (auto x = 0; x < width; x++, lvl++)
