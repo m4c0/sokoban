@@ -63,6 +63,14 @@ public:
     }
   }
 
+  [[nodiscard]] constexpr bool is_done() const noexcept {
+    for (auto c : m_buf)
+      if (c == target)
+        return false;
+
+    return true;
+  }
+
   constexpr void set_box(unsigned p) {
     m_buf[p] = (m_buf[p] == target) ? target_box : box;
   }
@@ -106,13 +114,17 @@ class game_grid : public quack::grid_renderer<12, 10, blocks> {
     case none:
       return;
     case push:
-      m_grid.set_box(m_p + p + p);
-      m_grid.clear_box(m_p + p);
+      m_p += p;
+      m_grid.set_box(m_p + p);
+      m_grid.clear_box(m_p);
+      if (m_grid.is_done()) {
+        set_level(level_1);
+      }
       break;
     case walk:
+      m_p += p;
       break;
     }
-    m_p += p;
     render();
   }
 
