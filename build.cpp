@@ -8,6 +8,7 @@ int main(int argc, char **argv) {
   auto m = unit::create<mod>("sokoban");
   m->add_wsdep("casein", casein());
   m->add_wsdep("quack", quack());
+  m->add_part("levels");
   m->add_part("game");
 
   auto a = unit::create<app>("sokoban");

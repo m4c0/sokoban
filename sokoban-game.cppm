@@ -1,4 +1,5 @@
 export module sokoban:game;
+import :levels;
 import quack;
 
 enum blocks : char {
@@ -11,31 +12,6 @@ enum blocks : char {
 };
 
 enum move_type { push, walk, none };
-
-static constexpr const auto level_1 = "                        "
-                                      "           XXXXX        "
-                                      "         XXX   X        "
-                                      "         X.PO  X        "
-                                      "         XXX O.X        "
-                                      "         X.XXO X        "
-                                      "         X X . XX       "
-                                      "         XO 0OO.X       "
-                                      "         X   .  X       "
-                                      "         XXXXXXXX       "
-                                      "                        "
-                                      "                        ";
-static constexpr const auto level_2 = "     XXXXX              "
-                                      "     X   X              "
-                                      "     XO  X              "
-                                      "   XXX  OXXX            "
-                                      "   X  O  O X            "
-                                      " XXX X XXX X     XXXXXXX"
-                                      " X   X XXX XXXXXXX   ..X"
-                                      " X O  O              ..X"
-                                      " XXXXX XXXX XPXXXX   ..X"
-                                      "     X      XXX  XXXXXXX"
-                                      "     XXXXXXXX           "
-                                      "                        ";
 
 class grid {
   blocks m_buf[1024]{};
@@ -96,6 +72,7 @@ public:
 class game_grid : public quack::grid_renderer<24, 12, blocks> {
   grid m_grid{};
   unsigned m_p{};
+  unsigned m_level{};
 
   void render() {
     unsigned i = 0;
@@ -132,7 +109,7 @@ class game_grid : public quack::grid_renderer<24, 12, blocks> {
       m_grid.set_box(m_p + p);
       m_grid.clear_box(m_p);
       if (m_grid.is_done()) {
-        set_level(level_2);
+        set_level(m_level + 1);
       }
       break;
     case walk:
@@ -143,7 +120,10 @@ class game_grid : public quack::grid_renderer<24, 12, blocks> {
   }
 
 public:
-  void set_level(const char *lvl) {
+  void set_level(unsigned idx) {
+    m_level = idx % max_levels;
+
+    auto lvl = levels[idx];
     m_grid.load(lvl);
 
     m_p = 0;
@@ -152,6 +132,7 @@ public:
 
     render();
   }
+  void reset_level() { set_level(m_level); }
 
   void down() { move(width); }
   void up() { move(-width); }

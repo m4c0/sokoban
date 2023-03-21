@@ -9,7 +9,7 @@ extern "C" void casein_handle(const casein::event &e) {
   switch (e.type()) {
   case casein::CREATE_WINDOW:
     r.setup(e.as<casein::events::create_window>().native_window_handle());
-    r.set_level(level_1);
+    r.set_level(0);
     break;
   case casein::REPAINT:
     r.repaint();
@@ -29,7 +29,7 @@ extern "C" void casein_handle(const casein::event &e) {
       r.right();
       break;
     case casein::K_SPACE:
-      r.set_level(level_1);
+      r.reset_level();
       break;
     default:
       break;
