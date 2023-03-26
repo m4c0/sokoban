@@ -10,6 +10,7 @@ extern "C" void casein_handle(const casein::event &e) {
   case casein::CREATE_WINDOW:
     r.setup(e.as<casein::events::create_window>().native_window_handle());
     r.set_level(0);
+    r.load_atlas(16, 16, [](auto *) {});
     break;
   case casein::REPAINT:
     r.repaint();
