@@ -5,6 +5,7 @@ import quack;
 
 enum blocks : char {
   player = 'P',
+  player_target = 'p',
   wall = 'X',
   empty = '.',
   outside = ' ',
@@ -41,7 +42,6 @@ public:
       switch (m_buf[next + delta]) {
       case empty:
       case target:
-      case player:
         return push;
       default:
         return none;
@@ -52,6 +52,7 @@ public:
     case empty:
     case target:
     case player:
+    case player_target:
       return walk;
     }
   }
@@ -87,7 +88,7 @@ class game_grid : public quack::grid_renderer<24, 12, blocks> {
     for (auto c : m_grid)
       at(i++) = c;
 
-    at(m_p) = player;
+    at(m_p) = at(m_p) == target ? player_target : player;
 
     load_atlas(atlas_col_count, atlas_row_count, atlas{});
     fill_uv([](char b) {
@@ -96,6 +97,7 @@ class game_grid : public quack::grid_renderer<24, 12, blocks> {
       case target_box:
         return uv(sprite_box);
       case player:
+      case player_target:
         return uv(sprite_player);
       default:
         return uv(sprite_empty);
@@ -105,6 +107,7 @@ class game_grid : public quack::grid_renderer<24, 12, blocks> {
       switch (b) {
       case target_box:
       case target:
+      case player_target:
         return quack::colour{0, 0.7, 0, 1};
       case wall:
         return quack::colour{0, 0, 1, 1};
