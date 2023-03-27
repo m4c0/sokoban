@@ -83,6 +83,7 @@ class game_grid : public quack::grid_renderer<24, 12, blocks> {
     at(m_p) = player;
 
     load_atlas(atlas_col_count, atlas_row_count, atlas{});
+    fill_uv([](char b) { return quack::uv{{0, 0}, {1, 1}}; });
     fill_colour([](char b) {
       switch (b) {
       case box:
