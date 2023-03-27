@@ -106,12 +106,11 @@ class game_grid : public quack::grid_renderer<24, 12, blocks> {
         return quack::colour{0, 1, 0, 1};
       case target:
         return quack::colour{0, 0.5, 0, 1};
-      case player:
-        return quack::colour{1, 0, 0, 1};
       case wall:
         return quack::colour{0, 0, 1, 1};
       case outside:
         return quack::colour{};
+      case player:
       case empty:
         return quack::colour{0, 0.3, 0, 1};
       }
