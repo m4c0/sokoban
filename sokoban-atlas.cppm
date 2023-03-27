@@ -3,30 +3,41 @@ import quack;
 
 constexpr const auto atlas_col_count = 8;
 constexpr const auto atlas_row_count = 8;
+constexpr const auto atlas_pixel_count = atlas_col_count * atlas_row_count;
 
-using pal_line = unsigned[atlas_col_count];
+using pal_line = char[atlas_col_count + 1];
 constexpr const pal_line paletted_atlas[atlas_row_count]{
-    {0, 1, 2, 3, 4, 5, 6, 7},
-    {0, 1, 2, 3, 4, 5, 6, 7},
-    {0, 1, 2, 3, 4, 5, 6, 7},
-    {0, 1, 2, 3, 4, 5, 6, 7},
+    "11001100", //
+    "00110011", //
+    "11001100", //
+    "00110011", //
+    "11001100", //
+    "00110011", //
+    "11001100", //
+    "00110011", //
 };
 constexpr const quack::u8_rgba palette[]{
-    {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0},
-    {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0},
+    {0, 0, 0, 0},
+    {255, 255, 255, 255},
 };
 
-struct atlas_t {
-  quack::u8_rgba data[atlas_row_count * atlas_col_count];
-};
-constexpr const atlas_t atlas = [] {
-  atlas_t res{};
-  for (auto i = 0; i < atlas_row_count; i++) {
-    const auto &row = paletted_atlas[i];
-    for (auto j = 0; j < atlas_col_count; j++) {
-      const auto rgba = palette[row[j]];
-      res.data[i * atlas_col_count + j] = rgba;
+class atlas {
+  quack::u8_rgba m_data[atlas_pixel_count];
+
+public:
+  constexpr atlas() {
+    for (auto i = 0; i < atlas_row_count; i++) {
+      const auto &row = paletted_atlas[i];
+      for (auto j = 0; j < atlas_col_count; j++) {
+        const auto rgba = palette[row[j] - '0'];
+        m_data[i * atlas_col_count + j] = rgba;
+      }
     }
   }
-  return res;
-}();
+
+  constexpr void operator()(quack::u8_rgba *img) {
+    for (auto i = 0; i < atlas_pixel_count; i++) {
+      img[i] = m_data[i];
+    }
+  }
+};
