@@ -96,6 +96,8 @@ class game_grid : public quack::grid_renderer<24, 12, blocks> {
       case box:
       case target_box:
         return uv(sprite_box);
+      case target:
+        return uv(sprite_target);
       case player:
       case player_target:
         return uv(sprite_player);

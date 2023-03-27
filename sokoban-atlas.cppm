@@ -1,7 +1,13 @@
 export module sokoban:atlas;
 import quack;
 
-enum atlas_sprites { sprite_empty, sprite_player, sprite_box, sprite_count };
+enum atlas_sprites {
+  sprite_empty,
+  sprite_player,
+  sprite_box,
+  sprite_target,
+  sprite_count
+};
 constexpr const auto atlas_col_count = 8;
 constexpr const auto atlas_row_count = 8 * sprite_count;
 constexpr const auto atlas_pixel_count = atlas_col_count * atlas_row_count;
@@ -32,6 +38,14 @@ constexpr const pal_line paletted_atlas[atlas_row_count]{
     "10100101", //
     "11000011", //
     "11111111", //
+    "00000000", // target
+    "00000000", //
+    "00000000", //
+    "00011000", //
+    "00011000", //
+    "00000000", //
+    "00000000", //
+    "00000000", //
 };
 constexpr const quack::u8_rgba palette[]{
     {0, 0, 0, 0},
