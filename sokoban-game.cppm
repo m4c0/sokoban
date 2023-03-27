@@ -78,7 +78,7 @@ class game_grid : public quack::grid_renderer<24, 12, blocks> {
   unsigned m_level{};
 
   static constexpr auto uv(unsigned n) {
-    constexpr const auto h = 1.0f / static_cast<float>(atlas_sprite_count);
+    constexpr const auto h = 1.0f / static_cast<float>(sprite_count);
     return quack::uv{{0, n * h}, {1, (n + 1) * h}};
   }
 
@@ -92,24 +92,25 @@ class game_grid : public quack::grid_renderer<24, 12, blocks> {
     load_atlas(atlas_col_count, atlas_row_count, atlas{});
     fill_uv([](char b) {
       switch (b) {
+      case box:
+      case target_box:
+        return uv(sprite_box);
       case player:
-        return uv(1);
+        return uv(sprite_player);
       default:
-        return uv(0);
+        return uv(sprite_empty);
       }
     });
     fill_colour([](char b) {
       switch (b) {
-      case box:
-        return quack::colour{1, 1, 0, 1};
       case target_box:
-        return quack::colour{0, 1, 0, 1};
       case target:
-        return quack::colour{0, 0.5, 0, 1};
+        return quack::colour{0, 0.7, 0, 1};
       case wall:
         return quack::colour{0, 0, 1, 1};
       case outside:
         return quack::colour{};
+      case box:
       case player:
       case empty:
         return quack::colour{0, 0.3, 0, 1};
