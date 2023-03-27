@@ -6,8 +6,9 @@ import quack;
 enum blocks : char {
   player = 'P',
   wall = 'X',
-  empty = ' ',
-  target = '.',
+  empty = '.',
+  outside = ' ',
+  target = '*',
   box = 'O',
   target_box = '0',
 };
@@ -22,7 +23,7 @@ public:
   constexpr void load(const char *l) {
     m_end = m_buf;
     while (*l) {
-      *m_end++ = static_cast<blocks>((*l == 'P') ? ' ' : *l);
+      *m_end++ = (*l == 'P') ? empty : static_cast<blocks>(*l);
       l++;
     }
   }
@@ -45,6 +46,7 @@ public:
       default:
         return none;
       }
+    case outside:
     case wall:
       return none;
     case empty:
@@ -108,8 +110,10 @@ class game_grid : public quack::grid_renderer<24, 12, blocks> {
         return quack::colour{1, 0, 0, 1};
       case wall:
         return quack::colour{0, 0, 1, 1};
-      case empty:
+      case outside:
         return quack::colour{};
+      case empty:
+        return quack::colour{0, 0.3, 0, 1};
       }
       return quack::colour{1, 0, 1, 1};
     });
