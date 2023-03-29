@@ -6,13 +6,11 @@ import quack;
 extern "C" void casein_handle(const casein::event &e) {
   static game_grid r{};
 
+  r.process_event(e);
+
   switch (e.type()) {
   case casein::CREATE_WINDOW:
-    r.setup(*e.as<casein::events::create_window>());
     r.set_level(0);
-    break;
-  case casein::REPAINT:
-    r.repaint();
     break;
   case casein::KEY_DOWN:
     switch (*e.as<casein::events::key_down>()) {
@@ -34,9 +32,6 @@ extern "C" void casein_handle(const casein::event &e) {
     default:
       break;
     }
-    break;
-  case casein::QUIT:
-    r.quit();
     break;
   default:
     break;
