@@ -8,14 +8,14 @@ extern "C" void casein_handle(const casein::event &e) {
 
   switch (e.type()) {
   case casein::CREATE_WINDOW:
-    r.setup(e.as<casein::events::create_window>().native_window_handle());
+    r.setup(*e.as<casein::events::create_window>());
     r.set_level(0);
     break;
   case casein::REPAINT:
     r.repaint();
     break;
   case casein::KEY_DOWN:
-    switch (e.as<casein::events::key_down>().key()) {
+    switch (*e.as<casein::events::key_down>()) {
     case casein::K_UP:
       r.up();
       break;
