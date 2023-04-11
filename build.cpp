@@ -15,6 +15,7 @@ int main(int argc, char **argv) {
   m->add_part("game");
 
   auto a = unit::create<app>("sokoban");
+  a->add_requirement(native);
   a->add_ref(m);
   return run_main(a, argc, argv);
 }
