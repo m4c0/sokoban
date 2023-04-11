@@ -2,6 +2,7 @@ export module sokoban:game;
 import :atlas;
 import :levels;
 import quack;
+import siaudio;
 
 enum blocks : char {
   player = 'P',
@@ -15,6 +16,29 @@ enum blocks : char {
 };
 
 enum move_type { push, walk, none };
+
+void play_sound() {
+  static volatile unsigned sp = 0;
+  static auto s = siaudio::streamer{[&](float *data, unsigned samples) {
+    auto ssp = sp;
+    float mult;
+    if (ssp < 1000) {
+      mult = ssp / 1000.0f;
+    } else if (ssp < 4000) {
+      mult = 1.0;
+    } else if (ssp < 5000) {
+      mult = (5000 - ssp) / 1000.0f;
+    } else {
+      mult = 0;
+    }
+    for (unsigned i = 0; i < samples; ++i) {
+      data[i] = mult * ((ssp / 20) % 2) - 0.5f;
+      ssp++;
+    }
+    sp = ssp;
+  }};
+  sp = 0;
+}
 
 class grid {
   blocks m_buf[1024]{};
@@ -135,6 +159,7 @@ class game_grid : public quack::grid_renderer<24, 12, blocks> {
       if (m_grid.is_done()) {
         set_level(m_level + 1);
       }
+      play_sound();
       break;
     case walk:
       m_p += p;
