@@ -21,6 +21,8 @@ jobs:
         uses: m4c0/casein/.github/actions/deps@main
       - name: 🦆 Setup Quack
         uses: m4c0/quack/.github/actions/deps@main
+      - name: 🔈 Setup Siaudio
+        uses: m4c0/siaudio/.github/actions/deps@main
       - name: 🖖 Install glslang
         uses: m4c0/vee/.github/actions/glslang@main
         with:
