@@ -12,6 +12,26 @@ extern "C" void casein_handle(const casein::event &e) {
   case casein::CREATE_WINDOW:
     r.set_level(0);
     break;
+  case casein::GESTURE:
+    switch (*e.as<casein::events::gesture>()) {
+    case casein::G_SWIPE_UP:
+      r.up();
+      break;
+    case casein::G_SWIPE_DOWN:
+      r.down();
+      break;
+    case casein::G_SWIPE_LEFT:
+      r.left();
+      break;
+    case casein::G_SWIPE_RIGHT:
+      r.right();
+      break;
+    case casein::G_SHAKE:
+      r.reset_level();
+      break;
+    default:
+      break;
+    }
   case casein::KEY_DOWN:
     switch (*e.as<casein::events::key_down>()) {
     case casein::K_UP:
