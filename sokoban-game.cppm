@@ -17,8 +17,9 @@ enum blocks : char {
 
 enum move_type { push, walk, none };
 
-void play_sound() {
+void play_sound(unsigned div) {
   static volatile unsigned sp = 0;
+  static volatile unsigned d = 0;
   static auto s = siaudio::streamer{[&](float *data, unsigned samples) {
     auto ssp = sp;
     float mult;
@@ -32,11 +33,12 @@ void play_sound() {
       mult = 0;
     }
     for (unsigned i = 0; i < samples; ++i) {
-      data[i] = 0.25f * mult * ((ssp / 200) % 2) - 0.5f;
+      data[i] = 0.25f * mult * ((ssp / d) % 2) - 0.5f;
       ssp++;
     }
     sp = ssp;
   }};
+  d = div;
   sp = 0;
 }
 
@@ -158,8 +160,8 @@ class game_grid : public quack::grid_renderer<24, 12, blocks> {
       m_grid.clear_box(m_p);
       if (m_grid.is_done()) {
         set_level(m_level + 1);
+        play_sound(50);
       }
-      play_sound();
       break;
     case walk:
       m_p += p;
