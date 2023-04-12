@@ -15,7 +15,7 @@ enum blocks : char {
   target_box = '0',
 };
 
-enum move_type { push, walk, none };
+enum move_type { push, walk, none, push2tgt };
 
 void play_sound(unsigned div) {
   static volatile unsigned sp = 0;
@@ -67,8 +67,9 @@ public:
     case target_box:
       switch (m_buf[next + delta]) {
       case empty:
-      case target:
         return push;
+      case target:
+        return push2tgt;
       default:
         return none;
       }
@@ -151,16 +152,21 @@ class game_grid : public quack::grid_renderer<24, 12, blocks> {
   }
 
   void move(unsigned p) {
-    switch (m_grid.move_type(m_p, p)) {
+    switch (auto mt = m_grid.move_type(m_p, p)) {
     case none:
+      play_sound(150);
       return;
     case push:
+    case push2tgt:
       m_p += p;
       m_grid.set_box(m_p + p);
       m_grid.clear_box(m_p);
       if (m_grid.is_done()) {
         set_level(m_level + 1);
-        play_sound(50);
+      } else if (mt == push2tgt) {
+        play_sound(100);
+      } else {
+        play_sound(200);
       }
       break;
     case walk:
@@ -182,6 +188,7 @@ public:
       m_p++;
 
     render();
+    play_sound(50);
   }
   void reset_level() { set_level(m_level); }
 
