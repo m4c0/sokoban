@@ -32,7 +32,7 @@ void play_sound() {
       mult = 0;
     }
     for (unsigned i = 0; i < samples; ++i) {
-      data[i] = mult * ((ssp / 20) % 2) - 0.5f;
+      data[i] = 0.25f * mult * ((ssp / 200) % 2) - 0.5f;
       ssp++;
     }
     sp = ssp;
