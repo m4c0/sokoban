@@ -100,10 +100,14 @@ public:
   }
 };
 
-class game_grid : public quack::grid_renderer<24, 12, blocks> {
+class game_grid {
+  quack::renderer m_r{1};
+  quack::grid_ilayout<24, 12, blocks> m_g{&m_r};
   grid m_grid{};
   unsigned m_p{};
   unsigned m_level{};
+
+  static constexpr const auto width = decltype(m_g)::width;
 
   static constexpr auto uv(unsigned n) {
     constexpr const auto h = 1.0f / static_cast<float>(sprite_count);
@@ -113,12 +117,12 @@ class game_grid : public quack::grid_renderer<24, 12, blocks> {
   void render() {
     unsigned i = 0;
     for (auto c : m_grid)
-      at(i++) = c;
+      m_g.at(i++) = c;
 
-    at(m_p) = at(m_p) == target ? player_target : player;
+    m_g.at(m_p) = m_g.at(m_p) == target ? player_target : player;
 
-    load_atlas(atlas_col_count, atlas_row_count, atlas{});
-    fill_uv([](char b) {
+    m_r.load_atlas(atlas_col_count, atlas_row_count, atlas{});
+    m_g.fill_uv([](char b) {
       switch (b) {
       case box:
       case target_box:
@@ -132,7 +136,7 @@ class game_grid : public quack::grid_renderer<24, 12, blocks> {
         return uv(sprite_empty);
       }
     });
-    fill_colour([](char b) {
+    m_g.fill_colour([](char b) {
       switch (b) {
       case target_box:
       case target:
@@ -196,4 +200,9 @@ public:
   void up() { move(-width); }
   void left() { move(-1); }
   void right() { move(1); }
+
+  void process_event(const auto &e) {
+    m_r.process_event(e);
+    m_g.process_event(e);
+  }
 };
