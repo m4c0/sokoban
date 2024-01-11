@@ -3,7 +3,6 @@
 export module sokoban;
 import :game;
 import casein;
-import quack;
 
 extern "C" void casein_handle(const casein::event &e) {
   static game_grid r{};

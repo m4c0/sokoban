@@ -1,5 +1,8 @@
 export module sokoban:levels;
 
+static constexpr const auto level_width = 24;
+static constexpr const auto level_height = 12;
+
 static constexpr const char *level_1 = "                        "
                                        "           XXXXX        "
                                        "         XXX...X        "
