@@ -130,7 +130,7 @@ class game_grid {
 
     m_g.at(m_p) = m_g.at(m_p) == target ? player_target : player;
 
-    m_r.load_atlas(atlas_col_count, atlas_row_count, atlas{});
+    m_g.batch()->load_atlas(atlas_col_count, atlas_row_count, atlas{});
     m_g.fill_uv([](char b) {
       switch (b) {
       case box:
@@ -162,6 +162,7 @@ class game_grid {
       }
       return quack::colour{1, 0, 1, 1};
     });
+    m_g.fill_mult([](char b) { return quack::colour{1, 1, 1, 1}; });
   }
 
   void move(unsigned p) {
