@@ -17,10 +17,12 @@ enum blocks : char {
 
 enum move_type { push, walk, none, push2tgt };
 
-void play_sound(unsigned div) {
-  static volatile unsigned sp = 0;
-  static volatile unsigned d = 0;
-  static auto s = siaudio::streamer{[&](float *data, unsigned samples) {
+class streamer : public siaudio::os_streamer {
+  volatile unsigned sp = 0;
+  volatile unsigned d = 0;
+
+public:
+  void fill_buffer(float *data, unsigned samples) override {
     auto ssp = sp;
     float mult;
     if (ssp < 1000) {
@@ -37,9 +39,16 @@ void play_sound(unsigned div) {
       ssp++;
     }
     sp = ssp;
-  }};
-  d = div;
-  sp = 0;
+  }
+  void play(unsigned div) {
+    d = div;
+    sp = 0;
+  }
+};
+
+void play_sound(unsigned div) {
+  static streamer s{};
+  s.play(div);
 }
 
 class grid {
