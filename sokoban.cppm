@@ -1,3 +1,5 @@
+#pragma leco app
+
 export module sokoban;
 import :game;
 import casein;
