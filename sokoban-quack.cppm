@@ -8,7 +8,6 @@ import quack;
 class renderer {
   quack::renderer m_r{1};
   quack::ilayout m_il{&m_r, level_width *level_height};
-  // quack::grid_ilayout<level_width, level_height, blocks> m_g{&m_r};
 
   static constexpr auto uv(atlas_sprites s) {
     constexpr const auto h = 1.0f / static_cast<float>(sprite_count);
