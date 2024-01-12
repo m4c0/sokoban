@@ -1,5 +1,4 @@
 export module sokoban:atlas;
-import quack;
 
 enum atlas_sprites {
   sprite_empty,
@@ -47,28 +46,18 @@ constexpr const pal_line paletted_atlas[atlas_row_count]{
     "00000000", //
     "00000000", //
 };
-constexpr const quack::u8_rgba palette[]{
-    {0, 0, 0, 0},
-    {255, 255, 255, 255},
+
+struct atlas_r8 {
+  unsigned char data[atlas_pixel_count];
 };
-
-class atlas {
-  quack::u8_rgba m_data[atlas_pixel_count];
-
-public:
-  constexpr atlas() {
-    for (auto i = 0; i < atlas_row_count; i++) {
-      const auto &row = paletted_atlas[i];
-      for (auto j = 0; j < atlas_col_count; j++) {
-        const auto rgba = palette[row[j] - '0'];
-        m_data[i * atlas_col_count + j] = rgba;
-      }
+constexpr auto atlas() {
+  atlas_r8 res{};
+  for (auto i = 0; i < atlas_row_count; i++) {
+    const auto &row = paletted_atlas[i];
+    for (auto j = 0; j < atlas_col_count; j++) {
+      const auto rgba = row[j] == '0' ? 0 : 255;
+      res.data[i * atlas_col_count + j] = rgba;
     }
   }
-
-  constexpr void operator()(quack::u8_rgba *img) {
-    for (auto i = 0; i < atlas_pixel_count; i++) {
-      img[i] = m_data[i];
-    }
-  }
-};
+  return res;
+}

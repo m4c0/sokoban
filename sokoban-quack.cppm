@@ -65,7 +65,12 @@ class renderer {
 
 public:
   void render(const grid &g, unsigned p) {
-    m_il->load_atlas(atlas_col_count, atlas_row_count, atlas{});
+    m_il->load_atlas(atlas_col_count, atlas_row_count, [](auto *rgba) {
+      constexpr const auto atl = atlas();
+      for (auto r8 : atl.data) {
+        *rgba++ = {r8, r8, r8, r8};
+      }
+    });
     m_il->map_all([&](auto all) {
       auto [c, m, _, u] = all;
       auto i = 0U;
