@@ -144,6 +144,7 @@ public:
       };
       extent_loop(dq, sw, [&] {
         pos_buf.submit(dq);
+        inst_buf.submit(dq);
         img.submit(dq);
 
         constexpr const float gw = level_width / 2.0;
