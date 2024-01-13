@@ -1,11 +1,14 @@
 #pragma leco app
 
 export module sokoban;
+import :audio;
 import :game;
 import casein;
 
 extern "C" void casein_handle(const casein::event &e) {
   static game_grid r{};
+
+  streamer::instance();
 
   r.process_event(e);
 
