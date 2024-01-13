@@ -3,7 +3,7 @@ import siaudio;
 
 class streamer : public siaudio::os_streamer {
   volatile unsigned sp = 0;
-  volatile unsigned d = 0;
+  volatile unsigned d = 1;
 
 public:
   void fill_buffer(float *data, unsigned samples) override {
