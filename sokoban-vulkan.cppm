@@ -22,8 +22,8 @@ struct upc {
 };
 
 struct inst {
-  v4 uv;
   v4 colour;
+  v4 uv;
 };
 
 class renderer : public voo::casein_thread {
@@ -131,8 +131,8 @@ public:
           .attributes{
               quad.vertex_attribute(0),
               vee::vertex_attribute_vec2(1, 0),
-              vee::vertex_attribute_vec4(2, sizeof(v4)),
               vee::vertex_attribute_vec4(2, 0),
+              vee::vertex_attribute_vec4(2, sizeof(v4)),
           },
       });
 
@@ -179,8 +179,8 @@ public:
         b = (b == target) ? player_target : player;
       }
       *is++ = inst{
-          .uv = uv(b),
           .colour = colour(b),
+          .uv = uv(b),
       };
       i++;
     }
