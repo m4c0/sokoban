@@ -24,13 +24,14 @@ public:
     }
     sp = ssp;
   }
+
   void play(unsigned div) {
     d = div;
     sp = 0;
   }
-};
 
-void play_sound(unsigned div) {
-  static streamer s{};
-  s.play(div);
-}
+  static auto &instance() {
+    static streamer s{};
+    return s;
+  }
+};

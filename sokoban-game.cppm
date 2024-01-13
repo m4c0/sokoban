@@ -17,7 +17,7 @@ class game_grid {
   void move(unsigned p) {
     switch (auto mt = m_grid.move_type(m_p, p)) {
     case none:
-      play_sound(150);
+      streamer::instance().play(150);
       return;
     case push:
     case push2tgt:
@@ -27,9 +27,9 @@ class game_grid {
       if (m_grid.is_done()) {
         set_level(m_level + 1);
       } else if (mt == push2tgt) {
-        play_sound(100);
+        streamer::instance().play(100);
       } else {
-        play_sound(200);
+        streamer::instance().play(200);
       }
       break;
     case walk:
@@ -51,7 +51,7 @@ public:
       m_p++;
 
     render();
-    play_sound(50);
+    streamer::instance().play(50);
   }
   void reset_level() { set_level(m_level); }
 
