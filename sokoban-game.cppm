@@ -39,6 +39,8 @@ class game_grid {
     render();
   }
 
+  game_grid() = default;
+
 public:
   void set_level(unsigned idx) {
     m_level = idx % max_levels;
@@ -59,4 +61,9 @@ public:
   void up() { move(-width); }
   void left() { move(-1); }
   void right() { move(1); }
+
+  static auto &instance() {
+    static game_grid i{};
+    return i;
+  }
 };
