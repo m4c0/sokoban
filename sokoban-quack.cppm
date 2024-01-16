@@ -4,10 +4,10 @@ import :grid;
 import :levels;
 import casein;
 import quack;
+import voo;
 
-class renderer {
-  quack::renderer m_r{1};
-  quack::ilayout m_il{&m_r, level_width *level_height};
+class renderer : public voo::casein_thread {
+  static constexpr auto max_quads = level_width * level_height;
 
   static constexpr auto uv(atlas_sprites s) {
     constexpr const auto h = 1.0f / static_cast<float>(sprite_count);
@@ -46,6 +46,8 @@ class renderer {
     return quack::colour{1, 0, 1, 1};
   }
 
+  quack::instance_batch *m_il;
+
   renderer() = default;
 
   void setup() {
@@ -60,16 +62,18 @@ class renderer {
         }
       }
     });
-  };
-
-public:
-  void render(const grid &g, unsigned p) {
     m_il->load_atlas(atlas_col_count, atlas_row_count, [](auto *rgba) {
       constexpr const auto atl = atlas();
       for (auto r8 : atl.data) {
         *rgba++ = {r8, r8, r8, r8};
       }
     });
+  };
+
+public:
+  void render(const grid &g, unsigned p) {
+    auto lck = wait_init();
+
     m_il->map_all([&](auto all) {
       auto [c, m, _, u] = all;
       auto i = 0U;
@@ -85,12 +89,28 @@ public:
     });
   }
 
-  void process_event(const auto &e) {
-    m_r.process_event(e);
-    m_il.process_event(e);
+  void run() override {
+    voo::device_and_queue dq{"sokoban", native_ptr()};
 
-    if (e.type() == casein::CREATE_WINDOW) {
+    while (!interrupted()) {
+      voo::swapchain_and_stuff sw{dq};
+
+      quack::pipeline_stuff ps{dq, sw, 1};
+      auto ib = ps.create_batch(max_quads);
+
+      m_il = &ib;
       setup();
+      release_init_lock();
+
+      extent_loop([&] {
+        sw.acquire_next_image();
+        ib.submit_buffers(dq.queue());
+        sw.one_time_submit(dq, [&](auto &pcb) {
+          auto scb = sw.cmd_render_pass(pcb);
+          ps.run(*scb, ib);
+        });
+        sw.queue_present(dq);
+      });
     }
   }
 
