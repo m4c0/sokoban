@@ -9,8 +9,7 @@ extern "C" void casein_handle(const casein::event &e) {
   static game_grid r{};
 
   streamer::instance();
-
-  r.process_event(e);
+  renderer::instance().handle(e);
 
   switch (e.type()) {
   case casein::CREATE_WINDOW:

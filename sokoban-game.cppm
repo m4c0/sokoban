@@ -59,6 +59,4 @@ public:
   void up() { move(-width); }
   void left() { move(-1); }
   void right() { move(1); }
-
-  void process_event(const auto &e) { renderer::instance().process_event(e); }
 };

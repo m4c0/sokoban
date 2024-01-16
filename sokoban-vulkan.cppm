@@ -195,8 +195,6 @@ public:
     m_aspect = sw / sh;
   }
 
-  void process_event(const casein::event &e) { handle(e); }
-
   static auto &instance() noexcept {
     static renderer r{};
     return r;
