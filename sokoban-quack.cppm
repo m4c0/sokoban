@@ -138,7 +138,10 @@ public:
       voo::swapchain_and_stuff sw{dq};
 
       extent_loop(dq.queue(), sw, [&] {
-        u.run_once();
+        if (m_dirty) {
+          u.run_once();
+          m_dirty = false;
+        }
 
         auto upc = quack::adjust_aspect(rpc, sw.aspect());
         sw.queue_one_time_submit(dq.queue(), [&](auto pcb) {
