@@ -127,6 +127,8 @@ public:
     updater u{&dq, ps};
 
     atlas_img a{&dq};
+    a.run_once();
+
     auto smp = vee::create_sampler(vee::nearest_sampler);
     auto dset = ps.allocate_descriptor_set(a.iv(), *smp);
 
