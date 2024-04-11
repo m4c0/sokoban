@@ -133,7 +133,7 @@ public:
     auto dset = ps.allocate_descriptor_set(a.iv(), *smp);
 
     quack::upc rpc{};
-    rpc.grid_size = {level_width, level_width};
+    rpc.grid_size = {level_width, level_height};
     rpc.grid_pos = rpc.grid_size / 2.0;
 
     while (!interrupted()) {
