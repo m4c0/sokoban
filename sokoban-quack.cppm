@@ -4,10 +4,39 @@ import :grid;
 import :levels;
 import casein;
 import quack;
+import vee;
 import voo;
 
-class renderer : public voo::casein_thread {
+class atlas_img : public voo::update_thread {
+  voo::h2l_image m_img;
+
+  void build_cmd_buf(vee::command_buffer cb) override {
+    voo::cmd_buf_one_time_submit pcb{cb};
+    m_img.setup_copy(cb);
+  }
+
+public:
+  atlas_img(voo::device_and_queue *dq)
+      : update_thread{dq->queue()}
+      , m_img{dq->physical_device(), atlas_col_count, atlas_row_count} {
+    constexpr const auto atl = atlas();
+
+    voo::mapmem m{m_img.host_memory()};
+    auto *rgba = static_cast<quack::u8_rgba *>(*m);
+    for (auto r8 : atl.data) {
+      *rgba++ = {r8, r8, r8, r8};
+    }
+  }
+
+  [[nodiscard]] constexpr auto iv() const noexcept { return m_img.iv(); }
+
+  using update_thread::run_once;
+};
+
+class updater : public voo::update_thread {
   static constexpr auto max_quads = level_width * level_height;
+
+  quack::instance_batch m_ib;
 
   static constexpr auto uv(atlas_sprites s) {
     constexpr const auto h = 1.0f / static_cast<float>(sprite_count);
@@ -46,35 +75,8 @@ class renderer : public voo::casein_thread {
     return quack::colour{1, 0, 1, 1};
   }
 
-  quack::instance_batch *m_il;
-
-  renderer() = default;
-
-  void setup() {
-    m_il->set_grid(level_width, level_height);
-    m_il->center_at(level_width / 2, level_height / 2);
-    m_il->set_count(level_width * level_height);
-    m_il->map_positions([](auto *is) {
-      unsigned i = 0;
-      for (float y = 0; y < level_height; y++) {
-        for (float x = 0; x < level_width; x++, i++) {
-          is[i] = {{x, y}, {1, 1}};
-        }
-      }
-    });
-    m_il->load_atlas(atlas_col_count, atlas_row_count, [](auto *rgba) {
-      constexpr const auto atl = atlas();
-      for (auto r8 : atl.data) {
-        *rgba++ = {r8, r8, r8, r8};
-      }
-    });
-  };
-
-public:
-  void render(const grid &g, unsigned p) {
-    auto lck = wait_init();
-
-    m_il->map_all([&](auto all) {
+  void build_cmd_buf(vee::command_buffer cb) override {
+    m_ib.map_all([&](auto all) {
       auto [c, m, _, u] = all;
       auto i = 0U;
       for (char b : g) {
@@ -87,26 +89,62 @@ public:
         i++;
       }
     });
+
+    voo::cmd_buf_one_time_submit pcb{cb};
+    m_ib.setup_copy(cb);
   }
 
+public:
+  explicit updater(voo::device_and_queue *dq, quack::pipeline_stuff &ps)
+      : update_thread{dq->queue()}
+      , m_ib{ps.create_batch(max_quads)} {
+    m_ib.map_positions([](auto *is) {
+      unsigned i = 0;
+      for (float y = 0; y < level_height; y++) {
+        for (float x = 0; x < level_width; x++, i++) {
+          is[i] = {{x, y}, {1, 1}};
+        }
+      }
+    });
+  }
+
+  [[nodiscard]] constexpr auto &batch() noexcept { return m_ib; }
+
+  void render(const grid &g, unsigned p) {}
+
+  using update_thread::run_once;
+};
+
+class renderer : public voo::casein_thread {
+  renderer() = default;
+
+public:
   void run() override {
     voo::device_and_queue dq{"sokoban", native_ptr()};
+    quack::pipeline_stuff ps{dq, 1};
+    updater u{&dq, ps};
+
+    atlas_img a{&dq};
+    auto smp = vee::create_sampler(vee::nearest_sampler);
+    auto dset = ps.allocate_descriptor_set(a.iv(), *smp);
+
+    quack::upc rpc{};
+    rpc.grid_size = {level_width, level_width};
+    rpc.grid_pos = rpc.grid_size / 2.0;
 
     while (!interrupted()) {
       voo::swapchain_and_stuff sw{dq};
 
-      quack::pipeline_stuff ps{dq, sw, 1};
-      auto ib = ps.create_batch(max_quads);
-
-      m_il = &ib;
-      setup();
-      release_init_lock();
-
-      extent_loop(dq, sw, [&] {
-        ib.submit_buffers(dq.queue());
-        sw.one_time_submit(dq, [&](auto &pcb) {
+      extent_loop(dq.queue(), sw, [&] {
+        auto upc = quack::adjust_aspect(rpc, sw.aspect());
+        sw.queue_one_time_submit(dq.queue(), [&](auto pcb) {
           auto scb = sw.cmd_render_pass(pcb);
-          ps.run(*scb, ib);
+          vee::cmd_set_viewport(*scb, sw.extent());
+          vee::cmd_set_scissor(*scb, sw.extent());
+          u.batch().build_commands(*pcb);
+          ps.cmd_bind_descriptor_set(*scb, dset);
+          ps.cmd_push_vert_frag_constants(*scb, upc);
+          ps.run(*scb, level_width * level_height);
         });
       });
     }
