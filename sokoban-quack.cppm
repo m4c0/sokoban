@@ -79,8 +79,8 @@ class updater : public voo::update_thread {
     m_ib.map_all([&](auto all) {
       auto [c, m, _, u] = all;
       auto i = 0U;
-      for (char b : g) {
-        if (p == i) {
+      for (char b : grid::instance()) {
+        if (grid::instance().player_pos() == i) {
           b = (b == target) ? player_target : player;
         }
         *u++ = uv(b);
@@ -110,15 +110,17 @@ public:
 
   [[nodiscard]] constexpr auto &batch() noexcept { return m_ib; }
 
-  void render(const grid &g, unsigned p) {}
-
   using update_thread::run_once;
 };
 
 class renderer : public voo::casein_thread {
+  volatile bool m_dirty{};
+
   renderer() = default;
 
 public:
+  void render() { m_dirty = true; };
+
   void run() override {
     voo::device_and_queue dq{"sokoban", native_ptr()};
     quack::pipeline_stuff ps{dq, 1};
@@ -136,6 +138,8 @@ public:
       voo::swapchain_and_stuff sw{dq};
 
       extent_loop(dq.queue(), sw, [&] {
+        u.run_once();
+
         auto upc = quack::adjust_aspect(rpc, sw.aspect());
         sw.queue_one_time_submit(dq.queue(), [&](auto pcb) {
           auto scb = sw.cmd_render_pass(pcb);

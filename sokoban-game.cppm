@@ -6,13 +6,13 @@ import :levels;
 import :quack;
 
 class game_grid {
-  grid m_grid{};
-  unsigned m_p{};
+  grid &m_grid = grid::instance();
+  unsigned &m_p = grid::instance().player_pos();
   unsigned m_level{};
 
   static constexpr const auto width = level_width;
 
-  void render() { renderer::instance().render(m_grid, m_p); }
+  void render() { renderer::instance().render(); }
 
   void move(unsigned p) {
     switch (auto mt = m_grid.move_type(m_p, p)) {
