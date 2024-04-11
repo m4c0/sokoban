@@ -10,26 +10,24 @@ jobs:
       matrix:
         os:
           - macos-latest
+          - ubuntu-latest
           - windows-latest
     runs-on: ${{ matrix.os }}
     steps:
-      - name: 🧰 Setup ECOW
-        uses: m4c0/ecow/.github/actions/setup@main
-      - name: 🧴 Setup Casein
-        uses: m4c0/casein/.github/actions/deps@main
-      - name: 🦆 Setup Quack
-        uses: m4c0/quack/.github/actions/deps@main
-      - name: 🔈 Setup Siaudio
-        uses: m4c0/siaudio/.github/actions/deps@main
+      - name: 🧰 Setup
+        uses: m4c0/leco/.github/actions/setup@main
+      - name: 🧀 Prepare Environment
+        run: |
+          git clone --depth=1 https://github.com/m4c0/casein.git
+          git clone --depth=1 https://github.com/m4c0/quack.git
+          git clone --depth=1 https://github.com/m4c0/siaudio.git
+          git clone --depth=1 https://github.com/m4c0/silog.git
+          git clone --depth=1 https://github.com/m4c0/sires.git
+          git clone --depth=1 https://github.com/m4c0/sokoban.git
+          git clone --depth=1 https://github.com/m4c0/wagen.git
+          git clone --depth=1 https://github.com/m4c0/vee.git
+          git clone --depth=1 https://github.com/m4c0/voo.git
       - name: 🖖 Install glslang
         uses: m4c0/vee/.github/actions/glslang@main
-      - name: 🛒 Checkout Sokoban
-        uses: actions/checkout@v3
-        with:
-          repository: m4c0/sokoban
-          path: sokoban
       - name: 🔨 Build
-        uses: m4c0/ecow/.github/actions/compile@main
-        with:
-          project: sokoban
-
+        run: ./leco/leco.exe -C sokoban -v
