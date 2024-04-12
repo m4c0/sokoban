@@ -19,14 +19,25 @@ jobs:
       - name: 🧀 Prepare Environment
         run: |
           git clone --depth=1 https://github.com/m4c0/casein.git
+          git clone --depth=1 https://github.com/m4c0/dotz.git
+          git clone --depth=1 https://github.com/m4c0/jute.git
+          git clone --depth=1 https://github.com/m4c0/hai.git
+          git clone --depth=1 https://github.com/m4c0/missingno.git
+          git clone --depth=1 https://github.com/m4c0/mtx.git
+          git clone --depth=1 https://github.com/m4c0/no.git
           git clone --depth=1 https://github.com/m4c0/quack.git
           git clone --depth=1 https://github.com/m4c0/siaudio.git
           git clone --depth=1 https://github.com/m4c0/silog.git
           git clone --depth=1 https://github.com/m4c0/sires.git
+          git clone --depth=1 https://github.com/m4c0/sitime.git
+          git clone --depth=1 https://github.com/m4c0/sith.git
           git clone --depth=1 https://github.com/m4c0/sokoban.git
+          git clone --depth=1 https://github.com/m4c0/stubby.git
+          git clone --depth=1 https://github.com/m4c0/traits.git
           git clone --depth=1 https://github.com/m4c0/wagen.git
           git clone --depth=1 https://github.com/m4c0/vee.git
           git clone --depth=1 https://github.com/m4c0/voo.git
+          git clone --depth=1 https://github.com/m4c0/yoyo.git
       - name: 🖖 Install glslang
         uses: m4c0/vee/.github/actions/glslang@main
       - name: 🔨 Build
