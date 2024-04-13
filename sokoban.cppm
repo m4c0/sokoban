@@ -7,8 +7,6 @@ import casein;
 import quack;
 
 class events : public casein::handler {
-  events() = default;
-
 public:
   void create_window(const casein::events::create_window &e) override {
     game_grid::instance().set_level(0);
@@ -37,16 +35,13 @@ public:
     }();
     map.handle(e);
   }
-
-  static auto &instance() {
-    static events i{};
-    return i;
-  }
 };
 
 extern "C" void casein_handle(const casein::event &e) {
+  static events evt{};
+
   streamer::instance();
   quack::mouse_tracker::instance().handle(e);
   renderer::instance().handle(e);
-  events::instance().handle(e);
+  evt.handle(e);
 }
