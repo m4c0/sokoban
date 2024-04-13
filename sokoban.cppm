@@ -16,28 +16,46 @@ public:
     m_game->set_level(0);
   }
   void gesture(const casein::events::gesture &e) override {
-    const auto map = [this] {
-      casein::gesture_map res{m_game};
-      res[casein::G_SWIPE_UP] = &game_grid::up;
-      res[casein::G_SWIPE_DOWN] = &game_grid::down;
-      res[casein::G_SWIPE_LEFT] = &game_grid::left;
-      res[casein::G_SWIPE_RIGHT] = &game_grid::right;
-      res[casein::G_SHAKE] = &game_grid::reset_level;
-      return res;
-    }();
-    map.handle(e);
+    switch (*e) {
+    case casein::G_SWIPE_UP:
+      m_game->up();
+      break;
+    case casein::G_SWIPE_DOWN:
+      m_game->down();
+      break;
+    case casein::G_SWIPE_LEFT:
+      m_game->left();
+      break;
+    case casein::G_SWIPE_RIGHT:
+      m_game->right();
+      break;
+    case casein::G_SHAKE:
+      m_game->reset_level();
+      break;
+    default:
+      break;
+    }
   }
   void key_down(const casein::events::key_down &e) override {
-    const auto map = [this] {
-      casein::key_down_map res{m_game};
-      res[casein::K_UP] = &game_grid::up;
-      res[casein::K_DOWN] = &game_grid::down;
-      res[casein::K_LEFT] = &game_grid::left;
-      res[casein::K_RIGHT] = &game_grid::right;
-      res[casein::K_SPACE] = &game_grid::reset_level;
-      return res;
-    }();
-    map.handle(e);
+    switch (*e) {
+    case casein::K_UP:
+      m_game->up();
+      break;
+    case casein::K_DOWN:
+      m_game->down();
+      break;
+    case casein::K_LEFT:
+      m_game->left();
+      break;
+    case casein::K_RIGHT:
+      m_game->right();
+      break;
+    case casein::K_SPACE:
+      m_game->reset_level();
+      break;
+    default:
+      break;
+    }
   }
 };
 
