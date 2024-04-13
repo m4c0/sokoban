@@ -7,13 +7,17 @@ import casein;
 import quack;
 
 class events : public casein::handler {
+  game_grid *m_game;
+
 public:
+  constexpr explicit events(game_grid *g) : m_game{g} {}
+
   void create_window(const casein::events::create_window &e) override {
-    game_grid::instance().set_level(0);
+    m_game->set_level(0);
   }
   void gesture(const casein::events::gesture &e) override {
-    static const auto map = [] {
-      casein::gesture_map res{&game_grid::instance()};
+    const auto map = [this] {
+      casein::gesture_map res{m_game};
       res[casein::G_SWIPE_UP] = &game_grid::up;
       res[casein::G_SWIPE_DOWN] = &game_grid::down;
       res[casein::G_SWIPE_LEFT] = &game_grid::left;
@@ -24,8 +28,8 @@ public:
     map.handle(e);
   }
   void key_down(const casein::events::key_down &e) override {
-    static const auto map = [] {
-      casein::key_down_map res{&game_grid::instance()};
+    const auto map = [this] {
+      casein::key_down_map res{m_game};
       res[casein::K_UP] = &game_grid::up;
       res[casein::K_DOWN] = &game_grid::down;
       res[casein::K_LEFT] = &game_grid::left;
@@ -38,7 +42,8 @@ public:
 };
 
 extern "C" void casein_handle(const casein::event &e) {
-  static events evt{};
+  static game_grid game{};
+  static events evt{&game};
 
   streamer::instance();
   quack::mouse_tracker::instance().handle(e);
