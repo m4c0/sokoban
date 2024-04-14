@@ -1,36 +1,43 @@
 #pragma leco app
+#pragma leco add_impl game_grid
 
 export module sokoban;
 import :audio;
-import :game;
+import :quack;
 import casein;
 import quack;
 
+namespace sokoban::game_grid {
+void set_level(unsigned);
+void reset_level();
+
+void down();
+void up();
+void left();
+void right();
+} // namespace sokoban::game_grid
+
 class events : public casein::handler {
-  game_grid *m_game;
-
 public:
-  constexpr explicit events(game_grid *g) : m_game{g} {}
-
   void create_window(const casein::events::create_window &e) override {
-    m_game->set_level(0);
+    sokoban::game_grid::set_level(0);
   }
   void gesture(const casein::events::gesture &e) override {
     switch (*e) {
     case casein::G_SWIPE_UP:
-      m_game->up();
+      sokoban::game_grid::up();
       break;
     case casein::G_SWIPE_DOWN:
-      m_game->down();
+      sokoban::game_grid::down();
       break;
     case casein::G_SWIPE_LEFT:
-      m_game->left();
+      sokoban::game_grid::left();
       break;
     case casein::G_SWIPE_RIGHT:
-      m_game->right();
+      sokoban::game_grid::right();
       break;
     case casein::G_SHAKE:
-      m_game->reset_level();
+      sokoban::game_grid::reset_level();
       break;
     default:
       break;
@@ -39,19 +46,19 @@ public:
   void key_down(const casein::events::key_down &e) override {
     switch (*e) {
     case casein::K_UP:
-      m_game->up();
+      sokoban::game_grid::up();
       break;
     case casein::K_DOWN:
-      m_game->down();
+      sokoban::game_grid::down();
       break;
     case casein::K_LEFT:
-      m_game->left();
+      sokoban::game_grid::left();
       break;
     case casein::K_RIGHT:
-      m_game->right();
+      sokoban::game_grid::right();
       break;
     case casein::K_SPACE:
-      m_game->reset_level();
+      sokoban::game_grid::reset_level();
       break;
     default:
       break;
@@ -60,8 +67,7 @@ public:
 };
 
 extern "C" void casein_handle(const casein::event &e) {
-  static game_grid game{};
-  static events evt{&game};
+  static events evt{};
 
   streamer::instance();
   quack::mouse_tracker::instance().handle(e);
