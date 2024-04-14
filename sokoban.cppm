@@ -22,7 +22,7 @@ void process_event(const casein::event &e);
 void render();
 } // namespace sokoban::renderer
 
-class events : public casein::handler {
+static class : public casein::handler {
 public:
   void create_window(const casein::events::create_window &e) override {
     sokoban::game_grid::set_level(0);
@@ -69,11 +69,9 @@ public:
       break;
     }
   }
-};
+} evt;
 
 extern "C" void casein_handle(const casein::event &e) {
-  static events evt{};
-
   streamer::instance();
   quack::mouse_tracker::instance().handle(e);
   sokoban::renderer::process_event(e);
