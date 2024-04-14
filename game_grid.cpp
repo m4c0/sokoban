@@ -1,9 +1,4 @@
 module sokoban;
-import :atlas;
-import :audio;
-import :grid;
-import :levels;
-import :quack;
 
 namespace sgg = sokoban::game_grid;
 
