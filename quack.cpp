@@ -1,4 +1,4 @@
-export module sokoban:quack;
+module sokoban;
 import :atlas;
 import :grid;
 import :levels;
@@ -113,14 +113,8 @@ public:
   using update_thread::run_once;
 };
 
-class renderer : public voo::casein_thread {
-  volatile bool m_dirty{};
-
-  renderer() = default;
-
-public:
-  void render() { m_dirty = true; };
-
+static volatile bool dirty{true};
+static struct : public voo::casein_thread {
   void run() override {
     voo::device_and_queue dq{"sokoban", native_ptr()};
     quack::pipeline_stuff ps{dq, 1};
@@ -140,9 +134,9 @@ public:
       voo::swapchain_and_stuff sw{dq};
 
       extent_loop(dq.queue(), sw, [&] {
-        if (m_dirty) {
+        if (dirty) {
           u.run_once();
-          m_dirty = false;
+          dirty = false;
         }
 
         auto upc = quack::adjust_aspect(rpc, sw.aspect());
@@ -158,9 +152,7 @@ public:
       });
     }
   }
+} r;
 
-  static auto &instance() noexcept {
-    static renderer r{};
-    return r;
-  }
-};
+void sokoban::renderer::render() { dirty = true; }
+void sokoban::renderer::process_event(const casein::event &e) { r.handle(e); }

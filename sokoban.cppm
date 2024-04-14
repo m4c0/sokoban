@@ -1,9 +1,9 @@
 #pragma leco app
 #pragma leco add_impl game_grid
+#pragma leco add_impl quack
 
 export module sokoban;
 import :audio;
-import :quack;
 import casein;
 import quack;
 
@@ -16,6 +16,11 @@ void up();
 void left();
 void right();
 } // namespace sokoban::game_grid
+
+namespace sokoban::renderer {
+void process_event(const casein::event &e);
+void render();
+} // namespace sokoban::renderer
 
 class events : public casein::handler {
 public:
@@ -71,6 +76,6 @@ extern "C" void casein_handle(const casein::event &e) {
 
   streamer::instance();
   quack::mouse_tracker::instance().handle(e);
-  renderer::instance().handle(e);
+  sokoban::renderer::process_event(e);
   evt.handle(e);
 }
