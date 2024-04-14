@@ -7,15 +7,15 @@ import :quack;
 
 namespace sgg = sokoban::game_grid;
 
-grid &m_grid = grid::instance();
-unsigned &m_p = grid::instance().player_pos();
-unsigned m_level{};
+static grid &m_grid = grid::instance();
+static unsigned &m_p = grid::instance().player_pos();
+static unsigned m_level{};
 
 static constexpr const auto width = level_width;
 
-void render() { renderer::instance().render(); }
+static void render() { renderer::instance().render(); }
 
-void move(unsigned p) {
+static void move(unsigned p) {
   switch (auto mt = m_grid.move_type(m_p, p)) {
   case none:
     streamer::instance().play(150);
