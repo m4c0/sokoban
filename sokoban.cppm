@@ -1,5 +1,6 @@
 #pragma leco app
 #pragma leco add_impl game_grid
+#pragma leco add_impl levels
 #pragma leco add_impl quack
 
 export module sokoban;
@@ -16,6 +17,13 @@ void up();
 void left();
 void right();
 } // namespace sokoban::game_grid
+
+namespace sokoban::levels {
+extern const unsigned level_width;
+extern const unsigned level_height;
+unsigned max_levels();
+const char *level(unsigned);
+} // namespace sokoban::levels
 
 namespace sokoban::renderer {
 void process_event(const casein::event &e);

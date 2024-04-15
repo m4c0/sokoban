@@ -4,7 +4,6 @@
 export module sokoban:vulkan;
 import :atlas;
 import :grid;
-import :levels;
 import casein;
 import vee;
 import voo;

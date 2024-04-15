@@ -1,15 +1,13 @@
 module sokoban;
 import :grid;
-import :levels;
 
 namespace sgg = sokoban::game_grid;
+namespace sl = sokoban::levels;
 namespace sr = sokoban::renderer;
 
 static grid &m_grid = grid::instance();
 static unsigned &m_p = grid::instance().player_pos();
 static unsigned m_level{};
-
-static constexpr const auto width = level_width;
 
 static void move(unsigned p) {
   switch (auto mt = m_grid.move_type(m_p, p)) {
@@ -37,9 +35,9 @@ static void move(unsigned p) {
 }
 
 void sgg::set_level(unsigned idx) {
-  m_level = idx % max_levels;
+  m_level = idx % sl::max_levels();
 
-  auto lvl = levels[idx];
+  auto lvl = sl::level(idx);
   m_grid.load(lvl);
 
   m_p = 0;
@@ -51,7 +49,7 @@ void sgg::set_level(unsigned idx) {
 }
 void sgg::reset_level() { set_level(m_level); }
 
-void sgg::down() { move(width); }
-void sgg::up() { move(-width); }
+void sgg::down() { move(sl::level_width); }
+void sgg::up() { move(-sl::level_width); }
 void sgg::left() { move(-1); }
 void sgg::right() { move(1); }

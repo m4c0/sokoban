@@ -1,11 +1,12 @@
 module sokoban;
 import :atlas;
 import :grid;
-import :levels;
 import casein;
 import quack;
 import vee;
 import voo;
+
+namespace sl = sokoban::levels;
 
 class atlas_img : public voo::update_thread {
   voo::h2l_image m_img;
@@ -34,8 +35,6 @@ public:
 };
 
 class updater : public voo::update_thread {
-  static constexpr auto max_quads = level_width * level_height;
-
   quack::instance_batch m_ib;
 
   static constexpr auto uv(atlas_sprites s) {
@@ -97,11 +96,11 @@ class updater : public voo::update_thread {
 public:
   explicit updater(voo::device_and_queue *dq, quack::pipeline_stuff &ps)
       : update_thread{dq->queue()}
-      , m_ib{ps.create_batch(max_quads)} {
+      , m_ib{ps.create_batch(sl::level_width * sl::level_height)} {
     m_ib.map_positions([](auto *is) {
       unsigned i = 0;
-      for (float y = 0; y < level_height; y++) {
-        for (float x = 0; x < level_width; x++, i++) {
+      for (float y = 0; y < sl::level_height; y++) {
+        for (float x = 0; x < sl::level_width; x++, i++) {
           is[i] = {{x, y}, {1, 1}};
         }
       }
@@ -127,7 +126,7 @@ static struct : public voo::casein_thread {
     auto dset = ps.allocate_descriptor_set(a.iv(), *smp);
 
     quack::upc rpc{};
-    rpc.grid_size = {level_width, level_height};
+    rpc.grid_size = {sl::level_width, sl::level_height};
     rpc.grid_pos = rpc.grid_size / 2.0;
 
     while (!interrupted()) {
@@ -147,7 +146,7 @@ static struct : public voo::casein_thread {
           u.batch().build_commands(*pcb);
           ps.cmd_bind_descriptor_set(*scb, dset);
           ps.cmd_push_vert_frag_constants(*scb, upc);
-          ps.run(*scb, level_width * level_height);
+          ps.run(*scb, sl::level_width * sl::level_height);
         });
       });
     }

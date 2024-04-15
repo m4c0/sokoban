@@ -1,7 +1,9 @@
-export module sokoban:levels;
+module sokoban;
 
-static constexpr const auto level_width = 24;
-static constexpr const auto level_height = 12;
+namespace sl = sokoban::levels;
+
+const unsigned sl::level_width = 24;
+const unsigned sl::level_height = 12;
 
 static constexpr const char *level_1 = "                        "
                                        "           XXXXX        "
@@ -42,3 +44,6 @@ static constexpr const char *level_3 = "                        "
 
 static constexpr const auto max_levels = 3;
 static constexpr const char *levels[max_levels] = {level_1, level_2, level_3};
+
+unsigned sl::max_levels() { return ::max_levels; }
+const char *sl::level(unsigned l) { return ::levels[l]; }
