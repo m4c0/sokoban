@@ -5,6 +5,7 @@
 
 export module sokoban;
 import :audio;
+import :grid;
 import casein;
 import quack;
 
@@ -29,6 +30,11 @@ namespace sokoban::renderer {
 void process_event(const casein::event &e);
 void render();
 } // namespace sokoban::renderer
+
+namespace sokoban::game {
+extern class grid grid;
+extern unsigned player_pos;
+} // namespace sokoban::game
 
 static class : public casein::handler {
 public:
@@ -85,3 +91,10 @@ extern "C" void casein_handle(const casein::event &e) {
   sokoban::renderer::process_event(e);
   evt.handle(e);
 }
+
+module :private;
+
+namespace sokoban::game {
+class grid grid {};
+unsigned player_pos{};
+} // namespace sokoban::game

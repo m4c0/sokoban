@@ -6,6 +6,7 @@ import quack;
 import vee;
 import voo;
 
+namespace sg = sokoban::game;
 namespace sl = sokoban::levels;
 
 class updater : public voo::update_thread {
@@ -52,8 +53,8 @@ class updater : public voo::update_thread {
     m_ib.map_all([&](auto all) {
       auto [c, m, _, u] = all;
       auto i = 0U;
-      for (char b : grid::instance()) {
-        if (grid::instance().player_pos() == i) {
+      for (char b : sg::grid) {
+        if (sg::player_pos == i) {
           b = (b == target) ? player_target : player;
         }
         *u++ = uv(b);

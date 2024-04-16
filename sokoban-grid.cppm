@@ -16,7 +16,6 @@ enum move_type { push, walk, none, push2tgt };
 class grid {
   blocks m_buf[1024]{};
   blocks *m_end{};
-  unsigned m_p;
 
 public:
   constexpr void load(const char *l) {
@@ -69,12 +68,5 @@ public:
   }
   constexpr void clear_box(unsigned p) {
     m_buf[p] = (m_buf[p] == target_box) ? target : empty;
-  }
-
-  [[nodiscard]] constexpr auto &player_pos() noexcept { return m_p; }
-
-  static auto &instance() {
-    static grid i{};
-    return i;
   }
 };
