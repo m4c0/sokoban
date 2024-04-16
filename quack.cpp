@@ -8,32 +8,6 @@ import voo;
 
 namespace sl = sokoban::levels;
 
-class atlas_img : public voo::update_thread {
-  voo::h2l_image m_img;
-
-  void build_cmd_buf(vee::command_buffer cb) override {
-    voo::cmd_buf_one_time_submit pcb{cb};
-    m_img.setup_copy(cb);
-  }
-
-public:
-  atlas_img(voo::device_and_queue *dq)
-      : update_thread{dq->queue()}
-      , m_img{dq->physical_device(), atlas_col_count, atlas_row_count} {
-    constexpr const auto atl = atlas();
-
-    voo::mapmem m{m_img.host_memory()};
-    auto *rgba = static_cast<quack::u8_rgba *>(*m);
-    for (auto r8 : atl.data) {
-      *rgba++ = {r8, r8, r8, r8};
-    }
-  }
-
-  [[nodiscard]] constexpr auto iv() const noexcept { return m_img.iv(); }
-
-  using update_thread::run_once;
-};
-
 class updater : public voo::update_thread {
   quack::instance_batch m_ib;
 
