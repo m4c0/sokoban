@@ -53,6 +53,7 @@ void up() { move(-sl::level_width); }
 void left() { move(-1); }
 void right() { move(1); }
 
+// TODO: use casein's map<void>
 static class : public casein::handler {
 public:
   void create_window(const casein::events::create_window &e) override {
