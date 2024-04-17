@@ -83,7 +83,9 @@ static struct : public voo::casein_thread {
     quack::instance_batch_thread u{dq.queue(), ps.create_batch(max_quads()),
                                    &update_data};
 
-    atlas_img a{&dq};
+    auto a =
+        voo::updater_thread{dq.queue(), &update_atlas, dq.physical_device(),
+                            atlas_col_count, atlas_row_count};
     a.run_once();
 
     auto smp = vee::create_sampler(vee::nearest_sampler);
