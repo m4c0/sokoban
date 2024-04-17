@@ -9,9 +9,7 @@ import voo;
 namespace sg = sokoban::game;
 namespace sl = sokoban::levels;
 
-class updater : public voo::update_thread {
-  quack::instance_batch m_ib;
-
+class updater : public quack::instance_batch_thread {
   // {{{ quad map utils
   static constexpr auto uv(atlas_sprites s) {
     constexpr const auto h = 1.0f / static_cast<float>(sprite_count);
@@ -51,8 +49,8 @@ class updater : public voo::update_thread {
   }
   // }}}
 
-  void build_cmd_buf(vee::command_buffer cb) override {
-    m_ib.map_all([&](auto all) {
+  void map_data(instance_batch *ib) override {
+    ib->map_all([&](auto all) {
       auto [c, m, p, u] = all;
       // {{{ quad memory map
       auto i = 0U;
@@ -70,9 +68,6 @@ class updater : public voo::update_thread {
       }
       // }}}
     });
-
-    voo::cmd_buf_one_time_submit pcb{cb};
-    m_ib.setup_copy(cb);
   }
 
 public:
@@ -81,12 +76,7 @@ public:
   // }}}
 
   explicit updater(voo::device_and_queue *dq, quack::pipeline_stuff &ps)
-      : update_thread{dq->queue()}
-      , m_ib{ps.create_batch(max_quads())} {}
-
-  [[nodiscard]] constexpr auto &batch() noexcept { return m_ib; }
-
-  using update_thread::run_once;
+      : instance_batch_thread{dq->queue(), ps.create_batch(max_quads())} {}
 };
 
 static volatile bool dirty{true};
