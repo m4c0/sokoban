@@ -49,7 +49,7 @@ class updater : public quack::instance_batch_thread {
   }
   // }}}
 
-  void map_all(all all) override {
+  void update_data(all all) override {
     auto [c, m, p, u] = all;
     // {{{ quad memory map
     auto i = 0U;
@@ -117,7 +117,7 @@ static struct : public voo::casein_thread {
           auto scb = sw.cmd_render_pass(pcb);
           vee::cmd_set_viewport(*scb, sw.extent());
           vee::cmd_set_scissor(*scb, sw.extent());
-          u.batch().build_commands(*pcb);
+          u.data().build_commands(*pcb);
           ps.cmd_bind_descriptor_set(*scb, dset);
           ps.cmd_push_vert_frag_constants(*scb, upc);
           ps.run(*scb, quad_count);
