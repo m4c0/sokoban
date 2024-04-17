@@ -49,25 +49,23 @@ class updater : public quack::instance_batch_thread {
   }
   // }}}
 
-  void map_data(instance_batch *ib) override {
-    ib->map_all([&](auto all) {
-      auto [c, m, p, u] = all;
-      // {{{ quad memory map
-      auto i = 0U;
-      for (char b : sg::grid) {
-        if (sg::player_pos == i) {
-          b = (b == target) ? player_target : player;
-        }
-        float x = i % sl::level_width;
-        float y = i / sl::level_width;
-        *p++ = {{x, y}, {1, 1}};
-        *u++ = uv(b);
-        *c++ = colour(b);
-        *m++ = quack::colour{1, 1, 1, 1};
-        i++;
+  void map_all(all all) override {
+    auto [c, m, p, u] = all;
+    // {{{ quad memory map
+    auto i = 0U;
+    for (char b : sg::grid) {
+      if (sg::player_pos == i) {
+        b = (b == target) ? player_target : player;
       }
-      // }}}
-    });
+      float x = i % sl::level_width;
+      float y = i / sl::level_width;
+      *p++ = {{x, y}, {1, 1}};
+      *u++ = uv(b);
+      *c++ = colour(b);
+      *m++ = quack::colour{1, 1, 1, 1};
+      i++;
+    }
+    // }}}
   }
 
 public:
