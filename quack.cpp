@@ -92,7 +92,7 @@ static struct : public voo::casein_thread {
     a.run_once();
 
     auto smp = vee::create_sampler(vee::nearest_sampler);
-    auto dset = ps.allocate_descriptor_set(a.iv(), *smp);
+    auto dset = ps.allocate_descriptor_set(a.data().iv(), *smp);
 
     quack::upc rpc{};
     // {{{ grid size/pos
