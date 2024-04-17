@@ -12,6 +12,7 @@ namespace sl = sokoban::levels;
 class updater : public voo::update_thread {
   quack::instance_batch m_ib;
 
+  // {{{ quad map utils
   static constexpr auto uv(atlas_sprites s) {
     constexpr const auto h = 1.0f / static_cast<float>(sprite_count);
     const auto n = static_cast<unsigned>(s);
@@ -48,20 +49,26 @@ class updater : public voo::update_thread {
     }
     return quack::colour{1, 0, 1, 1};
   }
+  // }}}
 
   void build_cmd_buf(vee::command_buffer cb) override {
     m_ib.map_all([&](auto all) {
-      auto [c, m, _, u] = all;
+      auto [c, m, p, u] = all;
+      // {{{ quad memory map
       auto i = 0U;
       for (char b : sg::grid) {
         if (sg::player_pos == i) {
           b = (b == target) ? player_target : player;
         }
+        float x = i % sl::level_width;
+        float y = i / sl::level_width;
+        *p++ = {{x, y}, {1, 1}};
         *u++ = uv(b);
         *c++ = colour(b);
         *m++ = quack::colour{1, 1, 1, 1};
         i++;
       }
+      // }}}
     });
 
     voo::cmd_buf_one_time_submit pcb{cb};
@@ -69,18 +76,13 @@ class updater : public voo::update_thread {
   }
 
 public:
+  // {{{ max quads
+  const unsigned max_quads() { return sl::level_width * sl::level_height; }
+  // }}}
+
   explicit updater(voo::device_and_queue *dq, quack::pipeline_stuff &ps)
       : update_thread{dq->queue()}
-      , m_ib{ps.create_batch(sl::level_width * sl::level_height)} {
-    m_ib.map_positions([](auto *is) {
-      unsigned i = 0;
-      for (float y = 0; y < sl::level_height; y++) {
-        for (float x = 0; x < sl::level_width; x++, i++) {
-          is[i] = {{x, y}, {1, 1}};
-        }
-      }
-    });
-  }
+      , m_ib{ps.create_batch(max_quads())} {}
 
   [[nodiscard]] constexpr auto &batch() noexcept { return m_ib; }
 
@@ -90,7 +92,11 @@ public:
 static volatile bool dirty{true};
 static struct : public voo::casein_thread {
   void run() override {
-    voo::device_and_queue dq{"sokoban", native_ptr()};
+    // {{{ app name
+    const auto app_name = "sokoban";
+    // }}}
+
+    voo::device_and_queue dq{app_name, native_ptr()};
     quack::pipeline_stuff ps{dq, 1};
     updater u{&dq, ps};
 
@@ -101,8 +107,10 @@ static struct : public voo::casein_thread {
     auto dset = ps.allocate_descriptor_set(a.iv(), *smp);
 
     quack::upc rpc{};
+    // {{{ grid size/pos
     rpc.grid_size = {sl::level_width, sl::level_height};
     rpc.grid_pos = rpc.grid_size / 2.0;
+    // }}}
 
     while (!interrupted()) {
       voo::swapchain_and_stuff sw{dq};
@@ -115,13 +123,16 @@ static struct : public voo::casein_thread {
 
         auto upc = quack::adjust_aspect(rpc, sw.aspect());
         sw.queue_one_time_submit(dq.queue(), [&](auto pcb) {
+          // {{{ quad count
+          auto quad_count = sl::level_width * sl::level_height;
+          // }}}
           auto scb = sw.cmd_render_pass(pcb);
           vee::cmd_set_viewport(*scb, sw.extent());
           vee::cmd_set_scissor(*scb, sw.extent());
           u.batch().build_commands(*pcb);
           ps.cmd_bind_descriptor_set(*scb, dset);
           ps.cmd_push_vert_frag_constants(*scb, upc);
-          ps.run(*scb, sl::level_width * sl::level_height);
+          ps.run(*scb, quad_count);
         });
       });
     }
