@@ -48,79 +48,40 @@ static constexpr auto colour(char b) {
 }
 // }}}
 
-void update_data(quack::mapped_buffers all) {
-  auto [c, m, p, u] = all;
-  // {{{ quad memory map
-  auto i = 0U;
-  for (char b : sg::grid) {
-    if (sg::player_pos == i) {
-      b = (b == target) ? player_target : player;
-    }
-    float x = i % sl::level_width;
-    float y = i / sl::level_width;
-    *p++ = {{x, y}, {1, 1}};
-    *u++ = uv(b);
-    *c++ = colour(b);
-    *m++ = quack::colour{1, 1, 1, 1};
-    i++;
-  }
-  // }}}
-}
-
-// {{{ max quads
-const unsigned max_quads() { return sl::level_width * sl::level_height; }
-// }}}
-
 static volatile bool dirty{true};
-static struct : public voo::casein_thread {
-  void run() override {
-    // {{{ app name
-    const auto app_name = "sokoban";
-    // }}}
+static struct : public quack::donald {
+  const char *app_name() const noexcept override { return "sokoban"; }
+  unsigned max_quads() const noexcept override {
+    return sl::level_width * sl::level_height;
+  }
 
-    voo::device_and_queue dq{app_name, native_ptr()};
-    quack::pipeline_stuff ps{dq, 1};
-    quack::instance_batch_thread u{dq.queue(), ps.create_batch(max_quads()),
-                                   &update_data};
-
-    auto a =
-        voo::updater_thread{dq.queue(), &update_atlas, dq.physical_device(),
-                            atlas_col_count, atlas_row_count};
-    a.run_once();
-
-    auto smp = vee::create_sampler(vee::nearest_sampler);
-    auto dset = ps.allocate_descriptor_set(a.data().iv(), *smp);
-
+  quack::upc push_constants() const noexcept override {
     quack::upc rpc{};
-    // {{{ grid size/pos
     rpc.grid_size = {sl::level_width, sl::level_height};
     rpc.grid_pos = rpc.grid_size / 2.0;
-    // }}}
+    return rpc;
+  }
 
-    while (!interrupted()) {
-      voo::swapchain_and_stuff sw{dq};
-
-      extent_loop(dq.queue(), sw, [&] {
-        if (dirty) {
-          u.run_once();
-          dirty = false;
-        }
-
-        auto upc = quack::adjust_aspect(rpc, sw.aspect());
-        sw.queue_one_time_submit(dq.queue(), [&](auto pcb) {
-          // {{{ quad count
-          auto quad_count = sl::level_width * sl::level_height;
-          // }}}
-          auto scb = sw.cmd_render_pass(pcb);
-          vee::cmd_set_viewport(*scb, sw.extent());
-          vee::cmd_set_scissor(*scb, sw.extent());
-          u.data().build_commands(*pcb);
-          ps.cmd_bind_descriptor_set(*scb, dset);
-          ps.cmd_push_vert_frag_constants(*scb, upc);
-          ps.run(*scb, quad_count);
-        });
-      });
+  void update_data(quack::mapped_buffers all) override {
+    auto [c, m, p, u] = all;
+    auto i = 0U;
+    for (char b : sg::grid) {
+      if (sg::player_pos == i) {
+        b = (b == target) ? player_target : player;
+      }
+      float x = i % sl::level_width;
+      float y = i / sl::level_width;
+      *p++ = {{x, y}, {1, 1}};
+      *u++ = uv(b);
+      *c++ = colour(b);
+      *m++ = quack::colour{1, 1, 1, 1};
+      i++;
     }
+  }
+
+  atlas create_atlas(voo::device_and_queue *dq) override {
+    return atlas::make(dq->queue(), &update_atlas, dq->physical_device(),
+                       atlas_col_count, atlas_row_count);
   }
 } r;
 
