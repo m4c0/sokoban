@@ -1,4 +1,4 @@
-module sokoban;
+module game;
 
 namespace sl = sokoban::levels;
 

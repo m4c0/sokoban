@@ -1,4 +1,4 @@
-export module sokoban:audio;
+export module game:audio;
 import siaudio;
 
 class streamer : public siaudio::os_streamer {

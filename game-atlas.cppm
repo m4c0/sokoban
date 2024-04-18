@@ -1,4 +1,4 @@
-export module sokoban:atlas;
+export module game:atlas;
 import vee;
 import voo;
 

@@ -1,4 +1,4 @@
-module sokoban;
+module game;
 import :atlas;
 import :grid;
 import casein;

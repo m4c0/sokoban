@@ -1,4 +1,4 @@
-module sokoban;
+module game;
 import :grid;
 
 namespace sg = sokoban::game;

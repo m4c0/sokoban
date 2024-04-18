@@ -1,4 +1,4 @@
-export module sokoban:grid;
+export module game:grid;
 
 enum blocks : char {
   player = 'P',

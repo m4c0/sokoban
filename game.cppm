@@ -3,7 +3,7 @@
 #pragma leco add_impl levels
 #pragma leco add_impl quack
 
-export module sokoban;
+export module game;
 import :audio;
 import :grid;
 import casein;

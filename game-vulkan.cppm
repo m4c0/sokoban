@@ -1,7 +1,7 @@
 #pragma leco add_shader "sokoban.vert"
 #pragma leco add_shader "sokoban.frag"
 
-export module sokoban:vulkan;
+export module game:vulkan;
 import :atlas;
 import :grid;
 import casein;
