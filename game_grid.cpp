@@ -1,6 +1,7 @@
 module game;
 import :grid;
 
+namespace sa = sokoban::audio;
 namespace sg = sokoban::game;
 namespace sl = sokoban::levels;
 namespace sr = sokoban::renderer;
@@ -18,13 +19,13 @@ void set_level(unsigned idx) {
     sg::player_pos++;
 
   sr::render();
-  streamer::instance().play(50);
+  sa::play(50);
 }
 
 static void move(unsigned p) {
   switch (auto mt = sg::grid.move_type(sg::player_pos, p)) {
   case none:
-    streamer::instance().play(150);
+    sa::play(150);
     return;
   case push:
   case push2tgt:
@@ -34,9 +35,9 @@ static void move(unsigned p) {
     if (sg::grid.is_done()) {
       set_level(m_level + 1);
     } else if (mt == push2tgt) {
-      streamer::instance().play(100);
+      sa::play(100);
     } else {
-      streamer::instance().play(200);
+      sa::play(200);
     }
     break;
   case walk:

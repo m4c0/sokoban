@@ -1,15 +1,19 @@
 #pragma leco app
+#pragma leco add_impl audio
 #pragma leco add_impl game_grid
 #pragma leco add_impl levels
 #pragma leco add_impl quack
 
 export module game;
-import :audio;
 import :grid;
 import casein;
 import quack;
 
 // TODO: move each of these into its own module
+
+namespace sokoban::audio {
+void play(unsigned);
+}
 
 namespace sokoban::game_grid {
 void process_event(const casein::event &e);
@@ -33,7 +37,6 @@ extern unsigned player_pos;
 } // namespace sokoban::game
 
 extern "C" void casein_handle(const casein::event &e) {
-  streamer::instance();
   quack::mouse_tracker::instance().handle(e);
   sokoban::renderer::process_event(e);
   sokoban::game_grid::process_event(e);

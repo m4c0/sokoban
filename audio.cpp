@@ -1,7 +1,7 @@
-export module game:audio;
+module game;
 import siaudio;
 
-class streamer : public siaudio::os_streamer {
+static class : public siaudio::os_streamer {
   volatile unsigned sp = 0;
   volatile unsigned d = 1;
 
@@ -29,9 +29,6 @@ public:
     d = div;
     sp = 0;
   }
+} a;
 
-  static auto &instance() {
-    static streamer s{};
-    return s;
-  }
-};
+void sokoban::audio::play(unsigned n) { a.play(n); }
