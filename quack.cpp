@@ -48,7 +48,6 @@ static constexpr auto colour(char b) {
 }
 // }}}
 
-static volatile bool dirty{true};
 static struct : public quack::donald {
   const char *app_name() const noexcept override { return "sokoban"; }
   unsigned max_quads() const noexcept override {
@@ -85,5 +84,5 @@ static struct : public quack::donald {
   }
 } r;
 
-void sokoban::renderer::render() { dirty = true; }
+void sokoban::renderer::render() { r.refresh_batch(); }
 void sokoban::renderer::process_event(const casein::event &e) { r.handle(e); }
