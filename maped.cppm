@@ -15,9 +15,11 @@ static void set_level(int l) {
 }
 static void prev_level() { set_level(g_lvl - 1); }
 static void next_level() { set_level(g_lvl + 1); }
+static void level_select();
 static void edit_level() {
   using namespace casein;
   reset_k(KEY_DOWN);
+  handle(KEY_DOWN, K_ESCAPE, &level_select);
 }
 static void level_select() {
   using namespace casein;
