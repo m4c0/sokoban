@@ -15,6 +15,7 @@ void play(unsigned);
 }
 
 export namespace sokoban::game_grid {
+void set_level(unsigned);
 void process_event(const casein::event &e);
 } // namespace sokoban::game_grid
 

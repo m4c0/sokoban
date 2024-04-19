@@ -3,12 +3,13 @@ import :grid;
 
 namespace sa = sokoban::audio;
 namespace sg = sokoban::game;
+namespace sgg = sokoban::game_grid;
 namespace sl = sokoban::levels;
 namespace sr = sokoban::renderer;
 
 static unsigned m_level{};
 
-void set_level(unsigned idx) {
+void sgg::set_level(unsigned idx) {
   m_level = idx % sl::max_levels();
 
   auto lvl = sl::level(idx);
@@ -32,7 +33,7 @@ static void move(unsigned p) {
     sg::grid.set_box(sg::player_pos + p);
     sg::grid.clear_box(sg::player_pos);
     if (sg::grid.is_done()) {
-      set_level(m_level + 1);
+      sgg::set_level(m_level + 1);
       sa::play(50);
     } else if (mt == push2tgt) {
       sa::play(100);
@@ -47,7 +48,7 @@ static void move(unsigned p) {
   sr::render();
 }
 
-void reset_level() { set_level(m_level); }
+void reset_level() { sgg::set_level(m_level); }
 
 void down() { move(sl::level_width); }
 void up() { move(-sl::level_width); }
@@ -58,7 +59,7 @@ void right() { move(1); }
 static class : public casein::handler {
 public:
   void create_window(const casein::events::create_window &e) override {
-    set_level(0);
+    sgg::set_level(0);
   }
   void gesture(const casein::events::gesture &e) override {
     switch (*e) {
@@ -103,6 +104,4 @@ public:
     }
   }
 } evt;
-void sokoban::game_grid::process_event(const casein::event &e) {
-  evt.handle(e);
-}
+void sgg::process_event(const casein::event &e) { evt.handle(e); }
