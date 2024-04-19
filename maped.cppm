@@ -15,10 +15,16 @@ static void set_level(int l) {
 }
 static void prev_level() { set_level(g_lvl - 1); }
 static void next_level() { set_level(g_lvl + 1); }
+static void edit_level() {
+  using namespace casein;
+  reset_k(KEY_DOWN);
+}
 static void level_select() {
   using namespace casein;
-  handle(KEY_DOWN, K_P, &prev_level);
-  handle(KEY_DOWN, K_N, &next_level);
+  reset_k(KEY_DOWN);
+  handle(KEY_DOWN, K_LEFT, &prev_level);
+  handle(KEY_DOWN, K_RIGHT, &next_level);
+  handle(KEY_DOWN, K_ENTER, &edit_level);
 }
 
 static struct init {
