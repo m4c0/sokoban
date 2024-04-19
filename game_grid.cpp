@@ -19,7 +19,6 @@ void set_level(unsigned idx) {
     sg::player_pos++;
 
   sr::render();
-  sa::play(50);
 }
 
 static void move(unsigned p) {
@@ -34,6 +33,7 @@ static void move(unsigned p) {
     sg::grid.clear_box(sg::player_pos);
     if (sg::grid.is_done()) {
       set_level(m_level + 1);
+      sa::play(50);
     } else if (mt == push2tgt) {
       sa::play(100);
     } else {
