@@ -1,5 +1,6 @@
 module game;
 import :grid;
+import casein;
 
 namespace sa = sokoban::audio;
 namespace sg = sokoban::game;
@@ -18,8 +19,6 @@ void sgg::set_level(unsigned idx) {
   sg::player_pos = 0;
   while (lvl[sg::player_pos] != 'P')
     sg::player_pos++;
-
-  sr::render();
 }
 
 static void move(unsigned p) {
@@ -34,6 +33,7 @@ static void move(unsigned p) {
     sg::grid.clear_box(sg::player_pos);
     if (sg::grid.is_done()) {
       sgg::set_level(m_level + 1);
+      sr::render();
       sa::play(50);
     } else if (mt == push2tgt) {
       sa::play(100);
@@ -48,60 +48,28 @@ static void move(unsigned p) {
   sr::render();
 }
 
-void reset_level() { sgg::set_level(m_level); }
+void reset_level() {
+  sgg::set_level(m_level);
+  sr::render();
+}
 
 void down() { move(sl::level_width); }
 void up() { move(-sl::level_width); }
 void left() { move(-1); }
 void right() { move(1); }
 
-// TODO: use casein's map<void>
-static class : public casein::handler {
-public:
-  void create_window(const casein::events::create_window &e) override {
-    sgg::set_level(0);
-  }
-  void gesture(const casein::events::gesture &e) override {
-    switch (*e) {
-    case casein::G_SWIPE_UP:
-      up();
-      break;
-    case casein::G_SWIPE_DOWN:
-      down();
-      break;
-    case casein::G_SWIPE_LEFT:
-      left();
-      break;
-    case casein::G_SWIPE_RIGHT:
-      right();
-      break;
-    case casein::G_SHAKE:
-      reset_level();
-      break;
-    default:
-      break;
-    }
-  }
-  void key_down(const casein::events::key_down &e) override {
-    switch (*e) {
-    case casein::K_UP:
-      up();
-      break;
-    case casein::K_DOWN:
-      down();
-      break;
-    case casein::K_LEFT:
-      left();
-      break;
-    case casein::K_RIGHT:
-      right();
-      break;
-    case casein::K_SPACE:
-      reset_level();
-      break;
-    default:
-      break;
-    }
-  }
-} evt;
-void sgg::process_event(const casein::event &e) { evt.handle(e); }
+void sgg::init() {
+  sgg::set_level(0);
+
+  using namespace casein;
+  handle(GESTURE, G_SWIPE_UP, &up);
+  handle(GESTURE, G_SWIPE_DOWN, &down);
+  handle(GESTURE, G_SWIPE_LEFT, &left);
+  handle(GESTURE, G_SWIPE_RIGHT, &right);
+  handle(GESTURE, G_SHAKE, &reset_level);
+  handle(KEY_DOWN, K_UP, &up);
+  handle(KEY_DOWN, K_DOWN, &down);
+  handle(KEY_DOWN, K_LEFT, &left);
+  handle(KEY_DOWN, K_RIGHT, &right);
+  handle(KEY_DOWN, K_SPACE, &reset_level);
+}

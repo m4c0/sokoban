@@ -5,7 +5,6 @@
 
 export module game;
 import :grid;
-import casein;
 import quack;
 
 // TODO: move each of these into its own module
@@ -15,8 +14,8 @@ void play(unsigned);
 }
 
 export namespace sokoban::game_grid {
+void init();
 void set_level(unsigned);
-void process_event(const casein::event &e);
 } // namespace sokoban::game_grid
 
 export namespace sokoban::levels {
@@ -27,7 +26,6 @@ const char *level(unsigned);
 } // namespace sokoban::levels
 
 export namespace sokoban::renderer {
-void process_event(const casein::event &e);
 void render();
 } // namespace sokoban::renderer
 

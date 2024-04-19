@@ -85,4 +85,3 @@ static struct : public quack::donald {
 } r;
 
 void sokoban::renderer::render() { r.refresh_batch(); }
-void sokoban::renderer::process_event(const casein::event &e) { r.handle(e); }
