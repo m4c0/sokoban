@@ -11,6 +11,7 @@ namespace sr = sokoban::renderer;
 static int g_lvl{0};
 static int g_cursor{0};
 
+static auto &lh = sl::level_height;
 static auto &lw = sl::level_width;
 
 static void set_level(int l) {
@@ -36,6 +37,12 @@ static void cursor_right() {
     g_cursor++;
   }
 }
+static void cursor_up() {
+  g_cursor -= lw;
+  if (g_cursor < 0)
+    g_cursor += lw * lh;
+}
+static void cursor_down() { g_cursor = (g_cursor + lw) % (lw * lh); }
 
 static void level_select();
 static void edit_level() {
@@ -44,6 +51,8 @@ static void edit_level() {
   handle(KEY_DOWN, K_ESCAPE, &level_select);
   handle(KEY_DOWN, K_LEFT, &cursor_left);
   handle(KEY_DOWN, K_RIGHT, &cursor_right);
+  handle(KEY_DOWN, K_DOWN, &cursor_down);
+  handle(KEY_DOWN, K_UP, &cursor_up);
 }
 static void level_select() {
   using namespace casein;
