@@ -5,6 +5,7 @@ import game;
 import silog;
 import quack;
 
+namespace sg = sokoban::game;
 namespace sgg = sokoban::game_grid;
 namespace sl = sokoban::levels;
 namespace sr = sokoban::renderer;
@@ -63,6 +64,8 @@ static void cursor_down() {
   g_cursor = (g_cursor + lw) % (lw * lh);
 }
 
+static void set_player() { sg::player_pos = g_cursor; }
+
 static void level_select();
 static void edit_level() {
   using namespace casein;
@@ -72,6 +75,7 @@ static void edit_level() {
   handle(KEY_DOWN, K_RIGHT, &cursor_right);
   handle(KEY_DOWN, K_DOWN, &cursor_down);
   handle(KEY_DOWN, K_UP, &cursor_up);
+  handle(KEY_DOWN, K_P, &set_player);
   g_cursor = 0;
 }
 static void level_select() {
