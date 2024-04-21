@@ -23,7 +23,12 @@ static struct : sr::rnd {
 
     if (g_cursor < 0)
       return;
-    all.colours[g_cursor] = {0, 0, 0, 1};
+
+    auto &c = all.colours[g_cursor];
+    c.r *= 0.2;
+    c.g *= 0.2;
+    c.b *= 0.2;
+    c.a = 1.0;
   }
 } r;
 
