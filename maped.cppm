@@ -45,7 +45,7 @@ static void cursor_left() {
   r.refresh_batch();
 }
 static void cursor_right() {
-  if (g_cursor % lw == lw + 1) {
+  if (g_cursor % lw == lw - 1) {
     g_cursor -= lw - 1;
   } else {
     g_cursor++;
