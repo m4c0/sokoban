@@ -64,7 +64,16 @@ static void cursor_down() {
   g_cursor = (g_cursor + lw) % (lw * lh);
 }
 
-static void set_player() { sg::player_pos = g_cursor; }
+static void set_player() {
+  switch (sg::grid.begin()[g_cursor]) {
+  case empty:
+  case target:
+    sg::player_pos = g_cursor;
+    break;
+  default:
+    break;
+  }
+}
 
 static void level_select();
 static void edit_level() {
