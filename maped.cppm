@@ -62,7 +62,7 @@ static void level_select() {
   handle(KEY_DOWN, K_ENTER, &edit_level);
 }
 
-static struct init {
+struct init {
   init() {
     sgg::set_level(g_lvl);
     level_select();
