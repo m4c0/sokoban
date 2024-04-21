@@ -8,6 +8,10 @@ namespace sgg = sokoban::game_grid;
 namespace sl = sokoban::levels;
 namespace sr = sokoban::renderer;
 
+static struct : sr::rnd {
+  const char *app_name() const noexcept override { return "maped"; }
+} r;
+
 static int g_lvl{0};
 static int g_cursor{0};
 
@@ -18,7 +22,7 @@ static void set_level(int l) {
   g_lvl = (sl::max_levels() + l) % sl::max_levels();
   silog::log(silog::info, "Changing editor to level %d", g_lvl);
   sgg::set_level(g_lvl);
-  sr::render();
+  r.refresh_batch();
 }
 static void prev_level() { set_level(g_lvl - 1); }
 static void next_level() { set_level(g_lvl + 1); }

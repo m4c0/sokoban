@@ -8,6 +8,7 @@ import voo;
 
 namespace sg = sokoban::game;
 namespace sl = sokoban::levels;
+namespace sr = sokoban::renderer;
 
 // {{{ quad map utils
 static constexpr auto uv(atlas_sprites s) {
@@ -48,40 +49,35 @@ static constexpr auto colour(char b) {
 }
 // }}}
 
-static struct : public quack::donald {
-  const char *app_name() const noexcept override { return "sokoban"; }
-  unsigned max_quads() const noexcept override {
-    return sl::level_width * sl::level_height;
-  }
+unsigned sr::rnd::max_quads() const noexcept {
+  return sl::level_width * sl::level_height;
+}
 
-  quack::upc push_constants() const noexcept override {
-    quack::upc rpc{};
-    rpc.grid_size = {sl::level_width, sl::level_height};
-    rpc.grid_pos = rpc.grid_size / 2.0;
-    return rpc;
-  }
+quack::upc sr::rnd::push_constants() const noexcept {
+  quack::upc rpc{};
+  rpc.grid_size = {sl::level_width, sl::level_height};
+  rpc.grid_pos = rpc.grid_size / 2.0;
+  return rpc;
+}
 
-  void update_data(quack::mapped_buffers all) override {
-    auto [c, m, p, u] = all;
-    auto i = 0U;
-    for (char b : sg::grid) {
-      if (sg::player_pos == i) {
-        b = (b == target) ? player_target : player;
-      }
-      float x = i % sl::level_width;
-      float y = i / sl::level_width;
-      *p++ = {{x, y}, {1, 1}};
-      *u++ = uv(b);
-      *c++ = colour(b);
-      *m++ = quack::colour{1, 1, 1, 1};
-      i++;
+void sr::rnd::update_data(quack::mapped_buffers all) {
+  auto [c, m, p, u] = all;
+  auto i = 0U;
+  for (char b : sg::grid) {
+    if (sg::player_pos == i) {
+      b = (b == target) ? player_target : player;
     }
+    float x = i % sl::level_width;
+    float y = i / sl::level_width;
+    *p++ = {{x, y}, {1, 1}};
+    *u++ = uv(b);
+    *c++ = colour(b);
+    *m++ = quack::colour{1, 1, 1, 1};
+    i++;
   }
+}
 
-  atlas create_atlas(voo::device_and_queue *dq) override {
-    return atlas::make(dq->queue(), &update_atlas, dq->physical_device(),
-                       atlas_col_count, atlas_row_count);
-  }
-} r;
-
-void sokoban::renderer::render() { r.refresh_batch(); }
+sr::rnd::atlas sr::rnd::create_atlas(voo::device_and_queue *dq) {
+  return atlas::make(dq->queue(), &update_atlas, dq->physical_device(),
+                     atlas_col_count, atlas_row_count);
+}

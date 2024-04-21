@@ -6,6 +6,7 @@
 export module game;
 import :grid;
 import quack;
+import voo;
 
 // TODO: move each of these into its own module
 
@@ -26,7 +27,12 @@ const char *level(unsigned);
 } // namespace sokoban::levels
 
 export namespace sokoban::renderer {
-void render();
+struct rnd : public quack::donald {
+  unsigned max_quads() const noexcept override;
+  quack::upc push_constants() const noexcept override;
+  virtual void update_data(quack::mapped_buffers all) override;
+  atlas create_atlas(voo::device_and_queue *dq) override;
+};
 } // namespace sokoban::renderer
 
 export namespace sokoban::game {

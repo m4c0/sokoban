@@ -21,6 +21,10 @@ void sgg::set_level(unsigned idx) {
     sg::player_pos++;
 }
 
+static struct : sr::rnd {
+  const char *app_name() const noexcept override { return "sokoban"; }
+} r;
+
 static void move(unsigned p) {
   switch (auto mt = sg::grid.move_type(sg::player_pos, p)) {
   case none:
@@ -33,7 +37,7 @@ static void move(unsigned p) {
     sg::grid.clear_box(sg::player_pos);
     if (sg::grid.is_done()) {
       sgg::set_level(m_level + 1);
-      sr::render();
+      r.refresh_batch();
       sa::play(50);
     } else if (mt == push2tgt) {
       sa::play(100);
@@ -45,12 +49,12 @@ static void move(unsigned p) {
     sg::player_pos += p;
     break;
   }
-  sr::render();
+  r.refresh_batch();
 }
 
 void reset_level() {
   sgg::set_level(m_level);
-  sr::render();
+  r.refresh_batch();
 }
 
 void down() { move(sl::level_width); }
