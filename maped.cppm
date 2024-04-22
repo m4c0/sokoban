@@ -5,7 +5,6 @@ import game;
 import silog;
 import quack;
 
-// TODO: "pen mode" (draw walls/empty/outside while changing cursor)
 // TODO: flood fill empty/outside
 // TODO: move all map (or center it) - suggestion: use "Shift-Arrows"
 
@@ -22,6 +21,7 @@ static char g_lvl_buf[1024];
 
 static int g_lvl{0};
 static int g_cursor{-1};
+static void (*g_pen)();
 
 static auto &lh = sl::level_height;
 static auto &lw = sl::level_width;
@@ -73,6 +73,8 @@ static void cursor_left() {
   } else {
     g_cursor--;
   }
+  if (g_pen)
+    g_pen();
 }
 static void cursor_right() {
   if (g_cursor % lw == lw - 1) {
@@ -80,14 +82,20 @@ static void cursor_right() {
   } else {
     g_cursor++;
   }
+  if (g_pen)
+    g_pen();
 }
 static void cursor_up() {
   g_cursor -= lw;
   if (g_cursor < 0)
     g_cursor += lw * lh;
+  if (g_pen)
+    g_pen();
 }
 static void cursor_down() {
   g_cursor = (g_cursor + lw) % (lw * lh);
+  if (g_pen)
+    g_pen();
 }
 
 static void clear_player() {
@@ -125,6 +133,7 @@ static void set_wall() {
   default:
     break;
   }
+  g_pen = set_wall;
 }
 
 static void set_void() {
@@ -139,6 +148,7 @@ static void set_void() {
   default:
     break;
   }
+  g_pen = set_void;
 }
 
 static void set_box() {
@@ -178,6 +188,8 @@ static void set_target() {
   }
 }
 
+static void reset_pen() { g_pen = {}; }
+
 static void level_dump() {
   const char *l = g_lvl_buf;
   for (auto y = 0; y < sl::level_height; y++, l += sl::level_width) {
@@ -189,6 +201,8 @@ static void level_select();
 static void edit_level() {
   using namespace casein;
   reset_k(KEY_DOWN);
+  reset_k(KEY_UP);
+
   handle(KEY_DOWN, K_ESCAPE, &level_select);
   handle(KEY_DOWN, K_ENTER, &level_dump);
   handle(KEY_DOWN, K_LEFT, &cursor_left);
@@ -196,15 +210,19 @@ static void edit_level() {
   handle(KEY_DOWN, K_DOWN, &cursor_down);
   handle(KEY_DOWN, K_UP, &cursor_up);
   handle(KEY_DOWN, K_P, &set_player);
-  handle(KEY_DOWN, K_W, &set_wall);
   handle(KEY_DOWN, K_B, &set_box);
   handle(KEY_DOWN, K_T, &set_target);
+  handle(KEY_DOWN, K_W, &set_wall);
   handle(KEY_DOWN, K_SPACE, &set_void);
+
+  handle(KEY_UP, K_W, &reset_pen);
+  handle(KEY_UP, K_SPACE, &reset_pen);
   g_cursor = 0;
 }
 static void level_select() {
   using namespace casein;
   reset_k(KEY_DOWN);
+  reset_k(KEY_UP);
   handle(KEY_DOWN, K_LEFT, &prev_level);
   handle(KEY_DOWN, K_RIGHT, &next_level);
   handle(KEY_DOWN, K_ENTER, &edit_level);
