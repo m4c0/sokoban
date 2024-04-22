@@ -96,6 +96,34 @@ static void set_player() {
   }
 }
 
+static void set_wall() {
+  switch (auto &pp = g_lvl_buf[g_cursor]) {
+  case empty:
+  case outside:
+    pp = wall;
+    sg::set_level(g_lvl_buf);
+    break;
+  default:
+    break;
+  }
+}
+
+static void set_void() {
+  switch (auto &pp = g_lvl_buf[g_cursor]) {
+  case outside:
+  case wall:
+    pp = empty;
+    sg::set_level(g_lvl_buf);
+    break;
+  case empty:
+    pp = outside;
+    sg::set_level(g_lvl_buf);
+    break;
+  default:
+    break;
+  }
+}
+
 static void level_dump() {
   const char *l = g_lvl_buf;
   for (auto y = 0; y < sl::level_height; y++, l += sl::level_width) {
@@ -114,6 +142,8 @@ static void edit_level() {
   handle(KEY_DOWN, K_DOWN, &cursor_down);
   handle(KEY_DOWN, K_UP, &cursor_up);
   handle(KEY_DOWN, K_P, &set_player);
+  handle(KEY_DOWN, K_W, &set_wall);
+  handle(KEY_DOWN, K_SPACE, &set_void);
   g_cursor = 0;
 }
 static void level_select() {
