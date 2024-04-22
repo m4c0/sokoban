@@ -71,11 +71,25 @@ static void cursor_down() {
   g_cursor = (g_cursor + lw) % (lw * lh);
 }
 
+// TODO: add support to player starting from a target
+// Note: this requires support in the game itself. Currently, it crashes if
+// player starts in a target.
+static void clear_player() {
+  switch (auto &pp = g_lvl_buf[sg::player_pos]) {
+  case player:
+    pp = empty;
+    break;
+  default:
+    silog::log(silog::error, "invalid map state in old player pos: [%c]", pp);
+    throw 0;
+  }
+}
 static void set_player() {
-  switch (sg::grid.begin()[g_cursor]) {
+  switch (auto &pp = g_lvl_buf[g_cursor]) {
   case empty:
-  case target:
-    sg::player_pos = g_cursor;
+    clear_player();
+    pp = player;
+    sg::set_level(g_lvl_buf);
     break;
   default:
     break;
