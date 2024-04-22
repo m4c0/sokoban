@@ -9,6 +9,8 @@ namespace sg = sokoban::game;
 namespace sl = sokoban::levels;
 namespace sr = sokoban::renderer;
 
+static char g_lvl_buf[1024];
+
 static int g_lvl{0};
 static int g_cursor{-1};
 
@@ -35,7 +37,13 @@ static struct : sr::rnd {
 static void set_level(int l) {
   g_lvl = (sl::max_levels() + l) % sl::max_levels();
   silog::log(silog::info, "Changing editor to level %d", g_lvl);
-  sg::set_level(sl::level(g_lvl));
+
+  const char *gl = sl::level(g_lvl);
+  char *nl = g_lvl_buf;
+  for (; *gl; nl++, gl++)
+    *nl = *gl;
+
+  sg::set_level(g_lvl_buf);
 }
 static void prev_level() { set_level(g_lvl - 1); }
 static void next_level() { set_level(g_lvl + 1); }
