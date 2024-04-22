@@ -12,13 +12,7 @@ static unsigned m_level{};
 
 void sgg::set_level(unsigned idx) {
   m_level = idx % sl::max_levels();
-
-  auto lvl = sl::level(idx);
-  sg::grid.load(lvl);
-
-  sg::player_pos = 0;
-  while (lvl[sg::player_pos] != 'P')
-    sg::player_pos++;
+  sg::set_level(sl::level(idx));
 }
 
 static struct : sr::rnd {

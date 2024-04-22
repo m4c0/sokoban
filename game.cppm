@@ -38,6 +38,7 @@ struct rnd : public quack::donald {
 export namespace sokoban::game {
 extern class grid grid;
 extern unsigned player_pos;
+void set_level(const char *lvl);
 } // namespace sokoban::game
 
 module :private;
@@ -45,4 +46,11 @@ module :private;
 namespace sokoban::game {
 class grid grid {};
 unsigned player_pos{};
+void set_level(const char *lvl) {
+  grid.load(lvl);
+
+  player_pos = 0;
+  while (lvl[player_pos] != 'P')
+    player_pos++;
+}
 } // namespace sokoban::game
