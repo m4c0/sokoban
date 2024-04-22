@@ -48,6 +48,16 @@ static void set_level(int l) {
 static void prev_level() { set_level(g_lvl - 1); }
 static void next_level() { set_level(g_lvl + 1); }
 
+static void new_level() {
+  for (auto &c : g_lvl_buf)
+    c = outside;
+
+  // TODO: without this, we explode like "player_target" in the editor
+  g_lvl_buf[1] = player;
+
+  sg::set_level(g_lvl_buf);
+}
+
 static void cursor_left() {
   if (g_cursor % lw == 0) {
     g_cursor += lw - 1;
@@ -192,6 +202,7 @@ static void level_select() {
   handle(KEY_DOWN, K_LEFT, &prev_level);
   handle(KEY_DOWN, K_RIGHT, &next_level);
   handle(KEY_DOWN, K_ENTER, &edit_level);
+  handle(KEY_DOWN, K_N, &new_level);
   g_cursor = -1;
 }
 
