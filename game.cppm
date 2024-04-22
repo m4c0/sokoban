@@ -1,5 +1,4 @@
 #pragma leco add_impl audio
-#pragma leco add_impl game_grid
 #pragma leco add_impl levels
 #pragma leco add_impl quack
 
@@ -10,14 +9,9 @@ import voo;
 
 // TODO: move each of these into its own module
 
-namespace sokoban::audio {
+export namespace sokoban::audio {
 void play(unsigned);
 }
-
-export namespace sokoban::game_grid {
-void init();
-void set_level(unsigned);
-} // namespace sokoban::game_grid
 
 export namespace sokoban::levels {
 extern const unsigned level_width;
