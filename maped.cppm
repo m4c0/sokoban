@@ -5,6 +5,15 @@ import game;
 import silog;
 import quack;
 
+// TODO: "pen mode" (draw walls/empty/outside while changing cursor)
+// TODO: flood fill empty/outside
+// TODO: move all map (or center it) - suggestion: use "Shift-Arrows"
+
+// TODO: add support to player starting from a target
+// TODO: maybe support for map without a player?
+// Note: these requires support in the game itself. Currently, it crashes if
+// player starts in a target.
+
 namespace sg = sokoban::game;
 namespace sl = sokoban::levels;
 namespace sr = sokoban::renderer;
@@ -81,9 +90,6 @@ static void cursor_down() {
   g_cursor = (g_cursor + lw) % (lw * lh);
 }
 
-// TODO: add support to player starting from a target
-// Note: this requires support in the game itself. Currently, it crashes if
-// player starts in a target.
 static void clear_player() {
   switch (auto &pp = g_lvl_buf[sg::player_pos]) {
   case player:
