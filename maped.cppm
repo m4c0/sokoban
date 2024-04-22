@@ -82,11 +82,19 @@ static void set_player() {
   }
 }
 
+static void level_dump() {
+  const char *l = g_lvl_buf;
+  for (auto y = 0; y < sl::level_height; y++, l += sl::level_width) {
+    silog::log(silog::info, "%.*s", sl::level_width, l);
+  }
+}
+
 static void level_select();
 static void edit_level() {
   using namespace casein;
   reset_k(KEY_DOWN);
   handle(KEY_DOWN, K_ESCAPE, &level_select);
+  handle(KEY_DOWN, K_ENTER, &level_dump);
   handle(KEY_DOWN, K_LEFT, &cursor_left);
   handle(KEY_DOWN, K_RIGHT, &cursor_right);
   handle(KEY_DOWN, K_DOWN, &cursor_down);
