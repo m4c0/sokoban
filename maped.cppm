@@ -125,6 +125,43 @@ static void set_void() {
   }
 }
 
+static void set_box() {
+  switch (g_lvl_buf[g_cursor]) {
+  case empty:
+    update(box);
+    break;
+  case box:
+    update(empty);
+    break;
+  case target:
+    update(target_box);
+    break;
+  case target_box:
+    update(target);
+    break;
+  default:
+    break;
+  }
+}
+static void set_target() {
+  switch (g_lvl_buf[g_cursor]) {
+  case empty:
+    update(target);
+    break;
+  case target:
+    update(empty);
+    break;
+  case box:
+    update(target_box);
+    break;
+  case target_box:
+    update(box);
+    break;
+  default:
+    break;
+  }
+}
+
 static void level_dump() {
   const char *l = g_lvl_buf;
   for (auto y = 0; y < sl::level_height; y++, l += sl::level_width) {
@@ -144,6 +181,8 @@ static void edit_level() {
   handle(KEY_DOWN, K_UP, &cursor_up);
   handle(KEY_DOWN, K_P, &set_player);
   handle(KEY_DOWN, K_W, &set_wall);
+  handle(KEY_DOWN, K_B, &set_box);
+  handle(KEY_DOWN, K_T, &set_target);
   handle(KEY_DOWN, K_SPACE, &set_void);
   g_cursor = 0;
 }
