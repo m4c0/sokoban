@@ -6,7 +6,6 @@ import silog;
 import quack;
 
 namespace sg = sokoban::game;
-namespace sgg = sokoban::game_grid;
 namespace sl = sokoban::levels;
 namespace sr = sokoban::renderer;
 
@@ -36,7 +35,7 @@ static struct : sr::rnd {
 static void set_level(int l) {
   g_lvl = (sl::max_levels() + l) % sl::max_levels();
   silog::log(silog::info, "Changing editor to level %d", g_lvl);
-  sgg::set_level(g_lvl);
+  sg::set_level(sl::level(g_lvl));
 }
 static void prev_level() { set_level(g_lvl - 1); }
 static void next_level() { set_level(g_lvl + 1); }
@@ -99,7 +98,7 @@ static void level_select() {
 static void refresh() { r.refresh_batch(); }
 struct init {
   init() {
-    sgg::set_level(g_lvl);
+    set_level(g_lvl);
     level_select();
 
     using namespace casein;
