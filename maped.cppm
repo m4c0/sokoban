@@ -84,12 +84,16 @@ static void clear_player() {
     throw 0;
   }
 }
+
+static void update(char b) {
+  g_lvl_buf[g_cursor] = b;
+  sg::set_level(g_lvl_buf);
+}
 static void set_player() {
-  switch (auto &pp = g_lvl_buf[g_cursor]) {
+  switch (g_lvl_buf[g_cursor]) {
   case empty:
     clear_player();
-    pp = player;
-    sg::set_level(g_lvl_buf);
+    update(player);
     break;
   default:
     break;
@@ -97,11 +101,10 @@ static void set_player() {
 }
 
 static void set_wall() {
-  switch (auto &pp = g_lvl_buf[g_cursor]) {
+  switch (g_lvl_buf[g_cursor]) {
   case empty:
   case outside:
-    pp = wall;
-    sg::set_level(g_lvl_buf);
+    update(wall);
     break;
   default:
     break;
@@ -109,15 +112,13 @@ static void set_wall() {
 }
 
 static void set_void() {
-  switch (auto &pp = g_lvl_buf[g_cursor]) {
+  switch (g_lvl_buf[g_cursor]) {
   case outside:
   case wall:
-    pp = empty;
-    sg::set_level(g_lvl_buf);
+    update(empty);
     break;
   case empty:
-    pp = outside;
-    sg::set_level(g_lvl_buf);
+    update(outside);
     break;
   default:
     break;
