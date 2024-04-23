@@ -4,6 +4,7 @@
 
 export module game;
 import :grid;
+import jute;
 import quack;
 import voo;
 
@@ -17,7 +18,7 @@ export namespace sokoban::levels {
 extern const unsigned level_width;
 extern const unsigned level_height;
 unsigned max_levels();
-const char *level(unsigned);
+jute::view level(unsigned);
 } // namespace sokoban::levels
 
 export namespace sokoban::renderer {
@@ -32,7 +33,7 @@ struct rnd : public quack::donald {
 export namespace sokoban::game {
 extern class grid grid;
 extern unsigned player_pos;
-void set_level(const char *lvl);
+void set_level(jute::view lvl);
 } // namespace sokoban::game
 
 module :private;
@@ -40,7 +41,7 @@ module :private;
 namespace sokoban::game {
 class grid grid {};
 unsigned player_pos{};
-void set_level(const char *lvl) {
+void set_level(jute::view lvl) {
   grid.load(lvl);
 
   player_pos = 0;

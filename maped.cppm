@@ -47,10 +47,9 @@ static void set_level(int l) {
   g_lvl = (sl::max_levels() + l) % sl::max_levels();
   silog::log(silog::info, "Changing editor to level %d", g_lvl);
 
-  const char *gl = sl::level(g_lvl);
   char *nl = g_lvl_buf;
-  for (; *gl; nl++, gl++)
-    *nl = *gl;
+  for (auto c : sl::level(g_lvl))
+    *nl++ = c;
 
   sg::set_level(g_lvl_buf);
 }

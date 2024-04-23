@@ -1,4 +1,5 @@
 export module game:grid;
+import jute;
 
 enum blocks : char {
   player = 'P',
@@ -18,11 +19,11 @@ class grid {
   blocks *m_end{};
 
 public:
-  constexpr void load(const char *l) {
+  constexpr void load(jute::view lvl) {
+    // TODO: assert lvl is smaller than our buffer
     m_end = m_buf;
-    while (*l) {
-      *m_end++ = (*l == 'P') ? empty : static_cast<blocks>(*l);
-      l++;
+    for (auto c : lvl) {
+      *m_end++ = (c == 'P') ? empty : static_cast<blocks>(c);
     }
   }
 
