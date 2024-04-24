@@ -46,7 +46,10 @@ void set_level(jute::view lvl) {
   grid.load(lvl);
 
   player_pos = 0;
-  while (lvl[player_pos] != 'P')
+  for (auto c : lvl) {
+    if (c == player || c == player_target)
+      break;
     player_pos++;
+  }
 }
 } // namespace sokoban::game
