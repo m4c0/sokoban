@@ -104,6 +104,9 @@ static void clear_player() {
   case player:
     pp = empty;
     break;
+  case player_target:
+    pp = target;
+    break;
   default:
     silog::log(silog::error, "invalid map state in old player pos: [%c]", pp);
     throw 0;
@@ -119,6 +122,10 @@ static void set_player() {
   case empty:
     clear_player();
     update(player);
+    break;
+  case target:
+    clear_player();
+    update(player_target);
     break;
   default:
     break;
