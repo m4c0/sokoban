@@ -23,7 +23,17 @@ public:
     // TODO: assert lvl is smaller than our buffer
     m_end = m_buf;
     for (auto c : lvl) {
-      *m_end++ = (c == 'P') ? empty : static_cast<blocks>(c);
+      switch (c) {
+      case player:
+        *m_end++ = empty;
+        break;
+      case player_target:
+        *m_end++ = target;
+        break;
+      default:
+        *m_end++ = static_cast<blocks>(c);
+        break;
+      }
     }
   }
 
