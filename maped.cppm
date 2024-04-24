@@ -59,10 +59,6 @@ static void next_level() { set_level(g_lvl + 1); }
 static void new_level() {
   silog::log(silog::info, "New level");
 
-  // TODO: use a real double-buffer
-  char tmp[sizeof(g_lvl_buf)]{"P"};
-  sg::set_level(tmp);
-
   for (auto &c : g_lvl_buf)
     c = outside;
 
