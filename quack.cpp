@@ -49,7 +49,9 @@ static constexpr auto colour(char b) {
 }
 // }}}
 
-unsigned sr::rnd::max_quads() const noexcept {
+// TODO: make this a common const between quack, maped and grid
+unsigned sr::rnd::max_quads() const noexcept { return 1024; }
+unsigned sr::rnd::quad_count() const noexcept {
   return sl::level_width * sl::level_height;
 }
 

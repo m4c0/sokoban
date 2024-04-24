@@ -24,6 +24,7 @@ jute::view level(unsigned);
 export namespace sokoban::renderer {
 struct rnd : public quack::donald {
   unsigned max_quads() const noexcept override;
+  unsigned quad_count() const noexcept override;
   quack::upc push_constants() const noexcept override;
   virtual void update_data(quack::mapped_buffers all) override;
   atlas create_atlas(voo::device_and_queue *dq) override;
