@@ -1,6 +1,6 @@
 #pragma leco add_impl audio
 #pragma leco add_impl levels
-#pragma leco add_impl quack
+#pragma leco add_impl renderer
 
 export module game;
 import :grid;
