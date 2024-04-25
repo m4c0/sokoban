@@ -62,9 +62,6 @@ static void new_level() {
   for (auto &c : g_lvl_buf)
     c = outside;
 
-  // TODO: without this, we explode like "player_target" in the editor
-  g_lvl_buf[1] = player;
-
   sg::set_level(g_lvl_buf);
 }
 
@@ -100,6 +97,9 @@ static void cursor_down() {
 }
 
 static void clear_player() {
+  if (sg::player_pos > sl::level_width * sl::level_height)
+    return;
+
   switch (auto &pp = g_lvl_buf[sg::player_pos]) {
   case player:
     pp = empty;
