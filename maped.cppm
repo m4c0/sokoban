@@ -1,9 +1,11 @@
 #pragma leco app
 export module maped;
 import casein;
+import fork;
 import game;
-import silog;
 import quack;
+import silog;
+import yoyo;
 
 // TODO: flood fill empty/outside
 // TODO: move all map (or center it) - suggestion: use "Shift-Arrows"
@@ -203,6 +205,17 @@ static void level_dump() {
   for (auto y = 0; y < sl::level_height; y++, l += sl::level_width) {
     silog::log(silog::info, "%.*s", sl::level_width, l);
   }
+
+  yoyo::file_writer w{"levels.dat"};
+  frk::push('SKBN', &w, [&](auto) {
+    return w
+        .write_u32(g_lvl) //
+        .fmap([&] {
+          return w.write(g_lvl_buf, sl::level_width * sl::level_height);
+        });
+  }).take([](auto err) {
+    silog::log(silog::error, "failed to write levels: %s", err);
+  });
 }
 
 static void level_select();
