@@ -117,6 +117,25 @@ static void clear_player() {
   }
 }
 
+static void move_lvl_left() {
+  const auto count = sl::level_width * sl::level_height;
+  g_lvl_buf[count] = outside;
+  for (auto i = 0; i < count - 1; i++) {
+    g_lvl_buf[i] = g_lvl_buf[i + 1];
+  }
+  sg::set_level(g_lvl_buf);
+}
+static void move_lvl_right() {
+  const auto count = sl::level_width * sl::level_height;
+  for (auto i = count; i > 0; i--) {
+    g_lvl_buf[i] = g_lvl_buf[i - 1];
+  }
+  g_lvl_buf[0] = outside;
+  sg::set_level(g_lvl_buf);
+}
+static void move_lvl_up() {}
+static void move_lvl_down() {}
+
 static void update(char b) {
   g_lvl_buf[g_cursor] = b;
   sg::set_level(g_lvl_buf);
@@ -245,6 +264,11 @@ static void edit_level() {
   handle(KEY_DOWN, K_T, &set_target);
   handle(KEY_DOWN, K_W, &set_wall);
   handle(KEY_DOWN, K_SPACE, &set_void);
+
+  handle(KEY_DOWN, K_H, &move_lvl_left);
+  handle(KEY_DOWN, K_J, &move_lvl_down);
+  handle(KEY_DOWN, K_K, &move_lvl_up);
+  handle(KEY_DOWN, K_L, &move_lvl_right);
 
   handle(KEY_UP, K_W, &reset_pen);
   handle(KEY_UP, K_SPACE, &reset_pen);
