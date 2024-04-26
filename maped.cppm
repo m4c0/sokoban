@@ -3,6 +3,7 @@ export module maped;
 import casein;
 import fork;
 import game;
+import jute;
 import quack;
 import silog;
 import yoyo;
@@ -201,6 +202,20 @@ static void set_target() {
 
 static void reset_pen() { g_pen = {}; }
 
+static mno::req<void> store_level(int l, yoyo::writer *w) {
+  jute::view lvl = (l == g_lvl) ? g_lvl_buf : sl::level(l);
+  return w->write_u32(l).fmap(
+      [&] { return w->write(lvl.data(), sl::level_width * sl::level_height); });
+}
+static mno::req<void> store_levels(int l, yoyo::writer *w) {
+  if (l == sl::max_levels()) {
+    if (l == g_lvl) { // new level
+    }
+    return {};
+  }
+  return frk::push('LEVL', w, [&](auto) { return store_level(l, w); })
+      .fmap([&] { return store_levels(l + 1, w); });
+}
 static void level_dump() {
   const char *l = g_lvl_buf;
   for (auto y = 0; y < sl::level_height; y++, l += sl::level_width) {
@@ -208,12 +223,8 @@ static void level_dump() {
   }
 
   yoyo::file_writer w{"levels.dat"};
-  frk::push('SKBN', &w, [&](auto) {
-    return w
-        .write_u32(g_lvl) //
-        .fmap([&] {
-          return w.write(g_lvl_buf, sl::level_width * sl::level_height);
-        });
+  frk::push('SKBN', &w, [&](auto w) {
+    return store_levels(0, w);
   }).take([](auto err) {
     silog::log(silog::error, "failed to write levels: %s", err);
   });
