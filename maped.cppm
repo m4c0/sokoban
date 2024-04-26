@@ -64,6 +64,7 @@ static void new_level() {
   for (auto &c : g_lvl_buf)
     c = outside;
 
+  g_lvl = sl::max_levels();
   sg::set_level(g_lvl_buf);
 }
 
