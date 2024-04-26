@@ -208,9 +208,7 @@ static mno::req<void> store_level(int l, yoyo::writer *w) {
       [&] { return w->write(lvl.data(), sl::level_width * sl::level_height); });
 }
 static mno::req<void> store_levels(int l, yoyo::writer *w) {
-  if (l == sl::max_levels()) {
-    if (l == g_lvl) { // new level
-    }
+  if (l >= sl::max_levels() && l != g_lvl) {
     return {};
   }
   return frk::push('LEVL', w, [&](auto) { return store_level(l, w); })
