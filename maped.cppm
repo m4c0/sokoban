@@ -9,9 +9,6 @@ import silog;
 import yoyo;
 
 // TODO: flood fill empty/outside
-// TODO: move all map (or center it) - suggestion: use "Shift-Arrows"
-
-// TODO: add support to player starting from a target
 // TODO: maybe support for map without a player?
 // Note: these requires support in the game itself. Currently, it crashes if
 // player starts in a target.
