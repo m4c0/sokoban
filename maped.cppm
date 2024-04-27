@@ -238,9 +238,10 @@ static void set_target() {
 static void reset_pen() { g_pen = {}; }
 
 static mno::req<void> store_level(int l, yoyo::writer *w) {
+  const auto lw = sl::level_width;
+  const auto lh = sl::level_height;
   jute::view lvl = (l == g_lvl) ? g_lvl_buf : sl::level(l);
-  return w->write_u32(l).fmap(
-      [&] { return w->write(lvl.data(), sl::level_width * sl::level_height); });
+  return w->write_u32(l).fmap([&] { return w->write(lvl.data(), lw * lh); });
 }
 static mno::req<void> store_levels(int l, yoyo::writer *w) {
   if (l >= sl::max_levels() && l != g_lvl) {
