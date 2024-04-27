@@ -10,7 +10,7 @@ namespace sl = sokoban::levels;
 static constexpr const auto max_level_capacity = 500;
 
 const unsigned sl::level_width = 24;
-const unsigned sl::level_height = 12;
+const unsigned sl::level_height = 14;
 
 static unsigned g_max_level{};
 hai::array<char[1024]> g_data{max_level_capacity};
