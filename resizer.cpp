@@ -22,10 +22,11 @@ mno::req<void> read_level(frk::pair p) {
   for (auto &c : lvl.data)
     c = ' ';
 
+  constexpr const auto a = (new_size - old_size) / 2;
   return data.read_u32()
       .fmap([&](auto l) {
         lvl.id = l;
-        return data.read(lvl.data, old_size);
+        return data.read(lvl.data + a, old_size);
       })
       .map([&] { g_data.push_back(lvl); });
 }
