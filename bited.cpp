@@ -10,6 +10,8 @@ static constexpr const unsigned image_h = 8 * 4;
 
 static void update_atlas(voo::h2l_image *img) {}
 
+static bool g_cursor_hl{};
+
 struct : public quack::donald {
   const char *app_name() const noexcept override { return "bited"; }
   unsigned max_quads() const noexcept override { return 2; }
@@ -32,9 +34,25 @@ struct : public quack::donald {
     p[0] = {{0, 0}, {image_w, image_h}};
     u[0] = {{0, 0}, {1, 1}};
 
-    c[1] = {0, 0, 0, 0};
-    m[1] = {1, 1, 1, 0.5};
+    if (g_cursor_hl) {
+      c[1] = {0, 0, 0, 0};
+    } else {
+      c[1] = {1, 1, 1, 1};
+    }
+    m[1] = {1, 1, 1, 1};
     p[1] = {{0, 0}, {1, 1}};
     u[1] = {};
   }
 } r;
+
+static void flip_cursor() {
+  g_cursor_hl = !g_cursor_hl;
+  r.refresh_batch();
+}
+
+struct init {
+  init() {
+    using namespace casein;
+    handle(TIMER, &flip_cursor);
+  }
+} i;
