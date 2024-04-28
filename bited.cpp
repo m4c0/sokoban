@@ -3,15 +3,14 @@
 import casein;
 import fork;
 import quack;
-import traits;
 import voo;
 
 static constexpr const unsigned image_w = 8;
 static constexpr const unsigned image_h = 8 * 4;
 
-void update_atlas(voo::h2l_image *img) {}
+static void update_atlas(voo::h2l_image *img) {}
 
-struct init : quack::donald {
+struct : public quack::donald {
   const char *app_name() const noexcept override { return "bited"; }
   unsigned max_quads() const noexcept override { return 2; }
   unsigned quad_count() const noexcept override { return max_quads(); }
