@@ -108,7 +108,9 @@ struct init {
     handle(KEY_DOWN, K_UP, up);
     handle(KEY_DOWN, K_LEFT, left);
     handle(KEY_DOWN, K_RIGHT, right);
+
     handle(KEY_DOWN, K_ENTER, flip);
+    handle(KEY_DOWN, K_SPACE, flip);
 
     handle(TIMER, &flip_cursor);
   }
