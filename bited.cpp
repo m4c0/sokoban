@@ -10,6 +10,8 @@ static constexpr const unsigned image_h = 8 * 4;
 
 static void update_atlas(voo::h2l_image *img) {}
 
+static unsigned g_cursor_x{};
+static unsigned g_cursor_y{};
 static bool g_cursor_hl{};
 
 struct : public quack::donald {
@@ -40,7 +42,8 @@ struct : public quack::donald {
       c[1] = {1, 1, 1, 1};
     }
     m[1] = {1, 1, 1, 1};
-    p[1] = {{0, 0}, {1, 1}};
+    p[1] = {{static_cast<float>(g_cursor_x), static_cast<float>(g_cursor_y)},
+            {1, 1}};
     u[1] = {};
   }
 } r;
@@ -50,9 +53,44 @@ static void flip_cursor() {
   r.refresh_batch();
 }
 
+static void down() {
+  if (g_cursor_y >= image_h - 1)
+    return;
+
+  g_cursor_y++;
+  r.refresh_batch();
+}
+static void up() {
+  if (g_cursor_y == 0)
+    return;
+
+  g_cursor_y--;
+  r.refresh_batch();
+}
+static void left() {
+  if (g_cursor_x == 0)
+    return;
+
+  g_cursor_x--;
+  r.refresh_batch();
+}
+static void right() {
+  if (g_cursor_x >= image_w - 1)
+    return;
+
+  g_cursor_x++;
+  r.refresh_batch();
+}
+
 struct init {
   init() {
     using namespace casein;
+
+    handle(KEY_DOWN, K_DOWN, down);
+    handle(KEY_DOWN, K_UP, up);
+    handle(KEY_DOWN, K_LEFT, left);
+    handle(KEY_DOWN, K_RIGHT, right);
+
     handle(TIMER, &flip_cursor);
   }
 } i;
