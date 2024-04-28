@@ -53,7 +53,7 @@ struct : public quack::donald {
     } else {
       c[1] = {1, 0, 0, 1};
     }
-    m[1] = {1, 1, 1, 1};
+    m[1] = {1, 1, 1, 0};
     p[1] = {{static_cast<float>(g_cursor_x), static_cast<float>(g_cursor_y)},
             {1, 1}};
     u[1] = {};
