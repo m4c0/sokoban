@@ -3,6 +3,7 @@
 import casein;
 import fork;
 import quack;
+import stubby;
 import traits;
 import voo;
 
@@ -100,6 +101,12 @@ static void flip() {
   r.refresh_atlas();
 }
 
+static void save() {
+  // TODO: improve safety with a hai::array<pixel> and X/Y accessors
+  auto *pix = reinterpret_cast<stbi::pixel *>(g_pixies);
+  stbi::write_rgba_unsafe("atlas.png", image_w, image_h, pix);
+}
+
 struct init {
   init() {
     using namespace casein;
@@ -108,8 +115,7 @@ struct init {
     handle(KEY_DOWN, K_UP, up);
     handle(KEY_DOWN, K_LEFT, left);
     handle(KEY_DOWN, K_RIGHT, right);
-
-    handle(KEY_DOWN, K_ENTER, flip);
+    handle(KEY_DOWN, K_ENTER, save);
     handle(KEY_DOWN, K_SPACE, flip);
 
     handle(TIMER, &flip_cursor);
