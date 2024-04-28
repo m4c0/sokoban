@@ -3,16 +3,28 @@
 import casein;
 import fork;
 import quack;
+import traits;
 import voo;
+
+using namespace traits::ints;
 
 static constexpr const unsigned image_w = 8;
 static constexpr const unsigned image_h = 8 * 4;
 
-static void update_atlas(voo::h2l_image *img) {}
-
 static unsigned g_cursor_x{};
 static unsigned g_cursor_y{};
 static bool g_cursor_hl{};
+static uint32_t g_pixies[image_h][image_w]{};
+
+static void update_atlas(voo::h2l_image *img) {
+  voo::mapmem m{img->host_memory()};
+  auto *buf = static_cast<uint32_t *>(*m);
+  for (auto y = 0; y < image_h; y++) {
+    for (auto x = 0; x < image_w; x++, buf++) {
+      *buf = g_pixies[y][x];
+    }
+  }
+}
 
 struct : public quack::donald {
   const char *app_name() const noexcept override { return "bited"; }
@@ -39,7 +51,7 @@ struct : public quack::donald {
     if (g_cursor_hl) {
       c[1] = {0, 0, 0, 0};
     } else {
-      c[1] = {1, 1, 1, 1};
+      c[1] = {1, 0, 0, 1};
     }
     m[1] = {1, 1, 1, 1};
     p[1] = {{static_cast<float>(g_cursor_x), static_cast<float>(g_cursor_y)},
@@ -82,6 +94,12 @@ static void right() {
   r.refresh_batch();
 }
 
+static void flip() {
+  auto &p = g_pixies[g_cursor_y][g_cursor_x];
+  p = ~p;
+  r.refresh_atlas();
+}
+
 struct init {
   init() {
     using namespace casein;
@@ -90,6 +108,7 @@ struct init {
     handle(KEY_DOWN, K_UP, up);
     handle(KEY_DOWN, K_LEFT, left);
     handle(KEY_DOWN, K_RIGHT, right);
+    handle(KEY_DOWN, K_ENTER, flip);
 
     handle(TIMER, &flip_cursor);
   }
