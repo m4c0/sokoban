@@ -134,6 +134,12 @@ struct init {
         .assert(sane_image_width, "image is wider than buffer")
         .assert(sane_image_height, "image is taller than buffer")
         .assert(sane_num_channels, "image is not RGBA")
+        .map([](auto &&img) {
+          auto *c = reinterpret_cast<unsigned char *>(g_pixies);
+          for (auto i = 0; i < img.width * img.height * 4; i++) {
+            c[i] = (*img.data)[i];
+          }
+        })
         .take([](auto err) {
           silog::log(silog::error, "failed to load atlas: %s", err);
         });
