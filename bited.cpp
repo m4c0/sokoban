@@ -1,8 +1,8 @@
 #pragma leco app
 
 import casein;
-import fork;
 import quack;
+import silog;
 import stubby;
 import traits;
 import voo;
@@ -107,6 +107,16 @@ static void save() {
   stbi::write_rgba_unsafe("atlas.png", image_w, image_h, pix);
 }
 
+static constexpr bool sane_image_width(const stbi::image &img) {
+  return img.width <= image_w;
+}
+static constexpr bool sane_image_height(const stbi::image &img) {
+  return img.height <= image_h;
+}
+static constexpr bool sane_num_channels(const stbi::image &img) {
+  return img.num_channels == 4;
+}
+
 struct init {
   init() {
     using namespace casein;
@@ -119,5 +129,13 @@ struct init {
     handle(KEY_DOWN, K_SPACE, flip);
 
     handle(TIMER, &flip_cursor);
+
+    stbi::load("atlas.png")
+        .assert(sane_image_width, "image is wider than buffer")
+        .assert(sane_image_height, "image is taller than buffer")
+        .assert(sane_num_channels, "image is not RGBA")
+        .take([](auto err) {
+          silog::log(silog::error, "failed to load atlas: %s", err);
+        });
   }
 } i;
