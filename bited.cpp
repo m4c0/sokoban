@@ -8,7 +8,7 @@ import voo;
 
 using namespace traits::ints;
 
-static constexpr const unsigned image_w = 8;
+static constexpr const unsigned image_w = 8 * 4;
 static constexpr const unsigned image_h = 8 * 4;
 
 static unsigned g_cursor_x{};
