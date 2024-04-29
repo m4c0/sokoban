@@ -9,8 +9,9 @@ import voo;
 
 using namespace traits::ints;
 
-static constexpr const unsigned image_w = 8 * 4;
-static constexpr const unsigned image_h = 8 * 4;
+// Shifts are a reminder for using POT textures to avoid FP imprecisions in GPU
+static constexpr const unsigned image_w = 8 * (1 << 0);
+static constexpr const unsigned image_h = 8 * (1 << 2);
 
 static unsigned g_cursor_x{};
 static unsigned g_cursor_y{};
