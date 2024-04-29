@@ -14,31 +14,36 @@ enum blocks : char {
 
 enum move_type { push, walk, none, push2tgt };
 
+// TODO: move these to a place common between here and level
+const unsigned level_width = 24;
+const unsigned level_height = 14;
+
 class grid {
   blocks m_buf[1024]{};
-  blocks *m_end{};
 
 public:
   constexpr void load(jute::view lvl) {
     // TODO: assert lvl is smaller than our buffer
-    m_end = m_buf;
+    auto ptr = m_buf;
     for (auto c : lvl) {
       switch (c) {
       case player:
-        *m_end++ = empty;
+        *ptr++ = empty;
         break;
       case player_target:
-        *m_end++ = target;
+        *ptr++ = target;
         break;
       default:
-        *m_end++ = static_cast<blocks>(c);
+        *ptr++ = static_cast<blocks>(c);
         break;
       }
     }
   }
 
   [[nodiscard]] constexpr auto *begin() const noexcept { return m_buf; }
-  [[nodiscard]] constexpr auto *end() const noexcept { return m_end; }
+  [[nodiscard]] constexpr auto *end() const noexcept {
+    return m_buf + level_width * level_height;
+  }
 
   [[nodiscard]] constexpr auto move_type(unsigned cur,
                                          unsigned delta) const noexcept {
