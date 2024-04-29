@@ -10,8 +10,10 @@ import voo;
 using namespace traits::ints;
 
 // Shifts are a reminder for using POT textures to avoid FP imprecisions in GPU
-static constexpr const unsigned image_w = 8 * (1 << 0);
-static constexpr const unsigned image_h = 8 * (1 << 2);
+static constexpr const unsigned cols = 1 << 0;
+static constexpr const unsigned rows = 1 << 2;
+static constexpr const unsigned image_w = 8 * cols;
+static constexpr const unsigned image_h = 8 * rows;
 
 static unsigned g_cursor_x{};
 static unsigned g_cursor_y{};
@@ -30,7 +32,7 @@ static void update_atlas(voo::h2l_image *img) {
 
 struct : public quack::donald {
   const char *app_name() const noexcept override { return "bited"; }
-  unsigned max_quads() const noexcept override { return 2; }
+  unsigned max_quads() const noexcept override { return 1 + (rows * cols); }
   unsigned quad_count() const noexcept override { return max_quads(); }
   quack::upc push_constants() const noexcept override {
     quack::upc res{};
@@ -44,11 +46,17 @@ struct : public quack::donald {
                        image_w, image_h);
   }
   void update_data(quack::mapped_buffers all) override {
+    static constexpr const float inv_c = 1.0f / cols;
+    static constexpr const float inv_r = 1.0f / rows;
     auto [c, m, p, u] = all;
-    *c++ = {0, 0, 0, 1};
-    *m++ = {1, 1, 1, 1};
-    *p++ = {{0, 0}, {image_w, image_h}};
-    *u++ = {{0, 0}, {1, 1}};
+    for (auto y = 0; y < rows; y++) {
+      for (auto x = 0; x < cols; x++) {
+        *c++ = {0, 0, 0, 1};
+        *m++ = {1, 1, 1, 1};
+        *p++ = {{x * 8.0f, y * 8.0f}, {8, 8}};
+        *u++ = {{x * inv_c, y * inv_r}, {(x + 1) * inv_c, (y + 1) * inv_r}};
+      }
+    }
 
     if (g_cursor_hl) {
       *c++ = {0, 0, 0, 0};
