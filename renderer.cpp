@@ -95,18 +95,18 @@ void sr::rnd::update_data(quack::mapped_buffers all) {
 
   // Number
   auto n = sl::current_level();
-  auto x = 3.f;
-  while (n > 0) {
+  auto x = 2.75f;
+  for (auto i = 0; i < 3; i++) {
     auto d = n % 10;
     auto uu = (d % 6) / 8.0f;
-    auto uv = (d / 6) / 8.0f;
+    auto uv = (d / 6) / 4.0f;
 
-    *p++ = {{x, 0}, {0.25, 1}};
-    *u++ = {{0.25f + uu, 0.25f + uv}, {0.325f + uu, 0.5f + uv}};
+    *p++ = {{x, 0}, {0.5, 1}};
+    *u++ = {{0.25f + uu, 0.25f + uv}, {0.375f + uu, 0.5f + uv}};
     *c++ = {0, 0, 0, 0};
     *m++ = {1, 1, 1, 1};
 
-    x += 0.25;
+    x -= 0.5;
     n /= 10;
   }
 }
