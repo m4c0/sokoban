@@ -22,7 +22,7 @@ enum atlas_sprites {
 static constexpr auto uv(atlas_sprites s) {
   constexpr const auto h = 1.0f / static_cast<float>(sprite_count);
   const auto n = static_cast<unsigned>(s);
-  return quack::uv{{0, n * h}, {1, (n + 1) * h}};
+  return quack::uv{{0, n * h}, {0.25, (n + 1) * h}};
 }
 static constexpr auto uv(char b) {
   switch (b) {

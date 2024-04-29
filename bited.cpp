@@ -10,7 +10,7 @@ import voo;
 using namespace traits::ints;
 
 // Shifts are a reminder for using POT textures to avoid FP imprecisions in GPU
-static constexpr const unsigned cols = 1 << 0;
+static constexpr const unsigned cols = 1 << 2;
 static constexpr const unsigned rows = 1 << 2;
 static constexpr const unsigned image_w = 8 * cols;
 static constexpr const unsigned image_h = 8 * rows;
