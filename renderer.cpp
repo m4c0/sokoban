@@ -1,6 +1,5 @@
 #pragma leco add_resource "atlas.png"
 module game;
-import :atlas;
 import :grid;
 import casein;
 import quack;
@@ -10,6 +9,14 @@ import voo;
 namespace sg = sokoban::game;
 namespace sl = sokoban::levels;
 namespace sr = sokoban::renderer;
+
+enum atlas_sprites {
+  sprite_empty,
+  sprite_player,
+  sprite_box,
+  sprite_target,
+  sprite_count
+};
 
 // {{{ quad map utils
 static constexpr auto uv(atlas_sprites s) {
