@@ -17,6 +17,7 @@ void play(unsigned);
 export namespace sokoban::levels {
 extern const unsigned level_width;
 extern const unsigned level_height;
+unsigned current_level();
 unsigned max_levels();
 jute::view level(unsigned);
 } // namespace sokoban::levels

@@ -12,6 +12,7 @@ static constexpr const auto max_level_capacity = 500;
 const unsigned sl::level_width = 24;
 const unsigned sl::level_height = 14;
 
+static unsigned g_cur_level{};
 static unsigned g_max_level{};
 hai::array<char[1024]> g_data{max_level_capacity};
 
@@ -50,5 +51,9 @@ static struct lvls {
   }
 } g_lvls;
 
+unsigned sl::current_level() { return g_cur_level + 1; }
 unsigned sl::max_levels() { return g_max_level + 1; }
-jute::view sl::level(unsigned l) { return g_data[l]; }
+jute::view sl::level(unsigned l) {
+  g_cur_level = l;
+  return g_data[l];
+}
