@@ -1,3 +1,4 @@
+#pragma leco add_resource "atlas.png"
 module game;
 import :atlas;
 import :grid;
@@ -80,6 +81,5 @@ void sr::rnd::update_data(quack::mapped_buffers all) {
 }
 
 sr::rnd::atlas sr::rnd::create_atlas(voo::device_and_queue *dq) {
-  return atlas::make(dq->queue(), &update_atlas, dq->physical_device(),
-                     atlas_col_count, atlas_row_count);
+  return atlas{new voo::sires_image("atlas.png", dq)};
 }
