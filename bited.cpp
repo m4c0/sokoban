@@ -53,7 +53,7 @@ struct : public quack::donald {
       for (auto x = 0; x < cols; x++) {
         *c++ = {0, 0, 0, 1};
         *m++ = {1, 1, 1, 1};
-        *p++ = {{x * 8.0f, y * 8.0f}, {8, 8}};
+        *p++ = {{x * 8.0f + 0.1f, y * 8.0f + 0.1f}, {8 - 0.2f, 8 - 0.2f}};
         *u++ = {{x * inv_c, y * inv_r}, {(x + 1) * inv_c, (y + 1) * inv_r}};
       }
     }
