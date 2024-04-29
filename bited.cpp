@@ -45,20 +45,20 @@ struct : public quack::donald {
   }
   void update_data(quack::mapped_buffers all) override {
     auto [c, m, p, u] = all;
-    c[0] = {0, 0, 0, 1};
-    m[0] = {1, 1, 1, 1};
-    p[0] = {{0, 0}, {image_w, image_h}};
-    u[0] = {{0, 0}, {1, 1}};
+    *c++ = {0, 0, 0, 1};
+    *m++ = {1, 1, 1, 1};
+    *p++ = {{0, 0}, {image_w, image_h}};
+    *u++ = {{0, 0}, {1, 1}};
 
     if (g_cursor_hl) {
-      c[1] = {0, 0, 0, 0};
+      *c++ = {0, 0, 0, 0};
     } else {
-      c[1] = {1, 0, 0, 1};
+      *c++ = {1, 0, 0, 1};
     }
-    m[1] = {1, 1, 1, 0};
-    p[1] = {{static_cast<float>(g_cursor_x), static_cast<float>(g_cursor_y)},
+    *m++ = {1, 1, 1, 0};
+    *p++ = {{static_cast<float>(g_cursor_x), static_cast<float>(g_cursor_y)},
             {1, 1}};
-    u[1] = {};
+    *u++ = {};
   }
 } r;
 
