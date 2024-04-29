@@ -144,9 +144,11 @@ struct init {
         .assert(sane_image_height, "image is taller than buffer")
         .assert(sane_num_channels, "image is not RGBA")
         .map([](auto &&img) {
-          auto *c = reinterpret_cast<unsigned char *>(g_pixies);
-          for (auto i = 0; i < img.width * img.height * 4; i++) {
-            c[i] = (*img.data)[i];
+          auto *d = reinterpret_cast<uint32_t *>(*img.data);
+          for (auto y = 0; y < img.height; y++) {
+            for (auto x = 0; x < img.width; x++) {
+              g_pixies[y][x] = *d++;
+            }
           }
         })
         .take([](auto err) {
