@@ -60,7 +60,7 @@ static constexpr auto colour(char b) {
 // TODO: make this a common const between quack, maped and grid
 unsigned sr::rnd::max_quads() const noexcept { return 1024; }
 unsigned sr::rnd::quad_count() const noexcept {
-  return sl::level_width * sl::level_height;
+  return sl::level_width * sl::level_height + 1;
 }
 
 quack::upc sr::rnd::push_constants() const noexcept {
@@ -73,6 +73,7 @@ quack::upc sr::rnd::push_constants() const noexcept {
 void sr::rnd::update_data(quack::mapped_buffers all) {
   auto [c, m, p, u] = all;
   auto i = 0U;
+
   for (char b : sg::grid) {
     if (sg::player_pos == i) {
       b = (b == target) ? player_target : player;
@@ -85,6 +86,11 @@ void sr::rnd::update_data(quack::mapped_buffers all) {
     *m++ = quack::colour{1, 1, 1, 1};
     i++;
   }
+
+  *p++ = {{0, 0}, {2, 1}};
+  *u++ = {{0.25, 0.0}, {0.75, 0.25}};
+  *c++ = {0, 0, 0, 0};
+  *m++ = {1, 1, 1, 1};
 }
 
 sr::rnd::atlas sr::rnd::create_atlas(voo::device_and_queue *dq) {
