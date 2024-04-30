@@ -20,26 +20,12 @@ class grid {
   blocks m_buf[1024]{};
 
 public:
-  constexpr void load(jute::view lvl) {
-    // TODO: assert lvl is smaller than our buffer
-    auto ptr = m_buf;
-    for (auto c : lvl) {
-      switch (c) {
-      case player:
-        *ptr++ = empty;
-        break;
-      case player_target:
-        *ptr++ = target;
-        break;
-      default:
-        *ptr++ = static_cast<blocks>(c);
-        break;
-      }
-    }
-  }
-
   [[nodiscard]] constexpr auto *begin() const noexcept { return m_buf; }
   [[nodiscard]] constexpr auto *end() const noexcept {
+    return m_buf + level_width * level_height;
+  }
+  [[nodiscard]] constexpr auto *begin() noexcept { return m_buf; }
+  [[nodiscard]] constexpr auto *end() noexcept {
     return m_buf + level_width * level_height;
   }
 

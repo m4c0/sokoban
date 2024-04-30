@@ -50,7 +50,21 @@ namespace sokoban::game {
 class grid grid {};
 unsigned player_pos{};
 void set_level(jute::view lvl) {
-  grid.load(lvl);
+  // TODO: assert lvl is smaller than our buffer
+  auto ptr = grid.begin();
+  for (auto c : lvl) {
+    switch (c) {
+    case player:
+      *ptr++ = empty;
+      break;
+    case player_target:
+      *ptr++ = target;
+      break;
+    default:
+      *ptr++ = static_cast<blocks>(c);
+      break;
+    }
+  }
 
   player_pos = 0;
   for (auto c : lvl) {
