@@ -22,8 +22,33 @@ static void set_level(unsigned idx) {
   r.refresh_batch();
 }
 
+static constexpr auto move_type(unsigned cur, unsigned delta) noexcept {
+  auto next = cur + delta;
+
+  switch (sg::grid[next]) {
+  case box:
+  case target_box:
+    switch (sg::grid[next + delta]) {
+    case empty:
+      return push;
+    case target:
+      return push2tgt;
+    default:
+      return none;
+    }
+  case outside:
+  case wall:
+    return none;
+  case empty:
+  case target:
+  case player:
+  case player_target:
+    return walk;
+  }
+}
+
 static void move(unsigned p) {
-  switch (auto mt = sg::grid.move_type(sg::player_pos, p)) {
+  switch (auto mt = move_type(sg::player_pos, p)) {
   case none:
     audio.play(150);
     return;

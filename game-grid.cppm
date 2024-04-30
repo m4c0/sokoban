@@ -45,30 +45,8 @@ public:
     return m_buf + level_width * level_height;
   }
 
-  [[nodiscard]] constexpr auto move_type(unsigned cur,
-                                         unsigned delta) const noexcept {
-    auto next = cur + delta;
-
-    switch (m_buf[next]) {
-    case box:
-    case target_box:
-      switch (m_buf[next + delta]) {
-      case empty:
-        return push;
-      case target:
-        return push2tgt;
-      default:
-        return none;
-      }
-    case outside:
-    case wall:
-      return none;
-    case empty:
-    case target:
-    case player:
-    case player_target:
-      return walk;
-    }
+  [[nodiscard]] constexpr auto &operator[](unsigned idx) noexcept {
+    return m_buf[idx];
   }
 
   [[nodiscard]] constexpr bool is_done() const noexcept {
