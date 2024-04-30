@@ -6,12 +6,18 @@ export module game;
 import :grid;
 import jute;
 import quack;
+import siaudio;
 import voo;
 
 // TODO: move each of these into its own module
 
 export namespace sokoban::audio {
-void play(unsigned);
+class streamer : siaudio::os_streamer {
+  void fill_buffer(float *data, unsigned samples) override;
+
+public:
+  void play(unsigned);
+};
 }
 
 export namespace sokoban::levels {

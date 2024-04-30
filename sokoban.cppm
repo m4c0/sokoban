@@ -19,10 +19,12 @@ static struct : sr::rnd {
   const char *app_name() const noexcept override { return "sokoban"; }
 } r;
 
+static sa::streamer audio{};
+
 static void move(unsigned p) {
   switch (auto mt = sg::grid.move_type(sg::player_pos, p)) {
   case none:
-    sa::play(150);
+    audio.play(150);
     return;
   case push:
   case push2tgt:
@@ -32,11 +34,11 @@ static void move(unsigned p) {
     if (sg::grid.is_done()) {
       set_level(m_level + 1);
       r.refresh_batch();
-      sa::play(50);
+      audio.play(50);
     } else if (mt == push2tgt) {
-      sa::play(100);
+      audio.play(100);
     } else {
-      sa::play(200);
+      audio.play(200);
     }
     break;
   case walk:
