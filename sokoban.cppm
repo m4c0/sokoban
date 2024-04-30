@@ -55,20 +55,23 @@ void up() { move(-sl::level_width); }
 void left() { move(-1); }
 void right() { move(1); }
 
-struct init {
-  init() {
-    sg::set_level(sl::level(m_level));
+void setup_game(int l) {
+  m_level = l;
+  sg::set_level(sl::level(l));
 
-    using namespace casein;
-    handle(GESTURE, G_SWIPE_UP, &up);
-    handle(GESTURE, G_SWIPE_DOWN, &down);
-    handle(GESTURE, G_SWIPE_LEFT, &left);
-    handle(GESTURE, G_SWIPE_RIGHT, &right);
-    handle(GESTURE, G_SHAKE, &reset_level);
-    handle(KEY_DOWN, K_UP, &up);
-    handle(KEY_DOWN, K_DOWN, &down);
-    handle(KEY_DOWN, K_LEFT, &left);
-    handle(KEY_DOWN, K_RIGHT, &right);
-    handle(KEY_DOWN, K_SPACE, &reset_level);
-  }
+  using namespace casein;
+  handle(GESTURE, G_SWIPE_UP, &up);
+  handle(GESTURE, G_SWIPE_DOWN, &down);
+  handle(GESTURE, G_SWIPE_LEFT, &left);
+  handle(GESTURE, G_SWIPE_RIGHT, &right);
+  handle(GESTURE, G_SHAKE, &reset_level);
+  handle(KEY_DOWN, K_UP, &up);
+  handle(KEY_DOWN, K_DOWN, &down);
+  handle(KEY_DOWN, K_LEFT, &left);
+  handle(KEY_DOWN, K_RIGHT, &right);
+  handle(KEY_DOWN, K_SPACE, &reset_level);
+}
+
+struct init {
+  init() { setup_game(0); }
 } i;
