@@ -20,15 +20,6 @@ class grid {
   blocks m_buf[1024]{};
 
 public:
-  [[nodiscard]] constexpr auto *begin() const noexcept { return m_buf; }
-  [[nodiscard]] constexpr auto *end() const noexcept {
-    return m_buf + level_width * level_height;
-  }
-  [[nodiscard]] constexpr auto *begin() noexcept { return m_buf; }
-  [[nodiscard]] constexpr auto *end() noexcept {
-    return m_buf + level_width * level_height;
-  }
-
   [[nodiscard]] constexpr auto &operator[](unsigned idx) noexcept {
     return m_buf[idx];
   }

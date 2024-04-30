@@ -72,9 +72,9 @@ quack::upc sr::rnd::push_constants() const noexcept {
 
 void sr::rnd::update_data(quack::mapped_buffers all) {
   auto [c, m, p, u] = all;
-  auto i = 0U;
 
-  for (char b : sg::grid) {
+  for (auto i = 0U; i < sl::level_quad_count(); i++) {
+    auto b = sg::grid[i];
     if (sg::player_pos == i) {
       b = (b == target) ? player_target : player;
     }
@@ -84,7 +84,6 @@ void sr::rnd::update_data(quack::mapped_buffers all) {
     *u++ = uv(b);
     *c++ = colour(b);
     *m++ = quack::colour{1, 1, 1, 1};
-    i++;
   }
 
   // Level

@@ -25,8 +25,8 @@ static void set_level(unsigned idx) {
 }
 
 static bool is_done() {
-  for (auto c : sg::grid)
-    if (c == target)
+  for (auto i = 0; i < sl::level_quad_count(); i++)
+    if (sg::grid[i] == target)
       return false;
 
   return true;

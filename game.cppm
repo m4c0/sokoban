@@ -26,6 +26,8 @@ extern const unsigned level_height;
 unsigned current_level();
 unsigned max_levels();
 jute::view level(unsigned);
+
+inline unsigned level_quad_count() { return level_width * level_height; }
 } // namespace sokoban::levels
 
 export namespace sokoban::renderer {
@@ -51,26 +53,20 @@ class grid grid {};
 unsigned player_pos{};
 void set_level(jute::view lvl) {
   // TODO: assert lvl is smaller than our buffer
-  auto ptr = grid.begin();
-  for (auto c : lvl) {
-    switch (c) {
+  for (auto i = 0U; i < levels::level_quad_count(); i++) {
+    switch (auto c = lvl[i]) {
     case player:
-      *ptr++ = empty;
+      game::grid[i] = empty;
+      player_pos = i;
       break;
     case player_target:
-      *ptr++ = target;
+      game::grid[i] = target;
+      player_pos = i;
       break;
     default:
-      *ptr++ = static_cast<blocks>(c);
+      game::grid[i] = static_cast<blocks>(c);
       break;
     }
-  }
-
-  player_pos = 0;
-  for (auto c : lvl) {
-    if (c == player || c == player_target)
-      break;
-    player_pos++;
   }
 }
 } // namespace sokoban::game
