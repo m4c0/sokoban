@@ -10,16 +10,17 @@ namespace sr = sokoban::renderer;
 
 static unsigned m_level{};
 
-static void set_level(unsigned idx) {
-  m_level = idx % sl::max_levels();
-  sg::set_level(sl::level(idx));
-}
-
 static struct : sr::rnd {
   const char *app_name() const noexcept override { return "sokoban"; }
 } r;
 
 static sa::streamer audio{};
+
+static void set_level(unsigned idx) {
+  m_level = idx % sl::max_levels();
+  sg::set_level(sl::level(idx));
+  r.refresh_batch();
+}
 
 static void move(unsigned p) {
   switch (auto mt = sg::grid.move_type(sg::player_pos, p)) {
@@ -33,7 +34,6 @@ static void move(unsigned p) {
     sg::grid.clear_box(sg::player_pos);
     if (sg::grid.is_done()) {
       set_level(m_level + 1);
-      r.refresh_batch();
       audio.play(50);
     } else if (mt == push2tgt) {
       audio.play(100);
@@ -48,10 +48,7 @@ static void move(unsigned p) {
   r.refresh_batch();
 }
 
-void reset_level() {
-  set_level(m_level);
-  r.refresh_batch();
-}
+void reset_level() { set_level(m_level); }
 
 void down() { move(sl::level_width); }
 void up() { move(-sl::level_width); }
@@ -60,7 +57,7 @@ void right() { move(1); }
 
 struct init {
   init() {
-    set_level(0);
+    sg::set_level(sl::level(m_level));
 
     using namespace casein;
     handle(GESTURE, G_SWIPE_UP, &up);
