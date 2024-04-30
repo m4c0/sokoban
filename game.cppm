@@ -3,7 +3,6 @@
 #pragma leco add_impl renderer
 
 export module game;
-import :grid;
 import jute;
 import quack;
 import siaudio;
@@ -17,6 +16,19 @@ class streamer : siaudio::os_streamer {
 
 public:
   void play(unsigned);
+};
+} // namespace sokoban::audio
+
+export namespace sokoban::enums {
+enum blocks : char {
+  player = 'P',
+  player_target = 'p',
+  wall = 'X',
+  empty = '.',
+  outside = ' ',
+  target = '*',
+  box = 'O',
+  target_box = '0',
 };
 }
 
@@ -41,7 +53,7 @@ struct rnd : public quack::donald {
 } // namespace sokoban::renderer
 
 export namespace sokoban::game {
-extern class grid grid;
+extern enums::blocks grid[1024];
 extern unsigned player_pos;
 void set_level(jute::view lvl);
 } // namespace sokoban::game
@@ -49,12 +61,13 @@ void set_level(jute::view lvl);
 module :private;
 
 namespace sokoban::game {
-class grid grid {};
+enums::blocks grid[1024];
 unsigned player_pos{};
 void set_level(jute::view lvl) {
   // TODO: assert lvl is smaller than our buffer
   for (auto i = 0U; i < levels::level_quad_count(); i++) {
     switch (auto c = lvl[i]) {
+      using namespace enums;
     case player:
       game::grid[i] = empty;
       player_pos = i;

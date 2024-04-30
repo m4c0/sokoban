@@ -16,6 +16,7 @@ import yoyo;
 namespace sg = sokoban::game;
 namespace sl = sokoban::levels;
 namespace sr = sokoban::renderer;
+using namespace sokoban::enums;
 
 static char g_lvl_buf[1024];
 

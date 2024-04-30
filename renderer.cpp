@@ -1,6 +1,5 @@
 #pragma leco add_resource "atlas.png"
 module game;
-import :grid;
 import casein;
 import quack;
 import vee;
@@ -9,6 +8,7 @@ import voo;
 namespace sg = sokoban::game;
 namespace sl = sokoban::levels;
 namespace sr = sokoban::renderer;
+using namespace sokoban::enums;
 
 enum atlas_sprites {
   sprite_empty,

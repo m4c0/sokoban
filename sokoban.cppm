@@ -7,6 +7,7 @@ namespace sa = sokoban::audio;
 namespace sg = sokoban::game;
 namespace sl = sokoban::levels;
 namespace sr = sokoban::renderer;
+using namespace sokoban::enums;
 
 enum move_type { push, walk, none, push2tgt };
 
