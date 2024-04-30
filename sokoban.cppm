@@ -8,6 +8,8 @@ namespace sg = sokoban::game;
 namespace sl = sokoban::levels;
 namespace sr = sokoban::renderer;
 
+enum move_type { push, walk, none, push2tgt };
+
 static unsigned m_level{};
 
 static struct : sr::rnd {
@@ -22,8 +24,8 @@ static void set_level(unsigned idx) {
   r.refresh_batch();
 }
 
-static constexpr auto move_type(unsigned cur, unsigned delta) noexcept {
-  auto next = cur + delta;
+static auto move_type(unsigned delta) noexcept {
+  auto next = sg::player_pos + delta;
 
   switch (sg::grid[next]) {
   case box:
@@ -48,7 +50,7 @@ static constexpr auto move_type(unsigned cur, unsigned delta) noexcept {
 }
 
 static void move(unsigned p) {
-  switch (auto mt = move_type(sg::player_pos, p)) {
+  switch (auto mt = move_type(p)) {
   case none:
     audio.play(150);
     return;

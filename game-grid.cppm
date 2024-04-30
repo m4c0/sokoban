@@ -12,8 +12,6 @@ enum blocks : char {
   target_box = '0',
 };
 
-enum move_type { push, walk, none, push2tgt };
-
 // TODO: move these to a place common between here and level
 const unsigned level_width = 24;
 const unsigned level_height = 14;
