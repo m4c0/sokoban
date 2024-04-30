@@ -24,6 +24,21 @@ static void set_level(unsigned idx) {
   r.refresh_batch();
 }
 
+static bool is_done() {
+  for (auto c : sg::grid)
+    if (c == target)
+      return false;
+
+  return true;
+}
+
+static void set_box(unsigned p) {
+  sg::grid[p] = (sg::grid[p] == target) ? target_box : box;
+}
+static void clear_box(unsigned p) {
+  sg::grid[p] = (sg::grid[p] == target_box) ? target : empty;
+}
+
 static auto move_type(unsigned delta) noexcept {
   auto next = sg::player_pos + delta;
 
@@ -57,9 +72,9 @@ static void move(unsigned p) {
   case push:
   case push2tgt:
     sg::player_pos += p;
-    sg::grid.set_box(sg::player_pos + p);
-    sg::grid.clear_box(sg::player_pos);
-    if (sg::grid.is_done()) {
+    set_box(sg::player_pos + p);
+    clear_box(sg::player_pos);
+    if (is_done()) {
       set_level(m_level + 1);
       audio.play(50);
     } else if (mt == push2tgt) {

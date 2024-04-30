@@ -46,19 +46,4 @@ public:
   [[nodiscard]] constexpr auto &operator[](unsigned idx) noexcept {
     return m_buf[idx];
   }
-
-  [[nodiscard]] constexpr bool is_done() const noexcept {
-    for (auto c : m_buf)
-      if (c == target)
-        return false;
-
-    return true;
-  }
-
-  constexpr void set_box(unsigned p) {
-    m_buf[p] = (m_buf[p] == target) ? target_box : box;
-  }
-  constexpr void clear_box(unsigned p) {
-    m_buf[p] = (m_buf[p] == target_box) ? target : empty;
-  }
 };
