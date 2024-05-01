@@ -234,6 +234,25 @@ static void set_target() {
   }
 }
 
+static void fill(int p) {
+  if (p < 0 || p >= sl::level_quad_count())
+    return;
+
+  auto &c = g_lvl_buf[p];
+  if (c != outside)
+    return;
+
+  c = empty;
+  fill(p - 1);
+  fill(p + 1);
+  fill(p - sl::level_width);
+  fill(p + sl::level_width);
+}
+static void fill() {
+  fill(g_cursor);
+  sl::load_level(g_lvl_buf, sl::current_level());
+}
+
 static void reset_pen() { g_pen = {}; }
 
 static mno::req<void> store_level(int l, yoyo::writer *w) {
@@ -280,6 +299,7 @@ static void edit_level() {
   handle(KEY_DOWN, K_T, &set_target);
   handle(KEY_DOWN, K_W, &set_wall);
   handle(KEY_DOWN, K_X, &set_outside);
+  handle(KEY_DOWN, K_Z, &fill);
   handle(KEY_DOWN, K_SPACE, &set_empty);
 
   handle(KEY_DOWN, K_H, &move_lvl_left);
