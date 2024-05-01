@@ -179,19 +179,20 @@ static void set_wall() {
   g_pen = set_wall;
 }
 
-static void set_void() {
+static void set_empty() {
   switch (g_lvl_buf[g_cursor]) {
   case outside:
-  case wall:
     update(empty);
-    break;
-  case empty:
-    update(outside);
     break;
   default:
     break;
   }
-  g_pen = set_void;
+  g_pen = set_empty;
+}
+
+static void set_outside() {
+  update(outside);
+  g_pen = set_outside;
 }
 
 static void set_box() {
@@ -278,7 +279,8 @@ static void edit_level() {
   handle(KEY_DOWN, K_B, &set_box);
   handle(KEY_DOWN, K_T, &set_target);
   handle(KEY_DOWN, K_W, &set_wall);
-  handle(KEY_DOWN, K_SPACE, &set_void);
+  handle(KEY_DOWN, K_X, &set_outside);
+  handle(KEY_DOWN, K_SPACE, &set_empty);
 
   handle(KEY_DOWN, K_H, &move_lvl_left);
   handle(KEY_DOWN, K_J, &move_lvl_down);
