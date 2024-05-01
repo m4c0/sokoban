@@ -97,7 +97,7 @@ static void cursor_down() {
 }
 
 static void clear_player() {
-  if (sg::player_pos > sl::level_width * sl::level_height)
+  if (sg::player_pos >= sl::level_width * sl::level_height)
     return;
 
   switch (auto &pp = g_lvl_buf[sg::player_pos]) {
