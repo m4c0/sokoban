@@ -20,7 +20,6 @@ using namespace sokoban::enums;
 
 static char g_lvl_buf[1024];
 
-static int g_lvl{0};
 static int g_cursor{-1};
 static void (*g_pen)();
 
@@ -44,18 +43,18 @@ static struct : sr::rnd {
   }
 } r;
 
-static void set_level(int l) {
-  g_lvl = (sl::max_levels() + l) % sl::max_levels();
-  silog::log(silog::info, "Changing editor to level %d", g_lvl);
+static void set_level(int dl) {
+  auto ll = (sl::max_levels() + sl::current_level() + dl) % sl::max_levels();
+  silog::log(silog::info, "Changing editor to level %d", ll);
 
   char *nl = g_lvl_buf;
-  for (auto c : sl::level(g_lvl))
+  for (auto c : sl::level(ll))
     *nl++ = c;
 
-  sl::load_level(g_lvl_buf, g_lvl);
+  sl::load_level(g_lvl_buf, ll);
 }
-static void prev_level() { set_level(g_lvl - 1); }
-static void next_level() { set_level(g_lvl + 1); }
+static void prev_level() { set_level(-1); }
+static void next_level() { set_level(+1); }
 
 static void new_level() {
   silog::log(silog::info, "New level");
@@ -63,8 +62,7 @@ static void new_level() {
   for (auto &c : g_lvl_buf)
     c = outside;
 
-  g_lvl = sl::max_levels();
-  sl::load_level(g_lvl_buf, g_lvl);
+  sl::load_level(g_lvl_buf, sl::max_levels());
 }
 
 static void cursor_left() {
@@ -121,7 +119,7 @@ static void move_lvl_left() {
     g_lvl_buf[i] = g_lvl_buf[i + 1];
   }
   g_lvl_buf[count - 1] = outside;
-  sl::load_level(g_lvl_buf, g_lvl);
+  sl::load_level(g_lvl_buf, sl::current_level());
 }
 static void move_lvl_right() {
   const auto count = sl::level_width * sl::level_height;
@@ -129,7 +127,7 @@ static void move_lvl_right() {
     g_lvl_buf[i] = g_lvl_buf[i - 1];
   }
   g_lvl_buf[0] = outside;
-  sl::load_level(g_lvl_buf, g_lvl);
+  sl::load_level(g_lvl_buf, sl::current_level());
 }
 static void move_lvl_up() {
   const auto count = sl::level_width * sl::level_height;
@@ -138,7 +136,7 @@ static void move_lvl_up() {
   }
   for (auto i = 0; i < sl::level_width; i++)
     g_lvl_buf[count - i] = outside;
-  sl::load_level(g_lvl_buf, g_lvl);
+  sl::load_level(g_lvl_buf, sl::current_level());
 }
 static void move_lvl_down() {
   const auto count = sl::level_width * sl::level_height;
@@ -147,12 +145,12 @@ static void move_lvl_down() {
   }
   for (auto i = 0; i < sl::level_width; i++)
     g_lvl_buf[i] = outside;
-  sl::load_level(g_lvl_buf, g_lvl);
+  sl::load_level(g_lvl_buf, sl::current_level());
 }
 
 static void update(char b) {
   g_lvl_buf[g_cursor] = b;
-  sl::load_level(g_lvl_buf, g_lvl);
+  sl::load_level(g_lvl_buf, sl::current_level());
 }
 static void set_player() {
   switch (g_lvl_buf[g_cursor]) {
@@ -238,11 +236,11 @@ static void reset_pen() { g_pen = {}; }
 static mno::req<void> store_level(int l, yoyo::writer *w) {
   const auto lw = sl::level_width;
   const auto lh = sl::level_height;
-  jute::view lvl = (l == g_lvl) ? g_lvl_buf : sl::level(l);
+  jute::view lvl = (l == sl::current_level()) ? g_lvl_buf : sl::level(l);
   return w->write_u32(l).fmap([&] { return w->write(lvl.data(), lw * lh); });
 }
 static mno::req<void> store_levels(int l, yoyo::writer *w) {
-  if (l >= sl::max_levels() && l != g_lvl) {
+  if (l >= sl::max_levels() && l != sl::current_level()) {
     return {};
   }
   return frk::push('LEVL', w, [&](auto) { return store_level(l, w); })
@@ -303,7 +301,7 @@ static void level_select() {
 static void refresh() { r.refresh_batch(); }
 struct init {
   init() {
-    set_level(g_lvl);
+    set_level(0);
     level_select();
 
     using namespace casein;

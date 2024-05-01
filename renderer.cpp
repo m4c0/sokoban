@@ -93,7 +93,7 @@ void sr::rnd::update_data(quack::mapped_buffers all) {
   *m++ = {1, 1, 1, 1};
 
   // Number
-  auto n = sl::current_level();
+  auto n = sl::current_level() + 1;
   auto x = 2.75f;
   for (auto i = 0; i < 3; i++) {
     auto d = n % 10;
