@@ -196,6 +196,7 @@ static void set_void() {
 
 static void set_box() {
   switch (g_lvl_buf[g_cursor]) {
+  case outside:
   case empty:
     update(box);
     break;
@@ -214,6 +215,7 @@ static void set_box() {
 }
 static void set_target() {
   switch (g_lvl_buf[g_cursor]) {
+  case outside:
   case empty:
     update(target);
     break;
