@@ -19,9 +19,10 @@ static struct : sr::rnd {
 
 static sa::streamer audio{};
 
+namespace ewww {
 static void set_level(unsigned idx) {
   m_level = idx % sl::max_levels();
-  sl::load_level(sl::level(idx));
+  sl::load_level(idx);
   r.refresh_batch();
 }
 
@@ -100,7 +101,7 @@ void right() { move(1); }
 
 void setup_game(int l) {
   m_level = l;
-  sl::load_level(sl::level(l));
+  sl::load_level(l);
 
   using namespace casein;
   handle(GESTURE, G_SWIPE_UP, &up);
@@ -114,7 +115,8 @@ void setup_game(int l) {
   handle(KEY_DOWN, K_RIGHT, &right);
   handle(KEY_DOWN, K_SPACE, &reset_level);
 }
+} // namespace ewww
 
 struct init {
-  init() { setup_game(0); }
+  init() { ewww::setup_game(0); }
 } i;

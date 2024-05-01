@@ -52,7 +52,7 @@ static void set_level(int l) {
   for (auto c : sl::level(g_lvl))
     *nl++ = c;
 
-  sl::load_level(g_lvl_buf);
+  sl::load_level(g_lvl_buf, g_lvl);
 }
 static void prev_level() { set_level(g_lvl - 1); }
 static void next_level() { set_level(g_lvl + 1); }
@@ -64,7 +64,7 @@ static void new_level() {
     c = outside;
 
   g_lvl = sl::max_levels();
-  sl::load_level(g_lvl_buf);
+  sl::load_level(g_lvl_buf, g_lvl);
 }
 
 static void cursor_left() {
@@ -121,7 +121,7 @@ static void move_lvl_left() {
     g_lvl_buf[i] = g_lvl_buf[i + 1];
   }
   g_lvl_buf[count - 1] = outside;
-  sl::load_level(g_lvl_buf);
+  sl::load_level(g_lvl_buf, g_lvl);
 }
 static void move_lvl_right() {
   const auto count = sl::level_width * sl::level_height;
@@ -129,7 +129,7 @@ static void move_lvl_right() {
     g_lvl_buf[i] = g_lvl_buf[i - 1];
   }
   g_lvl_buf[0] = outside;
-  sl::load_level(g_lvl_buf);
+  sl::load_level(g_lvl_buf, g_lvl);
 }
 static void move_lvl_up() {
   const auto count = sl::level_width * sl::level_height;
@@ -138,7 +138,7 @@ static void move_lvl_up() {
   }
   for (auto i = 0; i < sl::level_width; i++)
     g_lvl_buf[count - i] = outside;
-  sl::load_level(g_lvl_buf);
+  sl::load_level(g_lvl_buf, g_lvl);
 }
 static void move_lvl_down() {
   const auto count = sl::level_width * sl::level_height;
@@ -147,12 +147,12 @@ static void move_lvl_down() {
   }
   for (auto i = 0; i < sl::level_width; i++)
     g_lvl_buf[i] = outside;
-  sl::load_level(g_lvl_buf);
+  sl::load_level(g_lvl_buf, g_lvl);
 }
 
 static void update(char b) {
   g_lvl_buf[g_cursor] = b;
-  sl::load_level(g_lvl_buf);
+  sl::load_level(g_lvl_buf, g_lvl);
 }
 static void set_player() {
   switch (g_lvl_buf[g_cursor]) {

@@ -38,7 +38,8 @@ extern const unsigned level_height;
 unsigned current_level();
 unsigned max_levels();
 jute::view level(unsigned);
-void load_level(jute::view lvl);
+void load_level(jute::view lvl, unsigned lvl_number);
+void load_level(unsigned l);
 
 inline unsigned level_quad_count() { return level_width * level_height; }
 } // namespace sokoban::levels
