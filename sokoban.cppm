@@ -21,7 +21,7 @@ static sa::streamer audio{};
 
 static void set_level(unsigned idx) {
   m_level = idx % sl::max_levels();
-  sg::set_level(sl::level(idx));
+  sl::load_level(sl::level(idx));
   r.refresh_batch();
 }
 
@@ -100,7 +100,7 @@ void right() { move(1); }
 
 void setup_game(int l) {
   m_level = l;
-  sg::set_level(sl::level(l));
+  sl::load_level(sl::level(l));
 
   using namespace casein;
   handle(GESTURE, G_SWIPE_UP, &up);

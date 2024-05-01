@@ -57,3 +57,22 @@ jute::view sl::level(unsigned l) {
   g_cur_level = l;
   return g_data[l];
 }
+void sl::load_level(jute::view lvl) {
+  // TODO: assert lvl is smaller than our buffer
+  for (auto i = 0U; i < levels::level_quad_count(); i++) {
+    switch (auto c = lvl[i]) {
+      using namespace enums;
+    case player:
+      game::grid[i] = empty;
+      game::player_pos = i;
+      break;
+    case player_target:
+      game::grid[i] = target;
+      game::player_pos = i;
+      break;
+    default:
+      game::grid[i] = static_cast<blocks>(c);
+      break;
+    }
+  }
+}

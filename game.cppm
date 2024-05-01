@@ -38,6 +38,7 @@ extern const unsigned level_height;
 unsigned current_level();
 unsigned max_levels();
 jute::view level(unsigned);
+void load_level(jute::view lvl);
 
 inline unsigned level_quad_count() { return level_width * level_height; }
 } // namespace sokoban::levels
@@ -55,7 +56,6 @@ struct rnd : public quack::donald {
 export namespace sokoban::game {
 extern enums::blocks grid[1024];
 extern unsigned player_pos;
-void set_level(jute::view lvl);
 } // namespace sokoban::game
 
 module :private;
@@ -63,23 +63,4 @@ module :private;
 namespace sokoban::game {
 enums::blocks grid[1024];
 unsigned player_pos{};
-void set_level(jute::view lvl) {
-  // TODO: assert lvl is smaller than our buffer
-  for (auto i = 0U; i < levels::level_quad_count(); i++) {
-    switch (auto c = lvl[i]) {
-      using namespace enums;
-    case player:
-      game::grid[i] = empty;
-      player_pos = i;
-      break;
-    case player_target:
-      game::grid[i] = target;
-      player_pos = i;
-      break;
-    default:
-      game::grid[i] = static_cast<blocks>(c);
-      break;
-    }
-  }
-}
 } // namespace sokoban::game
