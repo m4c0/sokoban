@@ -57,6 +57,7 @@ jute::view sl::level(unsigned l) { return g_data[l]; }
 void sl::load_level(unsigned l) { sl::load_level(g_data[l], l); }
 void sl::load_level(jute::view lvl, unsigned lvl_number) {
   // TODO: assert lvl is smaller than our buffer
+  game::player_pos = levels::level_quad_count();
   for (auto i = 0U; i < levels::level_quad_count(); i++) {
     switch (auto c = lvl[i]) {
       using namespace enums;
