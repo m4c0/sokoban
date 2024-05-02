@@ -4,8 +4,8 @@ import hai;
 import silog;
 import yoyo;
 
-static constexpr const auto old_size = 24 * 12;
-static constexpr const auto new_size = 24 * 14;
+static constexpr const auto old_size = 24 * 14;
+static constexpr const auto new_size = 24 * 20;
 
 struct level {
   unsigned id;
