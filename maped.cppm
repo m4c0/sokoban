@@ -308,6 +308,7 @@ static void edit_level() {
   handle(KEY_DOWN, K_L, &move_lvl_right);
 
   handle(KEY_UP, K_W, &reset_pen);
+  handle(KEY_UP, K_X, &reset_pen);
   handle(KEY_UP, K_SPACE, &reset_pen);
   g_cursor = 0;
 }
