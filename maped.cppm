@@ -43,6 +43,14 @@ static struct : sr::rnd {
   }
 } r;
 
+static void read_levels() {
+  yoyo::file_reader::open("levels.dat")
+      .fmap([](auto &&r) { return sl::read_levels(&r); })
+      .take([](auto msg) {
+        silog::log(silog::error, "failed to load levels: %s", msg);
+      });
+}
+
 static void set_level(int dl) {
   auto ll = (sl::max_levels() + sl::current_level() + dl) % sl::max_levels();
   silog::log(silog::info, "Changing editor to level %d", ll);
@@ -280,6 +288,8 @@ static void level_dump() {
   }).take([](auto err) {
     silog::log(silog::error, "failed to write levels: %s", err);
   });
+
+  read_levels();
 }
 
 static void level_select();
@@ -326,12 +336,7 @@ static void level_select() {
 static void refresh() { r.refresh_batch(); }
 struct init {
   init() {
-    yoyo::file_reader::open("levels.dat")
-        .fmap([](auto &&r) { return sl::read_levels(&r); })
-        .take([](auto msg) {
-          silog::log(silog::error, "failed to load levels: %s", msg);
-        });
-
+    read_levels();
     set_level(0);
     level_select();
 
