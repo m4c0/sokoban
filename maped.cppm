@@ -326,6 +326,12 @@ static void level_select() {
 static void refresh() { r.refresh_batch(); }
 struct init {
   init() {
+    yoyo::file_reader::open("levels.dat")
+        .fmap([](auto &&r) { return sl::read_levels(&r); })
+        .take([](auto msg) {
+          silog::log(silog::error, "failed to load levels: %s", msg);
+        });
+
     set_level(0);
     level_select();
 

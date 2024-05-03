@@ -1,9 +1,8 @@
-#pragma leco add_resource "levels.dat"
 module game;
 import fork;
+import hai;
 import jute;
 import silog;
-import sires;
 
 namespace sl = sokoban::levels;
 
@@ -40,16 +39,9 @@ mno::req<void> read_list(frk::pair p) {
   }
   return frk::read_list(&data, read_level);
 }
-
-static struct lvls {
-  lvls() {
-    sires::open("levels.dat")
-        .fmap([](auto &&r) { return frk::read(&*r).fmap(read_list); })
-        .take([](auto msg) {
-          silog::log(silog::error, "failed to load levels data: %s", msg);
-        });
-  }
-} g_lvls;
+mno::req<void> sl::read_levels(yoyo::reader *r) {
+  return frk::read(r).fmap(read_list);
+}
 
 unsigned sl::current_level() { return g_cur_level; }
 unsigned sl::max_levels() { return g_max_level + 1; }
