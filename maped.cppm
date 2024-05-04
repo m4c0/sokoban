@@ -240,6 +240,7 @@ static void set_target() {
   default:
     break;
   }
+  g_pen = set_target;
 }
 
 static void fill(int p) {
@@ -319,6 +320,7 @@ static void edit_level() {
 
   handle(KEY_UP, K_W, &reset_pen);
   handle(KEY_UP, K_X, &reset_pen);
+  handle(KEY_UP, K_T, &reset_pen);
   handle(KEY_UP, K_SPACE, &reset_pen);
   g_cursor = 0;
 }
