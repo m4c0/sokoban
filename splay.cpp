@@ -80,6 +80,10 @@ static void up() { move(-sl::level_width); }
 static void left() { move(-1); }
 static void right() { move(1); }
 
+static void flip_fullscreen() {
+  casein::set_fullscreen(!casein::is_fullscreen());
+}
+
 void setup_game(int l) {
   sl::load_level(l);
 
@@ -94,4 +98,6 @@ void setup_game(int l) {
   handle(KEY_DOWN, K_LEFT, &left);
   handle(KEY_DOWN, K_RIGHT, &right);
   handle(KEY_DOWN, K_SPACE, &reset_level);
+  // TODO: add F11 to casein
+  handle(KEY_DOWN, K_F, &flip_fullscreen);
 }
