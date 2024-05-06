@@ -8,8 +8,8 @@ namespace sl = sokoban::levels;
 
 static constexpr const auto max_level_capacity = 500;
 
-const unsigned sl::level_width = 24;
-const unsigned sl::level_height = 20;
+const unsigned sl::level_width = 32;
+const unsigned sl::level_height = 24;
 
 static unsigned g_cur_level{};
 static unsigned g_max_level{};
