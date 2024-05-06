@@ -4,8 +4,13 @@ import hai;
 import silog;
 import yoyo;
 
-static constexpr const auto old_size = 24 * 20;
-static constexpr const auto new_size = 32 * 24;
+static constexpr const auto old_width = 24;
+static constexpr const auto old_height = 20;
+static constexpr const auto old_size = old_width * old_height;
+
+static constexpr const auto new_width = 32;
+static constexpr const auto new_height = 24;
+static constexpr const auto new_size = new_width * new_height;
 
 struct level {
   unsigned id;
@@ -22,11 +27,23 @@ mno::req<void> read_level(frk::pair p) {
   for (auto &c : lvl.data)
     c = ' ';
 
-  constexpr const auto a = (new_size - old_size) / 2;
+  char old[1024];
+
+  constexpr const auto dw = (new_width - old_width) / 2;
+  constexpr const auto dh = (new_height - old_height) / 2;
   return data.read_u32()
       .fmap([&](auto l) {
         lvl.id = l;
-        return data.read(lvl.data + a, old_size);
+        return data.read(old, old_size);
+      })
+      .map([&] {
+        auto op = old;
+        for (auto y = 0; y < old_height; y++) {
+          auto np = lvl.data + (y + dh) * new_width + dw;
+          for (auto x = 0; x < old_width; x++, np++, op++) {
+            *np = *op;
+          }
+        }
       })
       .map([&] { g_data.push_back(lvl); });
 }
