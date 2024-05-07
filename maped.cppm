@@ -289,8 +289,6 @@ static void level_dump() {
   }).take([](auto err) {
     silog::log(silog::error, "failed to write levels: %s", err);
   });
-
-  read_levels();
 }
 
 static void level_select();
@@ -333,13 +331,14 @@ static void level_select() {
   handle(KEY_DOWN, K_ENTER, &edit_level);
   handle(KEY_DOWN, K_N, &new_level);
   g_cursor = -1;
+
+  read_levels();
+  set_level(0);
 }
 
 static void refresh() { r.refresh_batch(); }
 struct init {
   init() {
-    read_levels();
-    set_level(0);
     level_select();
 
     using namespace casein;
