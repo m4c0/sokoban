@@ -8,10 +8,7 @@ import quack;
 import silog;
 import yoyo;
 
-// TODO: flood fill empty/outside
 // TODO: maybe support for map without a player?
-// Note: these requires support in the game itself. Currently, it crashes if
-// player starts in a target.
 
 namespace sg = sokoban::game;
 namespace sl = sokoban::levels;
