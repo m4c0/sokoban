@@ -4,6 +4,7 @@
 export module sokoban;
 import casein;
 import game;
+import quack;
 import silog;
 import sires;
 
@@ -13,13 +14,13 @@ namespace sl = sokoban::levels;
 namespace sr = sokoban::renderer;
 using namespace sokoban::enums;
 
-static struct : sr::rnd {
-  const char *app_name() const noexcept override { return "sokoban"; }
-} r;
-
 static sa::streamer audio{};
 
 void setup_game(int level);
+void refresh_batch() {
+  using namespace quack::donald;
+  data(sr::update_data);
+}
 
 struct init {
   init() {
@@ -30,5 +31,9 @@ struct init {
         });
 
     setup_game(0);
+
+    using namespace quack::donald;
+    app_name("sokoban");
+    refresh_batch();
   }
 } i;

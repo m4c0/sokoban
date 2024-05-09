@@ -4,7 +4,7 @@ enum move_type { push, walk, none, push2tgt };
 
 static void set_level(unsigned idx) {
   sl::load_level(idx);
-  r.refresh_batch();
+  refresh_batch();
 }
 
 static bool is_done() {
@@ -70,7 +70,7 @@ static void move(unsigned p) {
     sg::player_pos += p;
     break;
   }
-  r.refresh_batch();
+  refresh_batch();
 }
 
 static void reset_level() { set_level(sl::current_level()); }
