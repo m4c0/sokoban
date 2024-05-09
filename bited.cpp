@@ -14,6 +14,7 @@ static constexpr const unsigned cols = 1 << 2;
 static constexpr const unsigned rows = 1 << 2;
 static constexpr const unsigned image_w = 8 * cols;
 static constexpr const unsigned image_h = 8 * rows;
+static constexpr const unsigned quad_count = 1 + (rows * cols);
 
 static unsigned g_cursor_x{};
 static unsigned g_cursor_y{};
@@ -30,49 +31,43 @@ static void update_atlas(voo::h2l_image *img) {
   }
 }
 
-struct : public quack::donald {
-  const char *app_name() const noexcept override { return "bited"; }
-  unsigned max_quads() const noexcept override { return 1 + (rows * cols); }
-  unsigned quad_count() const noexcept override { return max_quads(); }
-  quack::upc push_constants() const noexcept override {
-    quack::upc res{};
-    res.grid_size = {image_w, image_h};
-    res.grid_pos = res.grid_size * 0.5;
-    return res;
+static quack::donald::atlas_t *bitmap(voo::device_and_queue *dq) {
+  return new quack::donald::atlas_t{dq->queue(), &update_atlas,
+                                    dq->physical_device(), image_w, image_h};
+}
+
+static unsigned update_data(quack::mapped_buffers all) {
+  static constexpr const float inv_c = 1.0f / cols;
+  static constexpr const float inv_r = 1.0f / rows;
+  auto [c, m, p, u] = all;
+  for (auto y = 0; y < rows; y++) {
+    for (auto x = 0; x < cols; x++) {
+      *c++ = {0, 0, 0, 1};
+      *m++ = {1, 1, 1, 1};
+      *p++ = {{x * 8.0f + 0.1f, y * 8.0f + 0.1f}, {8 - 0.2f, 8 - 0.2f}};
+      *u++ = {{x * inv_c, y * inv_r}, {(x + 1) * inv_c, (y + 1) * inv_r}};
+    }
   }
 
-  atlas create_atlas(voo::device_and_queue *dq) override {
-    return atlas::make(dq->queue(), &update_atlas, dq->physical_device(),
-                       image_w, image_h);
+  if (g_cursor_hl) {
+    *c++ = {0, 0, 0, 0};
+  } else {
+    *c++ = {1, 0, 0, 1};
   }
-  void update_data(quack::mapped_buffers all) override {
-    static constexpr const float inv_c = 1.0f / cols;
-    static constexpr const float inv_r = 1.0f / rows;
-    auto [c, m, p, u] = all;
-    for (auto y = 0; y < rows; y++) {
-      for (auto x = 0; x < cols; x++) {
-        *c++ = {0, 0, 0, 1};
-        *m++ = {1, 1, 1, 1};
-        *p++ = {{x * 8.0f + 0.1f, y * 8.0f + 0.1f}, {8 - 0.2f, 8 - 0.2f}};
-        *u++ = {{x * inv_c, y * inv_r}, {(x + 1) * inv_c, (y + 1) * inv_r}};
-      }
-    }
+  *m++ = {1, 1, 1, 0};
+  *p++ = {{static_cast<float>(g_cursor_x), static_cast<float>(g_cursor_y)},
+          {1, 1}};
+  *u++ = {};
 
-    if (g_cursor_hl) {
-      *c++ = {0, 0, 0, 0};
-    } else {
-      *c++ = {1, 0, 0, 1};
-    }
-    *m++ = {1, 1, 1, 0};
-    *p++ = {{static_cast<float>(g_cursor_x), static_cast<float>(g_cursor_y)},
-            {1, 1}};
-    *u++ = {};
-  }
-} r;
+  return quad_count;
+}
+
+void refresh_atlas() { quack::donald::atlas(bitmap); }
+void refresh_batch() { quack::donald::data(update_data); }
 
 static void flip_cursor() {
   g_cursor_hl = !g_cursor_hl;
-  r.refresh_batch();
+  refresh_batch();
 }
 
 static void down() {
@@ -80,34 +75,34 @@ static void down() {
     return;
 
   g_cursor_y++;
-  r.refresh_batch();
+  refresh_batch();
 }
 static void up() {
   if (g_cursor_y == 0)
     return;
 
   g_cursor_y--;
-  r.refresh_batch();
+  refresh_batch();
 }
 static void left() {
   if (g_cursor_x == 0)
     return;
 
   g_cursor_x--;
-  r.refresh_batch();
+  refresh_batch();
 }
 static void right() {
   if (g_cursor_x >= image_w - 1)
     return;
 
   g_cursor_x++;
-  r.refresh_batch();
+  refresh_batch();
 }
 
 static void flip() {
   auto &p = g_pixies[g_cursor_y][g_cursor_x];
   p = ~p;
-  r.refresh_atlas();
+  refresh_atlas();
 }
 
 static void save() {
@@ -154,5 +149,16 @@ struct init {
         .take([](auto err) {
           silog::log(silog::error, "failed to load atlas: %s", err);
         });
+
+    quack::upc upc{};
+    upc.grid_size = {image_w, image_h};
+    upc.grid_pos = upc.grid_size * 0.5;
+
+    using namespace quack::donald;
+    app_name("bited");
+    max_quads(quad_count);
+    push_constants(upc);
+    refresh_atlas();
+    refresh_batch();
   }
 } i;
