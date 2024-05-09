@@ -329,7 +329,7 @@ static void refresh() {
     c.g *= 0.2;
     c.b *= 0.2;
     c.a = 1.0;
-    return count + 1;
+    return count;
   });
 }
 struct init {
