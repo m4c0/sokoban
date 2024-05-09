@@ -23,23 +23,6 @@ static void (*g_pen)();
 static auto &lh = sl::level_height;
 static auto &lw = sl::level_width;
 
-static struct : sr::rnd {
-  const char *app_name() const noexcept override { return "maped"; }
-
-  void update_data(quack::mapped_buffers all) override {
-    rnd::update_data(all);
-
-    if (g_cursor < 0)
-      return;
-
-    auto &c = all.colours[g_cursor];
-    c.r *= 0.2;
-    c.g *= 0.2;
-    c.b *= 0.2;
-    c.a = 1.0;
-  }
-} r;
-
 static void read_levels() {
   yoyo::file_reader::open("levels.dat")
       .fmap([](auto &&r) { return sl::read_levels(&r); })
@@ -333,12 +316,30 @@ static void level_select() {
   set_level(0);
 }
 
-static void refresh() { r.refresh_batch(); }
+static void refresh() {
+  using namespace quack::donald;
+  data([](auto all) -> unsigned {
+    auto count = sr::update_data(all);
+
+    if (g_cursor < 0)
+      return count;
+
+    auto &c = all.colours[g_cursor];
+    c.r *= 0.2;
+    c.g *= 0.2;
+    c.b *= 0.2;
+    c.a = 1.0;
+    return count + 1;
+  });
+}
 struct init {
   init() {
     level_select();
 
     using namespace casein;
     handle(TIMER, &refresh);
+
+    using namespace quack::donald;
+    app_name("maped");
   }
 } i;

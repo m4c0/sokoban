@@ -48,13 +48,7 @@ inline unsigned level_quad_count() { return level_width * level_height; }
 } // namespace sokoban::levels
 
 export namespace sokoban::renderer {
-struct rnd : public quack::donald {
-  unsigned max_quads() const noexcept override;
-  unsigned quad_count() const noexcept override;
-  quack::upc push_constants() const noexcept override;
-  virtual void update_data(quack::mapped_buffers all) override;
-  atlas create_atlas(voo::device_and_queue *dq) override;
-};
+unsigned update_data(quack::mapped_buffers all);
 } // namespace sokoban::renderer
 
 export namespace sokoban::game {

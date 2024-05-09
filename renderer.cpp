@@ -58,19 +58,24 @@ static constexpr auto colour(char b) {
 // }}}
 
 // TODO: make this a common const between quack, maped and grid
-unsigned sr::rnd::max_quads() const noexcept { return 1024; }
-unsigned sr::rnd::quad_count() const noexcept {
-  return sl::level_width * sl::level_height + 3;
-}
+namespace {
+static struct init {
+  init() {
+    quack::upc rpc{};
+    rpc.grid_size = {sl::level_width, sl::level_height};
+    rpc.grid_pos = rpc.grid_size / 2.0;
 
-quack::upc sr::rnd::push_constants() const noexcept {
-  quack::upc rpc{};
-  rpc.grid_size = {sl::level_width, sl::level_height};
-  rpc.grid_pos = rpc.grid_size / 2.0;
-  return rpc;
-}
+    using namespace quack::donald;
+    max_quads(1024);
+    push_constants(rpc);
+    atlas([](auto dq) -> atlas_t * {
+      return new voo::sires_image("atlas.png", dq);
+    });
+  }
+} i;
+} // namespace
 
-void sr::rnd::update_data(quack::mapped_buffers all) {
+unsigned sr::update_data(quack::mapped_buffers all) {
   auto [c, m, p, u] = all;
 
   for (auto i = 0U; i < sl::level_quad_count(); i++) {
@@ -92,7 +97,9 @@ void sr::rnd::update_data(quack::mapped_buffers all) {
   *c++ = {0, 0, 0, 0};
   *m++ = {1, 1, 1, 1};
 
-  // Number
+  unsigned count = sl::level_width * sl::level_height + 1;
+
+  // Number (2+ digits)
   auto n = sl::current_level() + 1;
   auto x = 2.75f;
   for (auto i = 0; i < 3; i++) {
@@ -107,9 +114,9 @@ void sr::rnd::update_data(quack::mapped_buffers all) {
 
     x -= 0.5;
     n /= 10;
+    count++;
   }
+
+  return count - 1;
 }
 
-sr::rnd::atlas sr::rnd::create_atlas(voo::device_and_queue *dq) {
-  return atlas{new voo::sires_image("atlas.png", dq)};
-}
