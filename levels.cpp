@@ -35,8 +35,7 @@ mno::req<void> read_level(frk::pair p) {
 mno::req<void> read_list(frk::pair p) {
   auto [fourcc, data] = p;
   if (fourcc != 'SKBN') {
-    silog::log(silog::error, "data file is not valid");
-    return {};
+    return mno::req<void>::failed("data file is not valid");
   }
   return frk::read_list(&data, read_level);
 }
