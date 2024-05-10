@@ -52,13 +52,14 @@ unsigned update_data(quack::mapped_buffers all);
 } // namespace sokoban::renderer
 
 export namespace sokoban::game {
-extern enums::blocks grid[1024];
+constexpr const auto max_quads = 1024;
+extern enums::blocks grid[max_quads];
 extern unsigned player_pos;
 } // namespace sokoban::game
 
 module :private;
 
 namespace sokoban::game {
-enums::blocks grid[1024];
+enums::blocks grid[max_quads];
 unsigned player_pos{};
 } // namespace sokoban::game

@@ -4,6 +4,7 @@ import hai;
 import jute;
 import silog;
 
+namespace sg = sokoban::game;
 namespace sl = sokoban::levels;
 
 static constexpr const auto max_level_capacity = 500;
@@ -13,7 +14,7 @@ const unsigned sl::level_height = 24;
 
 static unsigned g_cur_level{};
 static unsigned g_max_level{};
-hai::array<char[1024]> g_data{max_level_capacity};
+hai::array<char[sg::max_quads]> g_data{max_level_capacity};
 
 mno::req<void> read_level(frk::pair p) {
   auto [fourcc, data] = p;

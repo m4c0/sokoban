@@ -15,7 +15,7 @@ namespace sl = sokoban::levels;
 namespace sr = sokoban::renderer;
 using namespace sokoban::enums;
 
-static char g_lvl_buf[1024];
+static char g_lvl_buf[sg::max_quads];
 
 static int g_cursor{-1};
 static void (*g_pen)();

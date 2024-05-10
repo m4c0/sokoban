@@ -66,7 +66,7 @@ static struct init {
     rpc.grid_pos = rpc.grid_size / 2.0;
 
     using namespace quack::donald;
-    max_quads(1024);
+    max_quads(sg::max_quads);
     push_constants(rpc);
     atlas([](auto dq) -> atlas_t * {
       return new voo::sires_image("atlas.png", dq);
