@@ -14,7 +14,7 @@ const unsigned sl::level_height = 24;
 
 static unsigned g_cur_level{};
 static unsigned g_max_level{};
-hai::array<char[sg::max_quads]> g_data{max_level_capacity};
+static char g_data[max_level_capacity][sg::max_quads]{};
 
 mno::req<void> read_level(frk::pair p) {
   auto [fourcc, data] = p;
