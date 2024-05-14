@@ -2,6 +2,7 @@
 #pragma leco add_impl splay
 #pragma leco add_resource "levels.dat"
 export module sokoban;
+import buoy;
 import casein;
 import game;
 import quack;
@@ -30,7 +31,10 @@ struct init {
           silog::log(silog::error, "failed to load levels data: %s", msg);
         });
 
-    setup_game(0);
+    int level = buoy::open_for_reading("sokoban", "save.dat")
+                    .fmap([](auto &&r) { return r->read_u32(); })
+                    .unwrap(0);
+    setup_game(level);
 
     using namespace quack::donald;
     app_name("sokoban");

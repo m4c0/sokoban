@@ -1,10 +1,17 @@
 module sokoban;
+import buoy;
 
 enum move_type { push, walk, none, push2tgt };
 
 static void set_level(unsigned idx) {
   sl::load_level(idx);
   refresh_batch();
+
+  buoy::open_for_writing("sokoban", "save.dat")
+      .fmap([idx](auto &&w) { return w->write_u32(idx); })
+      .take([](auto err) {
+        silog::log(silog::error, "failed to write save data: %s", err);
+      });
 }
 
 static bool is_done() {
