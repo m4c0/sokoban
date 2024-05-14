@@ -67,12 +67,15 @@ static mno::req<void> store_levels(level *l, level *end, yoyo::writer *w) {
       .fmap([&] { return store_levels(l + 1, end, w); });
 }
 static void level_dump() {
-  yoyo::file_writer w{"levels.dat"};
-  frk::push('SKBN', &w, [&](auto w) {
-    return store_levels(g_data.begin(), g_data.end(), w);
-  }).take([](auto err) {
-    silog::log(silog::error, "failed to write levels: %s", err);
-  });
+  yoyo::file_writer::open("levels.dat")
+      .fmap([](auto &&w) {
+        return frk::push('SKBN', &w, [&](auto w) {
+          return store_levels(g_data.begin(), g_data.end(), w);
+        });
+      })
+      .take([](auto err) {
+        silog::log(silog::error, "failed to write levels: %s", err);
+      });
 }
 
 int main() {

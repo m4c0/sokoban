@@ -263,12 +263,14 @@ static void level_dump() {
     silog::log(silog::info, "%.*s", sl::level_width, l);
   }
 
-  yoyo::file_writer w{"levels.dat"};
-  frk::push('SKBN', &w, [&](auto w) {
-    return store_levels(0, w);
-  }).take([](auto err) {
-    silog::log(silog::error, "failed to write levels: %s", err);
-  });
+  yoyo::file_writer::open("levels.dat")
+      .fmap([](auto &&w) {
+        return frk::push('SKBN', &w,
+                         [&](auto w) { return store_levels(0, w); });
+      })
+      .take([](auto err) {
+        silog::log(silog::error, "failed to write levels: %s", err);
+      });
 }
 
 static void level_select();
