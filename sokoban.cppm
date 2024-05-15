@@ -1,4 +1,5 @@
 #pragma leco app
+#pragma leco add_impl smenu
 #pragma leco add_impl splay
 #pragma leco add_resource "levels.dat"
 export module sokoban;
@@ -17,7 +18,9 @@ using namespace sokoban::enums;
 
 static sa::streamer audio{};
 
-void setup_game(int level);
+void setup_game();
+void open_menu();
+
 void refresh_batch() {
   using namespace quack::donald;
   data(sr::update_data);
@@ -34,7 +37,8 @@ struct init {
     int level = buoy::open_for_reading("sokoban", "save.dat")
                     .fmap([](auto &&r) { return r->read_u32(); })
                     .unwrap(0);
-    setup_game(level);
+    sl::load_level(level);
+    setup_game();
 
     using namespace quack::donald;
     app_name("sokoban");
