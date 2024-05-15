@@ -21,13 +21,10 @@ static sa::streamer audio{};
 void setup_game();
 void open_menu();
 
-void refresh_batch() {
-  using namespace quack::donald;
-  data(sr::update_data);
-}
-
 struct init {
   init() {
+    quack::donald::app_name("sokoban");
+
     sires::open("levels.dat")
         .fmap([](auto &&r) { return sl::read_levels(&*r); })
         .take([](auto msg) {
@@ -39,9 +36,5 @@ struct init {
                     .unwrap(0);
     sl::load_level(level);
     setup_game();
-
-    using namespace quack::donald;
-    app_name("sokoban");
-    refresh_batch();
   }
 } i;
