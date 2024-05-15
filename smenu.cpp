@@ -5,10 +5,10 @@ static unsigned update_data(quack::mapped_buffers all) {
 
   auto [c, m, p, u] = all;
 
-  float w = sl::level_width;
-  float h = sl::level_height;
+  float w = sl::level_width * 2.0;
+  float h = sl::level_height * 2.0;
 
-  p[count] = {{0, 0}, {w, h}};
+  p[count] = {{-w, -h}, {w * 2.0f, h * 2.0f}};
   u[count] = {};
   c[count] = {0, 0, 0, 0.9};
   m[count] = {1, 1, 1, 1};
