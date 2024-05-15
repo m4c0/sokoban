@@ -91,9 +91,17 @@ static void flip_fullscreen() {
   casein::set_fullscreen(!casein::is_fullscreen());
 }
 
-void setup_game(int l) {
-  sl::load_level(l);
+static void setup_game();
 
+void open_menu() {
+  using namespace casein;
+  reset_g(GESTURE);
+  reset_k(KEY_DOWN);
+
+  handle(KEY_DOWN, K_ESCAPE, &setup_game);
+}
+
+static void setup_game() {
   using namespace casein;
   handle(GESTURE, G_SWIPE_UP, &up);
   handle(GESTURE, G_SWIPE_DOWN, &down);
@@ -105,6 +113,11 @@ void setup_game(int l) {
   handle(KEY_DOWN, K_LEFT, &left);
   handle(KEY_DOWN, K_RIGHT, &right);
   handle(KEY_DOWN, K_SPACE, &reset_level);
-  // TODO: add F11 to casein
+  handle(KEY_DOWN, K_ESCAPE, &open_menu);
+
   handle(KEY_DOWN, K_F, &flip_fullscreen);
+}
+void setup_game(int l) {
+  sl::load_level(l);
+  setup_game();
 }
