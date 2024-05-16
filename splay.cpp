@@ -57,7 +57,7 @@ static auto move_type(unsigned delta) noexcept {
 static void move(unsigned p) {
   switch (auto mt = move_type(p)) {
   case none:
-    audio.play(150);
+    play_tone(150);
     return;
   case push:
   case push2tgt:
@@ -66,11 +66,11 @@ static void move(unsigned p) {
     clear_box(sg::player_pos);
     if (is_done()) {
       set_level(sl::current_level() + 1);
-      audio.play(50);
+      play_tone(50);
     } else if (mt == push2tgt) {
-      audio.play(100);
+      play_tone(100);
     } else {
-      audio.play(200);
+      play_tone(200);
     }
     break;
   case walk:

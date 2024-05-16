@@ -1,10 +1,9 @@
-module game;
+module sokoban;
 import siaudio;
 
 static volatile unsigned sp = 0;
 static volatile unsigned d = 1;
-
-void sokoban::audio::streamer::fill_buffer(float *data, unsigned samples) {
+static void tune_filler(float *data, unsigned samples) {
   auto ssp = sp;
   float mult;
   if (ssp < 1000) {
@@ -23,7 +22,18 @@ void sokoban::audio::streamer::fill_buffer(float *data, unsigned samples) {
   sp = ssp;
 }
 
-void sokoban::audio::streamer::play(unsigned div) {
+static void null_filler(float *data, unsigned samples) {
+  for (auto i = 0; i < samples; i++) {
+    data[i] = 0;
+  }
+}
+
+void setup_audio() {
+  siaudio::filler(null_filler);
+  siaudio::rate(44100);
+}
+void play_tone(unsigned div) {
   d = div;
   sp = 0;
+  siaudio::filler(tune_filler);
 }

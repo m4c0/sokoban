@@ -1,4 +1,5 @@
 #pragma leco app
+#pragma leco add_impl audio
 #pragma leco add_impl smenu
 #pragma leco add_impl splay
 #pragma leco add_resource "levels.dat"
@@ -10,19 +11,21 @@ import quack;
 import silog;
 import sires;
 
-namespace sa = sokoban::audio;
 namespace sg = sokoban::game;
 namespace sl = sokoban::levels;
 namespace sr = sokoban::renderer;
 using namespace sokoban::enums;
 
-static sa::streamer audio{};
-
 void setup_game();
 void open_menu();
 
+void setup_audio();
+void play_tone(unsigned);
+
 struct init {
   init() {
+    setup_audio();
+
     quack::donald::app_name("sokoban");
 
     sires::open("levels.dat")

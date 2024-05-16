@@ -1,4 +1,3 @@
-#pragma leco add_impl audio
 #pragma leco add_impl levels
 #pragma leco add_impl renderer
 
@@ -9,17 +8,6 @@ import yoyo;
 import quack;
 import siaudio;
 import voo;
-
-// TODO: move each of these into its own module
-
-export namespace sokoban::audio {
-class streamer : siaudio::os_streamer {
-  void fill_buffer(float *data, unsigned samples) override;
-
-public:
-  void play(unsigned);
-};
-} // namespace sokoban::audio
 
 export namespace sokoban::enums {
 enum blocks : char {
