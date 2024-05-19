@@ -16,7 +16,7 @@ unsigned digit(quack::mapped_buffers &all, unsigned d, float x, float y) {
   auto uu = (d % 6) / 8.0f;
   auto uv = (d / 6) / 4.0f;
 
-  *p++ = {{x, 0}, {0.5, 1}};
+  *p++ = {{x, y}, {0.5, 1}};
   *u++ = {{0.25f + uu, 0.25f + uv}, {0.375f + uu, 0.5f + uv}};
   *c++ = {0, 0, 0, 0};
   *m++ = {1, 1, 1, 1};
@@ -25,7 +25,7 @@ unsigned digit(quack::mapped_buffers &all, unsigned d, float x, float y) {
 unsigned number(quack::mapped_buffers &all, unsigned n, float x, float y) {
   unsigned count{};
   for (auto i = 0; i < 2; i++) {
-    count += digit(all, n % 10, x, 0);
+    count += digit(all, n % 10, x, y);
 
     x -= 0.5;
     n /= 10;
