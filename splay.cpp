@@ -3,9 +3,13 @@ import buoy;
 
 enum move_type { push, walk, none, push2tgt };
 
+static unsigned update_data(quack::mapped_buffers all) {
+  return sr::update_data(all);
+}
+
 static void set_level(unsigned idx) {
   sl::load_level(idx);
-  quack::donald::data(sr::update_data);
+  quack::donald::data(update_data);
 
   buoy::open_for_writing("sokoban", "save.dat")
       .fmap([idx](auto &&w) { return w->write_u32(idx); })
@@ -77,7 +81,7 @@ static void move(unsigned p) {
     sg::player_pos += p;
     break;
   }
-  quack::donald::data(sr::update_data);
+  quack::donald::data(update_data);
 }
 
 static void reset_level() { set_level(sl::current_level()); }
@@ -107,5 +111,5 @@ void setup_game() {
 
   handle(KEY_DOWN, K_F, &flip_fullscreen);
 
-  quack::donald::data(sr::update_data);
+  quack::donald::data(update_data);
 }

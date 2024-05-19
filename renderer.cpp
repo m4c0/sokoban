@@ -69,8 +69,8 @@ static struct init {
 } i;
 } // namespace
 
-unsigned sr::update_data(quack::mapped_buffers all) {
-  auto [c, m, p, u] = all;
+unsigned sr::update_data(quack::mapped_buffers &all) {
+  auto &[c, m, p, u] = all;
 
   for (auto i = 0U; i < sl::level_quad_count(); i++) {
     auto b = sg::grid[i];
@@ -90,4 +90,3 @@ unsigned sr::update_data(quack::mapped_buffers all) {
   count += spr::blit::number(all, sl::current_level() + 1, 2.75, 0);
   return count;
 }
-
