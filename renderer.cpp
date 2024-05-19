@@ -2,6 +2,7 @@
 module game;
 import casein;
 import quack;
+import sprites;
 import vee;
 import voo;
 
@@ -10,17 +11,11 @@ namespace sl = sokoban::levels;
 namespace sr = sokoban::renderer;
 using namespace sokoban::enums;
 
-enum atlas_sprites {
-  sprite_empty,
-  sprite_player,
-  sprite_box,
-  sprite_target,
-  sprite_count
-};
+enum atlas_sprites { sprite_empty, sprite_player, sprite_box, sprite_target };
 
 // {{{ quad map utils
 static constexpr auto uv(atlas_sprites s) {
-  constexpr const auto h = 1.0f / static_cast<float>(sprite_count);
+  constexpr const auto h = 1.0f / static_cast<float>(spr::rows);
   const auto n = static_cast<unsigned>(s);
   return quack::uv{{0, n * h}, {0.25, (n + 1) * h}};
 }

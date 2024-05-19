@@ -3,15 +3,14 @@
 import casein;
 import quack;
 import silog;
+import sprites;
 import stubby;
 import traits;
 import voo;
 
 using namespace traits::ints;
+using namespace spr;
 
-// Shifts are a reminder for using POT textures to avoid FP imprecisions in GPU
-static constexpr const unsigned cols = 1 << 2;
-static constexpr const unsigned rows = 1 << 2;
 static constexpr const unsigned image_w = 8 * cols;
 static constexpr const unsigned image_h = 8 * rows;
 static constexpr const unsigned quad_count = 1 + (rows * cols);
