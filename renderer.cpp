@@ -15,9 +15,8 @@ enum atlas_sprites { sprite_empty, sprite_player, sprite_box, sprite_target };
 
 // {{{ quad map utils
 static constexpr auto uv(atlas_sprites s) {
-  constexpr const auto h = 1.0f / static_cast<float>(spr::rows);
   const auto n = static_cast<unsigned>(s);
-  return quack::uv{{0, n * h}, {0.25, (n + 1) * h}};
+  return quack::uv{{0, n * spr::h}, {spr::w, (n + 1) * spr::h}};
 }
 static constexpr auto uv(char b) {
   switch (b) {
@@ -85,33 +84,10 @@ unsigned sr::update_data(quack::mapped_buffers all) {
     *c++ = colour(b);
     *m++ = quack::colour{1, 1, 1, 1};
   }
+  unsigned count = sl::level_width * sl::level_height;
 
-  // Level
-  *p++ = {{0, 0}, {2, 1}};
-  *u++ = {{0.25, 0.0}, {0.75, 0.25}};
-  *c++ = {0, 0, 0, 0};
-  *m++ = {1, 1, 1, 1};
-
-  unsigned count = sl::level_width * sl::level_height + 1;
-
-  // Number (2+ digits)
-  auto n = sl::current_level() + 1;
-  auto x = 2.75f;
-  for (auto i = 0; i < 3; i++) {
-    auto d = n % 10;
-    auto uu = (d % 6) / 8.0f;
-    auto uv = (d / 6) / 4.0f;
-
-    *p++ = {{x, 0}, {0.5, 1}};
-    *u++ = {{0.25f + uu, 0.25f + uv}, {0.375f + uu, 0.5f + uv}};
-    *c++ = {0, 0, 0, 0};
-    *m++ = {1, 1, 1, 1};
-
-    x -= 0.5;
-    n /= 10;
-    count++;
-  }
-
-  return count - 1;
+  count += spr::blit::level(all, 0, 0);
+  count += spr::blit::number(all, sl::current_level() + 1, 2.75, 0);
+  return count;
 }
 
