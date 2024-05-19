@@ -12,8 +12,15 @@ static unsigned update_data(quack::mapped_buffers all) {
   u[count] = {};
   c[count] = {0, 0, 0, 0.9};
   m[count] = {1, 1, 1, 1};
+  count++;
 
-  return count + 1;
+  p[count] = {{0, 0}, {2, 1}};
+  u[count] = {{0.25, 0.0}, {0.75, 0.25}};
+  c[count] = {0, 0, 0, 0};
+  m[count] = {1, 1, 1, 1};
+  count++;
+
+  return count;
 }
 
 void open_menu() {
