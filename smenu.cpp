@@ -13,14 +13,15 @@ static unsigned dim(quack::mapped_buffers &all) {
   return 1;
 }
 
-static unsigned bg(quack::mapped_buffers &all, float w, float h) {
+static unsigned bg(quack::mapped_buffers &all, float w, float h,
+                   quack::colour cl) {
   auto &[c, m, p, u] = all;
   float x = sl::level_width - w;
   float y = sl::level_height - h;
 
   *p++ = {{x * 0.5f, y * 0.5f}, {w, h}};
   *u++ = {};
-  *c++ = {0.1, 0.2, 0.3, 0.7};
+  *c++ = cl;
   *m++ = {1, 1, 1, 1};
   return 1;
 }
@@ -34,13 +35,18 @@ static quack::rect shrink(quack::rect r) {
 }
 
 static unsigned update_data(quack::mapped_buffers all) {
+  static constexpr const quack::colour diag_bg{0.1, 0.2, 0.3, 0.7};
+  static constexpr const quack::colour sel_bg{0.1, 0.4, 0.3, 0.7};
+
   auto count = sr::update_data(all);
 
   count += dim(all);
-  count += bg(all, 18, 10);
+  count += bg(all, 18, 10, diag_bg);
 
   auto r = shrink(all.positions[-1]);
   auto rr = r.x + r.w - 2;
+
+  count += bg(all, 16, 1.5, sel_bg);
 
   count += spr::blit::level(all, r.x, r.y);
   count += spr::blit::number(all, sl::current_level(), rr, r.y);
