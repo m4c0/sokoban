@@ -87,6 +87,6 @@ unsigned sr::update_data(quack::mapped_buffers &all) {
   unsigned count = sl::level_width * sl::level_height;
 
   count += spr::blit::level(all, 0, 0);
-  count += spr::blit::number(all, sl::current_level() + 1, 2.75, 0);
+  count += spr::blit::number(all, sl::current_level() + 1, 3.5, 0);
   return count;
 }

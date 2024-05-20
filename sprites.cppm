@@ -40,8 +40,8 @@ unsigned number(quack::mapped_buffers &all, unsigned n, float x, float y) {
 
 unsigned level(quack::mapped_buffers &all, float x, float y) {
   auto &[c, m, p, u] = all;
-  *p++ = {{x, y}, {2, 1}};
-  *u++ = {{1_w, 0_h}, {3_w, 1_h}};
+  *p++ = {{x, y}, {3, 1}};
+  *u++ = {{1_w, 0_h}, {4_w, 1_h}};
   *c++ = {0, 0, 0, 0};
   *m++ = {1, 1, 1, 1};
   return 1;
