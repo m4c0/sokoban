@@ -53,7 +53,7 @@ static unsigned update_data(quack::mapped_buffers all) {
   s.y = r.y - 0.3f + g_sel * 1.5f;
 
   count += spr::blit::level(all, r.x, r.y);
-  count += spr::blit::number(all, sl::current_level(), rr, r.y);
+  count += spr::blit::number(all, sl::current_level() + 1, rr, r.y);
   count += spr::blit::sound(all, r.x, r.y + 1.5f);
   count += spr::blit::boolean(all, true, rr - 1.0, r.y + 1.5f);
   count += spr::blit::fullscreen(all, r.x, r.y + 3.0f);
@@ -62,13 +62,24 @@ static unsigned update_data(quack::mapped_buffers all) {
   return count;
 }
 
+static void sel_down() {
+  g_sel = (g_sel + 1) % 3;
+  quack::donald::data(update_data);
+}
+static void sel_up() {
+  g_sel = (3 + g_sel - 1) % 3;
+  quack::donald::data(update_data);
+}
+
 void open_menu() {
   using namespace casein;
   reset_g(GESTURE);
   reset_k(KEY_DOWN);
 
   handle(KEY_DOWN, K_ESCAPE, &setup_game);
+  handle(KEY_DOWN, K_UP, &sel_up);
+  handle(KEY_DOWN, K_DOWN, &sel_down);
 
-  g_sel = 2;
+  g_sel = 0;
   quack::donald::data(update_data);
 }
