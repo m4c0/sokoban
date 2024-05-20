@@ -1,6 +1,8 @@
 module sokoban;
 import sprites;
 
+static unsigned g_sel{};
+
 static unsigned dim(quack::mapped_buffers &all) {
   auto &[c, m, p, u] = all;
   float w = sl::level_width * 2.0;
@@ -47,6 +49,8 @@ static unsigned update_data(quack::mapped_buffers all) {
   auto rr = r.x + r.w - 2;
 
   count += bg(all, 16, 1.5, sel_bg);
+  auto &s = all.positions[-1];
+  s.y = r.y - 0.3f + g_sel * 1.5f;
 
   count += spr::blit::level(all, r.x, r.y);
   count += spr::blit::number(all, sl::current_level(), rr, r.y);
@@ -65,5 +69,6 @@ void open_menu() {
 
   handle(KEY_DOWN, K_ESCAPE, &setup_game);
 
+  g_sel = 2;
   quack::donald::data(update_data);
 }
