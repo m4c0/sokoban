@@ -108,6 +108,7 @@ static void save() {
   // TODO: improve safety with a hai::array<pixel> and X/Y accessors
   auto *pix = reinterpret_cast<stbi::pixel *>(g_pixies);
   stbi::write_rgba_unsafe("atlas.png", image_w, image_h, pix);
+  silog::log(silog::info, "Atlas saved");
 }
 
 static constexpr bool sane_image_width(const stbi::image &img) {
