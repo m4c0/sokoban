@@ -258,16 +258,12 @@ static mno::req<void> store_levels(int l, yoyo::writer *w) {
       .fmap([&] { return store_levels(l + 1, w); });
 }
 static void level_dump() {
-  const char *l = g_lvl_buf;
-  for (auto y = 0; y < sl::level_height; y++, l += sl::level_width) {
-    silog::log(silog::info, "%.*s", sl::level_width, l);
-  }
-
   yoyo::file_writer::open("levels.dat")
       .fmap([](auto &&w) {
         return frk::push('SKBN', &w,
                          [&](auto w) { return store_levels(0, w); });
       })
+      .map([] { silog::log(silog::info, "Levels persisted"); })
       .take([](auto err) {
         silog::log(silog::error, "failed to write levels: %s", err);
       });
@@ -321,7 +317,8 @@ static void level_select() {
 static void refresh() {
   using namespace quack::donald;
   data([](auto all) -> unsigned {
-    auto count = sr::update_data(all);
+    auto all2 = all;
+    auto count = sr::update_data(all2);
 
     if (g_cursor < 0)
       return count;
