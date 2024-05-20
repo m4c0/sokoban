@@ -28,11 +28,19 @@ static void null_filler(float *data, unsigned samples) {
   }
 }
 
-void setup_audio() {
+static bool enabled = false;
+
+bool is_audio_enabled() { return enabled; }
+
+void enable_audio(bool n) {
+  enabled = n;
   siaudio::filler(null_filler);
   siaudio::rate(44100);
 }
 void play_tone(unsigned div) {
+  if (!enabled)
+    return;
+
   d = div;
   sp = 0;
   siaudio::filler(tune_filler);

@@ -53,18 +53,23 @@ static unsigned update_data(quack::mapped_buffers all) {
   auto &s = all.positions[-1];
   s.y = r.y - 0.3f + g_sel * 1.5f;
 
+  auto au = is_audio_enabled();
   auto fs = casein::is_fullscreen();
 
   count += spr::blit::level(all, r.x, r.y);
   count += spr::blit::number(all, sl::current_level() + 1, rr, r.y);
   count += spr::blit::sound(all, r.x, r.y + 1.5f);
-  count += spr::blit::boolean(all, true, rr - 1.0, r.y + 1.5f);
+  count += spr::blit::boolean(all, au, rr - 1.0, r.y + 1.5f);
   count += spr::blit::fullscreen(all, r.x, r.y + 3.0f);
   count += spr::blit::boolean(all, fs, rr - 1.0, r.y + 3.0f);
 
   return count;
 }
 
+static void toggle_audio() {
+  enable_audio(!is_audio_enabled());
+  quack::donald::data(update_data);
+}
 static void toggle_fullscreen() {
   casein::set_fullscreen(!casein::is_fullscreen());
   quack::donald::data(update_data);
@@ -83,6 +88,7 @@ static void sel_activate() {
   case 0:
     break;
   case 1:
+    toggle_audio();
     break;
   case 2:
     toggle_fullscreen();
