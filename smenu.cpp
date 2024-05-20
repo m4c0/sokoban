@@ -47,9 +47,9 @@ static unsigned update_data(quack::mapped_buffers all) {
   count += spr::blit::level(all, r.x, r.y);
   count += spr::blit::number(all, sl::current_level(), rr, r.y);
   count += spr::blit::sound(all, r.x, r.y + 1.0f);
-  count += spr::blit::boolean(all, true, rr - 0.5, r.y + 1.0f);
+  count += spr::blit::boolean(all, true, rr - 1.0, r.y + 1.0f);
   count += spr::blit::fullscreen(all, r.x, r.y + 2.0f);
-  count += spr::blit::boolean(all, false, rr - 0.5, r.y + 2.0f);
+  count += spr::blit::boolean(all, false, rr - 1.0, r.y + 2.0f);
 
   return count;
 }
