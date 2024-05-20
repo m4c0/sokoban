@@ -43,9 +43,14 @@ unsigned boolean(quack::mapped_buffers &all, bool val, float x, float y) {
 
   auto &[c, m, p, u] = all;
   *p++ = {{x, y}, {1, 1}};
-  *u++ = {{5_w, v}, {6_w, v + 1_h}};
-  *c++ = {0, 0, 0, 0};
-  *m++ = {1, 1, 1, 1};
+  *u++ = {{4_w, v}, {5_w, v + 1_h}};
+  if (val) {
+    *c++ = {0, 1, 0, 1};
+    *m++ = {0, 0, 0, 1};
+  } else {
+    *c++ = {0, 0, 0, 0};
+    *m++ = {1, 1, 1, 1};
+  }
   return 1;
 }
 
