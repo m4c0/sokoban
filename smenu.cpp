@@ -1,4 +1,5 @@
 module sokoban;
+import casein;
 import sprites;
 
 static unsigned g_sel{};
@@ -52,14 +53,21 @@ static unsigned update_data(quack::mapped_buffers all) {
   auto &s = all.positions[-1];
   s.y = r.y - 0.3f + g_sel * 1.5f;
 
+  auto fs = casein::is_fullscreen();
+
   count += spr::blit::level(all, r.x, r.y);
   count += spr::blit::number(all, sl::current_level() + 1, rr, r.y);
   count += spr::blit::sound(all, r.x, r.y + 1.5f);
   count += spr::blit::boolean(all, true, rr - 1.0, r.y + 1.5f);
   count += spr::blit::fullscreen(all, r.x, r.y + 3.0f);
-  count += spr::blit::boolean(all, false, rr - 1.0, r.y + 3.0f);
+  count += spr::blit::boolean(all, fs, rr - 1.0, r.y + 3.0f);
 
   return count;
+}
+
+static void toggle_fullscreen() {
+  casein::set_fullscreen(!casein::is_fullscreen());
+  quack::donald::data(update_data);
 }
 
 static void sel_down() {
@@ -70,6 +78,17 @@ static void sel_up() {
   g_sel = (3 + g_sel - 1) % 3;
   quack::donald::data(update_data);
 }
+static void sel_activate() {
+  switch (g_sel) {
+  case 0:
+    break;
+  case 1:
+    break;
+  case 2:
+    toggle_fullscreen();
+    break;
+  }
+}
 
 void open_menu() {
   using namespace casein;
@@ -79,6 +98,7 @@ void open_menu() {
   handle(KEY_DOWN, K_ESCAPE, &setup_game);
   handle(KEY_DOWN, K_UP, &sel_up);
   handle(KEY_DOWN, K_DOWN, &sel_down);
+  handle(KEY_DOWN, K_ENTER, &sel_activate);
 
   g_sel = 0;
   quack::donald::data(update_data);
