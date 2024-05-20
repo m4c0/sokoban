@@ -27,25 +27,6 @@ static unsigned bg(quack::mapped_buffers &all) {
   return 1;
 }
 
-static unsigned level_opt(quack::mapped_buffers all, quack::rect r,
-                          bool hover) {
-  float mid = r.x + r.w * 0.5;
-
-  unsigned count{};
-  if (hover) {
-    auto &[c, m, p, u] = all;
-    *p++ = {{mid - 3.f, r.y}, {3.f + 1.5f, 1.0f}};
-    *u++ = {};
-    *c++ = {0.1, 0.5, 0.05, 0.6};
-    *m++ = {1, 1, 1, 1};
-    count++;
-  }
-
-  count += spr::blit::level(all, mid - 2.5f, r.y);
-  count += spr::blit::number(all, sl::current_level(), mid + 0.5f, r.y);
-  return count;
-}
-
 static quack::rect shrink(quack::rect r) {
   r.x++;
   r.y++;
@@ -59,9 +40,16 @@ static unsigned update_data(quack::mapped_buffers all) {
 
   count += dim(all);
   count += bg(all);
-  auto bg_rect = shrink(all.positions[-1]);
 
-  count += level_opt(all, bg_rect, true);
+  auto r = shrink(all.positions[-1]);
+  auto rr = r.x + r.w - 1;
+
+  count += spr::blit::level(all, r.x, r.y);
+  count += spr::blit::number(all, sl::current_level(), rr, r.y);
+  count += spr::blit::sound(all, r.x, r.y + 1.0f);
+  count += spr::blit::boolean(all, true, rr - 0.5, r.y + 1.0f);
+  count += spr::blit::fullscreen(all, r.x, r.y + 2.0f);
+  count += spr::blit::boolean(all, false, rr - 0.5, r.y + 2.0f);
 
   return count;
 }
