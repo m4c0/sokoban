@@ -13,10 +13,8 @@ static unsigned dim(quack::mapped_buffers &all) {
   return 1;
 }
 
-static unsigned bg(quack::mapped_buffers &all) {
+static unsigned bg(quack::mapped_buffers &all, float w, float h) {
   auto &[c, m, p, u] = all;
-  float w = sl::level_width * 0.5;
-  float h = sl::level_height * 0.5;
   float x = sl::level_width - w;
   float y = sl::level_height - h;
 
@@ -39,7 +37,7 @@ static unsigned update_data(quack::mapped_buffers all) {
   auto count = sr::update_data(all);
 
   count += dim(all);
-  count += bg(all);
+  count += bg(all, 18, 10);
 
   auto r = shrink(all.positions[-1]);
   auto rr = r.x + r.w - 1;
