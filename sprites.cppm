@@ -3,7 +3,7 @@ import quack;
 
 export namespace spr {
 // Shifts are a reminder for using POT textures to avoid FP imprecisions in GPU
-constexpr const unsigned cols = 1 << 2;
+constexpr const unsigned cols = 1 << 4;
 constexpr const unsigned rows = 1 << 2;
 
 constexpr const auto w = 1.0f / static_cast<float>(cols);
