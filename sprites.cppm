@@ -38,6 +38,17 @@ unsigned number(quack::mapped_buffers &all, unsigned n, float x, float y) {
   return count;
 }
 
+unsigned boolean(quack::mapped_buffers &all, bool val, float x, float y) {
+  float v = val ? 2_h : 3_h;
+
+  auto &[c, m, p, u] = all;
+  *p++ = {{x, y}, {1, 1}};
+  *u++ = {{5_w, v}, {6_w, v + 1_h}};
+  *c++ = {0, 0, 0, 0};
+  *m++ = {1, 1, 1, 1};
+  return 1;
+}
+
 unsigned level(quack::mapped_buffers &all, float x, float y) {
   auto &[c, m, p, u] = all;
   *p++ = {{x, y}, {3, 1}};
@@ -46,4 +57,21 @@ unsigned level(quack::mapped_buffers &all, float x, float y) {
   *m++ = {1, 1, 1, 1};
   return 1;
 }
+unsigned sound(quack::mapped_buffers &all, float x, float y) {
+  auto &[c, m, p, u] = all;
+  *p++ = {{x, y}, {3, 1}};
+  *u++ = {{4_w, 0_h}, {7_w, 1_h}};
+  *c++ = {0, 0, 0, 0};
+  *m++ = {1, 1, 1, 1};
+  return 1;
+}
+unsigned fullscreen(quack::mapped_buffers &all, float x, float y) {
+  auto &[c, m, p, u] = all;
+  *p++ = {{x, y}, {5, 1}};
+  *u++ = {{4_w, 1_h}, {9_w, 2_h}};
+  *c++ = {0, 0, 0, 0};
+  *m++ = {1, 1, 1, 1};
+  return 1;
+}
+
 } // namespace spr::blit
