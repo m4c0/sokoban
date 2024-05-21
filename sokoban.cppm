@@ -6,10 +6,10 @@
 #pragma leco add_impl sui
 #pragma leco add_resource "levels.dat"
 export module sokoban;
-import buoy;
 import casein;
 import game;
 import quack;
+import save;
 import silog;
 import sires;
 
@@ -43,9 +43,7 @@ struct init {
           silog::log(silog::error, "failed to load levels data: %s", msg);
         });
 
-    int level = buoy::open_for_reading("sokoban", "save.dat")
-                    .fmap([](auto &&r) { return r->read_u32(); })
-                    .unwrap(0);
+    int level = save::read();
     sl::load_level(level);
     setup_game();
   }

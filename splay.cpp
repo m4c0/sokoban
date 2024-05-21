@@ -10,12 +10,7 @@ static unsigned update_data(quack::mapped_buffers all) {
 static void set_level(unsigned idx) {
   sl::load_level(idx);
   quack::donald::data(update_data);
-
-  buoy::open_for_writing("sokoban", "save.dat")
-      .fmap([idx](auto &&w) { return w->write_u32(idx); })
-      .take([](auto err) {
-        silog::log(silog::error, "failed to write save data: %s", err);
-      });
+  save::write(idx);
 }
 
 static bool is_done() {
