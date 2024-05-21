@@ -19,12 +19,13 @@ using namespace sokoban::enums;
 void setup_game();
 void open_menu();
 
-void setup_audio();
+bool is_audio_enabled();
+void enable_audio(bool);
 void play_tone(unsigned);
 
 struct init {
   init() {
-    setup_audio();
+    enable_audio(true);
 
     quack::donald::app_name("sokoban");
 
