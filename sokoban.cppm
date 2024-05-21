@@ -1,6 +1,7 @@
 #pragma leco app
 #pragma leco add_impl audio
 #pragma leco add_impl smenu
+#pragma leco add_impl sselect
 #pragma leco add_impl splay
 #pragma leco add_resource "levels.dat"
 export module sokoban;
@@ -18,6 +19,7 @@ using namespace sokoban::enums;
 
 void setup_game();
 void open_menu();
+void open_level_select();
 
 bool is_audio_enabled();
 void enable_audio(bool);
