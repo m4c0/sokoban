@@ -4,31 +4,6 @@ import sprites;
 
 static unsigned g_sel{};
 
-static unsigned dim(quack::mapped_buffers &all) {
-  auto &[c, m, p, u] = all;
-  float w = sl::level_width * 2.0;
-  float h = sl::level_height * 2.0;
-
-  *p++ = {{-w, -h}, {w * 2.0f, h * 2.0f}};
-  *u++ = {};
-  *c++ = {0, 0, 0, 0.9};
-  *m++ = {1, 1, 1, 1};
-  return 1;
-}
-
-static unsigned bg(quack::mapped_buffers &all, float w, float h,
-                   quack::colour cl) {
-  auto &[c, m, p, u] = all;
-  float x = sl::level_width - w;
-  float y = sl::level_height - h;
-
-  *p++ = {{x * 0.5f, y * 0.5f}, {w, h}};
-  *u++ = {};
-  *c++ = cl;
-  *m++ = {1, 1, 1, 1};
-  return 1;
-}
-
 static quack::rect shrink(quack::rect r) {
   r.x += 2.0;
   r.y += 2.0;
@@ -38,18 +13,14 @@ static quack::rect shrink(quack::rect r) {
 }
 
 static unsigned update_data(quack::mapped_buffers all) {
-  static constexpr const quack::colour diag_bg{0.1, 0.2, 0.3, 0.7};
   static constexpr const quack::colour sel_bg{0.1, 0.4, 0.3, 0.7};
 
-  auto count = sr::update_data(all);
-
-  count += dim(all);
-  count += bg(all, 18, 10, diag_bg);
+  auto count = ui::menu_bg(all, 18, 10);
 
   auto r = shrink(all.positions[-1]);
   auto rr = r.x + r.w - 2;
 
-  count += bg(all, 16, 1.5, sel_bg);
+  count += ui::bg(all, 16, 1.5, sel_bg);
   auto &s = all.positions[-1];
   s.y = r.y - 0.3f + g_sel * 1.5f;
 
