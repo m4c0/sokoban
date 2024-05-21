@@ -1,8 +1,9 @@
 #pragma leco app
 #pragma leco add_impl audio
 #pragma leco add_impl smenu
-#pragma leco add_impl sselect
 #pragma leco add_impl splay
+#pragma leco add_impl sselect
+#pragma leco add_impl sui
 #pragma leco add_resource "levels.dat"
 export module sokoban;
 import buoy;
@@ -16,6 +17,11 @@ namespace sg = sokoban::game;
 namespace sl = sokoban::levels;
 namespace sr = sokoban::renderer;
 using namespace sokoban::enums;
+
+namespace ui {
+unsigned bg(quack::mapped_buffers &all, float w, float h, quack::colour cl);
+unsigned menu_bg(quack::mapped_buffers all, float w, float h);
+} // namespace ui
 
 void setup_game();
 void open_menu();
