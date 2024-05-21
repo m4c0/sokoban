@@ -25,7 +25,16 @@ unsigned ui::bg(quack::mapped_buffers &all, float w, float h,
   return 1;
 }
 
-unsigned ui::menu_bg(quack::mapped_buffers all, float w, float h) {
+static quack::rect shrink(quack::rect r) {
+  r.x += 2.0;
+  r.y += 2.0;
+  r.w -= 2.0;
+  r.h -= 2.0;
+  return r;
+}
+
+unsigned ui::menu_bg(quack::mapped_buffers &all, float w, float h,
+                     quack::rect &r) {
   static constexpr const quack::colour diag_bg{0.1, 0.2, 0.3, 0.7};
 
   auto count = sr::update_data(all);
@@ -33,5 +42,6 @@ unsigned ui::menu_bg(quack::mapped_buffers all, float w, float h) {
   count += dim(all);
   count += bg(all, w, h, diag_bg);
 
+  r = shrink(all.positions[-1]);
   return count;
 }

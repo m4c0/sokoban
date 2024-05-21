@@ -4,20 +4,12 @@ import sprites;
 
 static unsigned g_sel{};
 
-static quack::rect shrink(quack::rect r) {
-  r.x += 2.0;
-  r.y += 2.0;
-  r.w -= 2.0;
-  r.h -= 2.0;
-  return r;
-}
-
 static unsigned update_data(quack::mapped_buffers all) {
   static constexpr const quack::colour sel_bg{0.1, 0.4, 0.3, 0.7};
 
-  auto count = ui::menu_bg(all, 18, 10);
+  quack::rect r{};
+  auto count = ui::menu_bg(all, 18, 10, r);
 
-  auto r = shrink(all.positions[-1]);
   auto rr = r.x + r.w - 2;
 
   count += ui::bg(all, 16, 1.5, sel_bg);

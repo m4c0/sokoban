@@ -20,7 +20,7 @@ using namespace sokoban::enums;
 
 namespace ui {
 unsigned bg(quack::mapped_buffers &all, float w, float h, quack::colour cl);
-unsigned menu_bg(quack::mapped_buffers all, float w, float h);
+unsigned menu_bg(quack::mapped_buffers &all, float w, float h, quack::rect &r);
 } // namespace ui
 
 void setup_game();

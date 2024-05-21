@@ -1,7 +1,8 @@
 module sokoban;
 
 static unsigned update_data(quack::mapped_buffers all) {
-  auto count = ui::menu_bg(all, 10, 10);
+  quack::rect r{};
+  auto count = ui::menu_bg(all, 10, 10, r);
   return count;
 }
 
