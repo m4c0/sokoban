@@ -43,7 +43,7 @@ struct init {
           silog::log(silog::error, "failed to load levels data: %s", msg);
         });
 
-    int level = save::read();
+    int level = save::read().cur_level;
     sl::load_level(level);
     setup_game();
   }

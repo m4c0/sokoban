@@ -2,16 +2,20 @@ export module save;
 import buoy;
 import silog;
 
-namespace save {
-export unsigned read() {
+export namespace save {
+struct data {
+  unsigned cur_level{};
+};
+
+data read() {
   return buoy::open_for_reading("sokoban", "save.dat")
-      .fmap([](auto &&r) { return r->read_u32(); })
-      .unwrap(0);
+      .fmap([](auto &&r) { return r->template read<data>(); })
+      .unwrap(data{});
 }
 
-export void write(unsigned idx) {
+void write(data d) {
   buoy::open_for_writing("sokoban", "save.dat")
-      .fmap([idx](auto &&w) { return w->write_u32(idx); })
+      .fmap([d](auto &&w) { return w->write(d); })
       .take([](auto err) {
         silog::log(silog::error, "failed to write save data: %s", err);
       });

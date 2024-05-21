@@ -10,7 +10,7 @@ static unsigned update_data(quack::mapped_buffers all) {
 static void set_level(unsigned idx) {
   sl::load_level(idx);
   quack::donald::data(update_data);
-  save::write(idx);
+  save::write({idx});
 }
 
 static bool is_done() {
