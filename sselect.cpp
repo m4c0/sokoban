@@ -26,5 +26,7 @@ void open_level_select() {
   reset_g(GESTURE);
   reset_k(KEY_DOWN);
 
+  handle(KEY_DOWN, K_ESCAPE, open_menu);
+
   quack::donald::data(update_data);
 }
