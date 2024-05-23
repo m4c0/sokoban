@@ -49,6 +49,7 @@ static void sel_up() {
 static void sel_activate() {
   switch (g_sel) {
   case 0:
+    open_level_select();
     break;
   case 1:
     toggle_audio();
