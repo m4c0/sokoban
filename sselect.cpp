@@ -48,6 +48,8 @@ void open_level_select() {
   reset_k(KEY_DOWN);
 
   handle(KEY_DOWN, K_ESCAPE, open_menu);
+  handle(KEY_DOWN, K_ENTER, open_menu);
+
   handle(KEY_DOWN, K_LEFT, left);
   handle(KEY_DOWN, K_RIGHT, right);
   handle(KEY_DOWN, K_DOWN, down);
