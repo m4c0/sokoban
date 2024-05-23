@@ -23,6 +23,23 @@ static unsigned update_data(quack::mapped_buffers all) {
   return count;
 }
 
+static void change_level(int d) {
+  int l = sl::current_level() + d;
+  if (l < 0)
+    return;
+  if (l > max_level)
+    return;
+
+  sl::load_level(l);
+
+  quack::donald::data(update_data);
+}
+
+static void left() { change_level(-1); }
+static void right() { change_level(1); }
+static void down() { change_level(10); }
+static void up() { change_level(-10); }
+
 void open_level_select() {
   max_level = save::read().max_level;
 
@@ -31,6 +48,10 @@ void open_level_select() {
   reset_k(KEY_DOWN);
 
   handle(KEY_DOWN, K_ESCAPE, open_menu);
+  handle(KEY_DOWN, K_LEFT, left);
+  handle(KEY_DOWN, K_RIGHT, right);
+  handle(KEY_DOWN, K_DOWN, down);
+  handle(KEY_DOWN, K_UP, up);
 
   quack::donald::data(update_data);
 }
