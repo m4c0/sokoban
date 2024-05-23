@@ -10,7 +10,14 @@ static unsigned update_data(quack::mapped_buffers all) {
 static void set_level(unsigned idx) {
   sl::load_level(idx);
   quack::donald::data(update_data);
-  save::write({idx});
+
+  auto max = save::read().max_level;
+  if (idx > max)
+    max = idx;
+  save::write({
+      .cur_level = idx,
+      .max_level = max,
+  });
 }
 
 static bool is_done() {

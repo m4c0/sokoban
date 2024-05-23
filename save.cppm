@@ -5,6 +5,7 @@ import silog;
 export namespace save {
 struct data {
   unsigned cur_level{};
+  unsigned max_level{};
 };
 
 data read() {
