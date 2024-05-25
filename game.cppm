@@ -7,20 +7,8 @@ import missingno;
 import yoyo;
 import quack;
 import siaudio;
+import sprites;
 import voo;
-
-export namespace sokoban::enums {
-enum blocks : char {
-  player = 'P',
-  player_target = 'p',
-  wall = 'X',
-  empty = '.',
-  outside = ' ',
-  target = '*',
-  box = 'O',
-  target_box = '0',
-};
-}
 
 export namespace sokoban::levels {
 extern const unsigned level_width;
@@ -41,13 +29,13 @@ unsigned update_data(quack::mapped_buffers &all);
 
 export namespace sokoban::game {
 constexpr const auto max_quads = 1024;
-extern enums::blocks grid[max_quads];
+extern spr::blocks grid[max_quads];
 extern unsigned player_pos;
 } // namespace sokoban::game
 
 module :private;
 
 namespace sokoban::game {
-enums::blocks grid[max_quads];
+spr::blocks grid[max_quads];
 unsigned player_pos{};
 } // namespace sokoban::game

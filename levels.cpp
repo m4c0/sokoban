@@ -52,7 +52,7 @@ void sl::load_level(jute::view lvl, unsigned lvl_number) {
   game::player_pos = levels::level_quad_count();
   for (auto i = 0U; i < levels::level_quad_count(); i++) {
     switch (auto c = lvl[i]) {
-      using namespace enums;
+      using namespace spr;
     case player:
       game::grid[i] = empty;
       game::player_pos = i;

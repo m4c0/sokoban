@@ -8,6 +8,56 @@ constexpr const unsigned rows = 1 << 2;
 
 constexpr const auto w = 1.0f / static_cast<float>(cols);
 constexpr const auto h = 1.0f / static_cast<float>(rows);
+
+enum blocks : char {
+  player = 'P',
+  player_target = 'p',
+  wall = 'X',
+  empty = '.',
+  outside = ' ',
+  target = '*',
+  box = 'O',
+  target_box = '0',
+};
+} // namespace spr
+
+namespace spr {
+enum atlas_sprites { sprite_empty, sprite_player, sprite_box, sprite_target };
+static constexpr auto uv(atlas_sprites s) {
+  const auto n = static_cast<unsigned>(s);
+  return quack::uv{{0, n * spr::h}, {spr::w, (n + 1) * spr::h}};
+}
+static constexpr auto uv(char b) {
+  switch (b) {
+  case box:
+  case target_box:
+    return uv(sprite_box);
+  case target:
+    return uv(sprite_target);
+  case player:
+  case player_target:
+    return uv(sprite_player);
+  default:
+    return uv(sprite_empty);
+  }
+}
+static constexpr auto colour(char b) {
+  switch (b) {
+  case target_box:
+  case target:
+  case player_target:
+    return quack::colour{0, 0.7, 0, 1};
+  case wall:
+    return quack::colour{0, 0, 1, 1};
+  case outside:
+    return quack::colour{};
+  case box:
+  case player:
+  case empty:
+    return quack::colour{0, 0.3, 0, 1};
+  }
+  return quack::colour{1, 0, 1, 1};
+}
 } // namespace spr
 
 export namespace spr::blit {
@@ -74,4 +124,12 @@ unsigned fullscreen(quack::mapped_buffers &all, float x, float y) {
   return 1;
 }
 
+unsigned block(quack::mapped_buffers &all, float x, float y, blocks b) {
+  auto &[c, m, p, u] = all;
+  *p++ = {{x, y}, {1, 1}};
+  *u++ = uv(b);
+  *c++ = colour(b);
+  *m++ = quack::colour{1, 1, 1, 1};
+  return 1;
+}
 } // namespace spr::blit

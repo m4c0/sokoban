@@ -12,11 +12,12 @@ import quack;
 import save;
 import silog;
 import sires;
+import sprites;
 
 namespace sg = sokoban::game;
 namespace sl = sokoban::levels;
 namespace sr = sokoban::renderer;
-using namespace sokoban::enums;
+using namespace spr;
 
 namespace ui {
 unsigned bg(quack::mapped_buffers &all, float w, float h, quack::colour cl);

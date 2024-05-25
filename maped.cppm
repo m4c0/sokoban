@@ -6,6 +6,7 @@ import game;
 import jute;
 import quack;
 import silog;
+import sprites;
 import yoyo;
 
 // TODO: maybe support for map without a player?
@@ -13,7 +14,7 @@ import yoyo;
 namespace sg = sokoban::game;
 namespace sl = sokoban::levels;
 namespace sr = sokoban::renderer;
-using namespace sokoban::enums;
+using namespace spr;
 
 static char g_lvl_buf[sg::max_quads];
 
