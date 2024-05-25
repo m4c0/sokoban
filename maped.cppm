@@ -315,11 +315,48 @@ static void level_select() {
   set_level(0);
 }
 
+static unsigned validate_level(quack::mapped_buffers &all) {
+  auto players = false;
+  auto boxes = 0U;
+  auto targets = 0U;
+
+  for (auto c : g_lvl_buf) {
+    switch (c) {
+    case player:
+      players = true;
+      break;
+    case box:
+      boxes++;
+      break;
+    case target:
+      targets++;
+      break;
+    case target_box:
+      boxes++;
+      targets++;
+      break;
+    default:
+      break;
+    }
+  }
+
+  auto count = 0U;
+  if (!players)
+    count += spr::blit::block(all, count, 1, player);
+  if (boxes > targets || targets == 0)
+    count += spr::blit::block(all, count, 1, target);
+  if (boxes < targets)
+    count += spr::blit::block(all, count, 1, box);
+
+  return count;
+}
+
 static void refresh() {
   using namespace quack::donald;
   data([](auto all) -> unsigned {
     auto all2 = all;
     auto count = sr::update_data(all2);
+    count += validate_level(all2);
 
     if (g_cursor < 0)
       return count;
