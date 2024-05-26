@@ -146,9 +146,8 @@ struct init {
             }
           }
         })
-        .take([](auto err) {
-          silog::log(silog::error, "failed to load atlas: %s", err);
-        });
+        .trace("loading atlas")
+        .log_error();
 
     quack::upc upc{};
     upc.grid_size = {image_w, image_h};
