@@ -40,9 +40,8 @@ struct init {
 
     sires::open("levels.dat")
         .fmap([](auto &&r) { return sl::read_levels(&*r); })
-        .take([](auto msg) {
-          silog::log(silog::error, "failed to load levels data: %s", msg);
-        });
+        .trace("loading levels")
+        .log_error();
 
     int level = save::read().cur_level;
     sl::load_level(level);

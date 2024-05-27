@@ -27,9 +27,8 @@ static auto &lw = sl::level_width;
 static void read_levels() {
   yoyo::file_reader::open("levels.dat")
       .fmap([](auto &&r) { return sl::read_levels(&r); })
-      .take([](auto msg) {
-        silog::log(silog::error, "failed to load levels: %s", msg);
-      });
+      .trace("loading levels")
+      .log_error();
 }
 
 static void set_level(int dl) {
@@ -265,9 +264,8 @@ static void level_dump() {
                          [&](auto w) { return store_levels(0, w); });
       })
       .map([] { silog::log(silog::info, "Levels persisted"); })
-      .take([](auto err) {
-        silog::log(silog::error, "failed to write levels: %s", err);
-      });
+      .trace("writing levels")
+      .log_error();
 }
 
 static void level_select();
