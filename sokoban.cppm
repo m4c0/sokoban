@@ -5,6 +5,7 @@
 #pragma leco add_impl sselect
 #pragma leco add_impl sui
 #pragma leco add_resource "levels.dat"
+#pragma leco add_build_dep "maped.cppm"
 export module sokoban;
 import casein;
 import game;
