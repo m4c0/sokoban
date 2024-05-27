@@ -66,24 +66,23 @@ static mno::req<void> store_levels(level *l, level *end, yoyo::writer *w) {
   return frk::push('LEVL', w, [&](auto) { return store_level(*l, w); })
       .fmap([&] { return store_levels(l + 1, end, w); });
 }
-static void level_dump() {
-  yoyo::file_writer::open("levels.dat")
+static mno::req<void> level_dump() {
+  return yoyo::file_writer::open("levels.dat")
       .fmap([](auto &&w) {
         return frk::push('SKBN', &w, [&](auto w) {
           return store_levels(g_data.begin(), g_data.end(), w);
         });
       })
-      .take([](auto err) {
-        silog::log(silog::error, "failed to write levels: %s", err);
-      });
+      .trace("writing levels");
 }
 
 int main() {
-  yoyo::file_reader::open("levels.dat")
-      .fmap([](auto &&r) { return frk::read(&r).fmap(read_list); })
-      .take([](auto msg) {
-        silog::log(silog::error, "failed to load levels data: %s", msg);
-        throw 0;
-      });
-  level_dump();
+  bool success =
+      yoyo::file_reader::open("levels.dat")
+          .fmap([](auto &&r) { return frk::read(&r).fmap(read_list); })
+          .trace("loading levels")
+          .fmap(level_dump)
+          .map([] { return true; })
+          .log_error();
+  return success ? 0 : 1;
 }
