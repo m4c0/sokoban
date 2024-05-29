@@ -104,10 +104,22 @@ void setup_game() {
   handle(GESTURE, G_SWIPE_LEFT, &left);
   handle(GESTURE, G_SWIPE_RIGHT, &right);
   handle(GESTURE, G_SHAKE, &reset_level);
+
   handle(KEY_DOWN, K_UP, &up);
   handle(KEY_DOWN, K_DOWN, &down);
   handle(KEY_DOWN, K_LEFT, &left);
   handle(KEY_DOWN, K_RIGHT, &right);
+
+  handle(KEY_DOWN, K_W, &up);
+  handle(KEY_DOWN, K_S, &down);
+  handle(KEY_DOWN, K_A, &left);
+  handle(KEY_DOWN, K_D, &right);
+
+  handle(KEY_DOWN, K_K, &up);
+  handle(KEY_DOWN, K_J, &down);
+  handle(KEY_DOWN, K_H, &left);
+  handle(KEY_DOWN, K_L, &right);
+
   handle(KEY_DOWN, K_SPACE, &reset_level);
   handle(KEY_DOWN, K_ESCAPE, &open_menu);
 
