@@ -35,6 +35,7 @@ void play_tone(unsigned);
 
 struct init {
   init() {
+    casein::set_title("Warehouse Game");
     enable_audio(true);
 
     quack::donald::app_name("sokoban");
