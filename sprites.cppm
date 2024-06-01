@@ -25,7 +25,7 @@ namespace spr {
 enum atlas_sprites { sprite_empty, sprite_player, sprite_box, sprite_target };
 static constexpr auto uv(atlas_sprites s) {
   const auto n = static_cast<unsigned>(s);
-  return quack::uv{{0, n * spr::h}, {spr::w, (n + 1) * spr::h}};
+  return quack::uv{{0.0f, n * spr::h}, {spr::w, (n + 1) * spr::h}};
 }
 static constexpr auto uv(char b) {
   switch (b) {
