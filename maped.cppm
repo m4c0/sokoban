@@ -24,13 +24,6 @@ static void (*g_pen)();
 static auto &lh = sl::level_height;
 static auto &lw = sl::level_width;
 
-static void read_levels() {
-  yoyo::file_reader::open("levels.dat")
-      .fmap([](auto &&r) { return sl::read_levels(&r); })
-      .trace("loading levels")
-      .log_error();
-}
-
 static void set_level(int dl) {
   auto ll = (sl::max_levels() + sl::current_level() + dl) % sl::max_levels();
   silog::log(silog::info, "Changing editor to level %d", ll);
@@ -309,7 +302,7 @@ static void level_select() {
   handle(KEY_DOWN, K_N, &new_level);
   g_cursor = -1;
 
-  read_levels();
+  sl::read_levels();
   set_level(0);
 }
 

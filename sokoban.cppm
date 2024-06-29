@@ -40,10 +40,7 @@ struct init {
 
     quack::donald::app_name("sokoban");
 
-    sires::open("levels.dat")
-        .fmap([](auto &&r) { return sl::read_levels(&*r); })
-        .trace("loading levels")
-        .log_error();
+    sl::read_levels();
 
     int level = save::read().cur_level;
     sl::load_level(level);

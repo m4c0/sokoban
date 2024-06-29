@@ -3,6 +3,7 @@ import fork;
 import hai;
 import jute;
 import silog;
+import sires;
 
 namespace sg = sokoban::game;
 namespace sl = sokoban::levels;
@@ -41,6 +42,13 @@ mno::req<void> read_list(frk::pair p) {
 }
 mno::req<void> sl::read_levels(yoyo::reader *r) {
   return frk::read(r).fmap(read_list);
+}
+
+void sl::read_levels() {
+  sires::open("levels.dat")
+      .fmap([](auto &&r) { return sl::read_levels(&*r); })
+      .trace("loading levels")
+      .log_error();
 }
 
 unsigned sl::current_level() { return g_cur_level; }

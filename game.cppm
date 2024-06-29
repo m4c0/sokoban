@@ -18,7 +18,7 @@ unsigned max_levels();
 jute::view level(unsigned);
 void load_level(jute::view lvl, unsigned lvl_number);
 void load_level(unsigned l);
-mno::req<void> read_levels(yoyo::reader *r);
+void read_levels();
 
 inline unsigned level_quad_count() { return level_width * level_height; }
 } // namespace sokoban::levels
