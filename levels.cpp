@@ -17,11 +17,7 @@ static unsigned g_cur_level{};
 static unsigned g_max_level{};
 static char g_data[max_level_capacity][sg::max_quads]{};
 
-mno::req<void> read_level(frk::pair p) {
-  auto [fourcc, data] = p;
-  if (fourcc != 'LEVL')
-    return {};
-
+mno::req<void> read_level(yoyo::subreader data) {
   return data.read_u32()
       .assert([](auto lvl) { return lvl <= max_level_capacity; },
               "max level capacity")
@@ -33,20 +29,12 @@ mno::req<void> read_level(frk::pair p) {
         return data.read(d, sl::level_width * sl::level_height);
       });
 }
-mno::req<void> read_list(frk::pair p) {
-  auto [fourcc, data] = p;
-  if (fourcc != 'SKBN') {
-    return mno::req<void>::failed("data file is not valid");
-  }
-  return frk::read_list(&data, read_level);
-}
-mno::req<void> sl::read_levels(yoyo::reader *r) {
-  return frk::read(r).fmap(read_list);
-}
 
 void sl::read_levels() {
   sires::open("levels.dat")
-      .fmap([](auto &&r) { return sl::read_levels(&*r); })
+      .fpeek(frk::assert("SKB"))
+      .fpeek(frk::take_all("LEVL", read_level))
+      .map(frk::end())
       .trace("loading levels")
       .log_error();
 }
