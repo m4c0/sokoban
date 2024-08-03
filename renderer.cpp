@@ -20,14 +20,12 @@ static struct init {
     using namespace quack::donald;
     max_quads(sg::max_quads);
     push_constants(rpc);
-    atlas([](auto dq) -> atlas_t * {
-      return new voo::sires_image("atlas.png", dq);
-    });
+    atlas([](auto pd) { return voo::load_sires_image("atlas.png", pd); });
   }
 } i;
 } // namespace
 
-unsigned sr::update_data(quack::mapped_buffers &all) {
+unsigned sr::update_data(quack::instance *&all) {
   auto count = 0U;
   for (auto i = 0U; i < sl::level_quad_count(); i++) {
     auto b = sg::grid[i];

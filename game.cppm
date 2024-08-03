@@ -24,7 +24,7 @@ inline unsigned level_quad_count() { return level_width * level_height; }
 } // namespace sokoban::levels
 
 export namespace sokoban::renderer {
-unsigned update_data(quack::mapped_buffers &all);
+unsigned update_data(quack::instance *&i);
 } // namespace sokoban::renderer
 
 export namespace sokoban::game {

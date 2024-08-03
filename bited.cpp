@@ -1,6 +1,7 @@
 #pragma leco app
 
 import casein;
+import dotz;
 import quack;
 import silog;
 import sprites;
@@ -20,43 +21,41 @@ static unsigned g_cursor_y{};
 static bool g_cursor_hl{};
 static uint32_t g_pixies[image_h][image_w]{};
 
-static void update_atlas(voo::h2l_image *img) {
-  voo::mapmem m{img->host_memory()};
+static auto bitmap(auto pd) {
+  voo::h2l_image img{pd, image_w, image_h};
+
+  voo::mapmem m{img.host_memory()};
   auto *buf = static_cast<uint32_t *>(*m);
   for (auto y = 0; y < image_h; y++) {
     for (auto x = 0; x < image_w; x++, buf++) {
       *buf = g_pixies[y][x];
     }
   }
+
+  return img;
 }
 
-static quack::donald::atlas_t *bitmap(voo::device_and_queue *dq) {
-  return new quack::donald::atlas_t{dq->queue(), &update_atlas,
-                                    dq->physical_device(), image_w, image_h};
-}
-
-static unsigned update_data(quack::mapped_buffers all) {
+static unsigned update_data(quack::instance *i) {
   static constexpr const float inv_c = 1.0f / cols;
   static constexpr const float inv_r = 1.0f / rows;
-  auto [c, m, p, u] = all;
   for (auto y = 0; y < rows; y++) {
     for (auto x = 0; x < cols; x++) {
-      *c++ = {0, 0, 0, 1};
-      *m++ = {1, 1, 1, 1};
-      *p++ = {{x * 8.0f + 0.1f, y * 8.0f + 0.1f}, {8 - 0.2f, 8 - 0.2f}};
-      *u++ = {{x * inv_c, y * inv_r}, {(x + 1) * inv_c, (y + 1) * inv_r}};
+      *i++ = quack::instance{
+          .position{x * 8.0f + 0.1f, y * 8.0f + 0.1f},
+          .size{8 - 0.2f, 8 - 0.2f},
+          .uv0{x * inv_c, y * inv_r},
+          .uv1{(x + 1) * inv_c, (y + 1) * inv_r},
+          .multiplier{1},
+      };
     }
   }
 
-  if (g_cursor_hl) {
-    *c++ = {0, 0, 0, 0};
-  } else {
-    *c++ = {1, 0, 0, 1};
-  }
-  *m++ = {1, 1, 1, 0};
-  *p++ = {{static_cast<float>(g_cursor_x), static_cast<float>(g_cursor_y)},
-          {1, 1}};
-  *u++ = {};
+  *i++ = quack::instance{
+      .position{static_cast<float>(g_cursor_x), static_cast<float>(g_cursor_y)},
+      .size{1},
+      .colour = g_cursor_hl ? dotz::vec4{} : dotz::vec4{1, 0, 0, 1},
+      .multiplier{1, 1, 1, 0},
+  };
 
   return quad_count;
 }
