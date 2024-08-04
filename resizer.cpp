@@ -14,15 +14,11 @@ static constexpr const auto new_size = new_width * new_height;
 
 struct level {
   unsigned id;
-  char data[1024];
+  char data[new_size];
 };
 hai::varray<level> g_data{1000};
 
-mno::req<void> read_level(frk::pair p) {
-  auto [fourcc, data] = p;
-  if (fourcc != 'LEVL')
-    return {};
-
+static mno::req<void> read_level(yoyo::subreader data) {
   level lvl{};
   for (auto &c : lvl.data)
     c = ' ';
@@ -47,42 +43,18 @@ mno::req<void> read_level(frk::pair p) {
       })
       .map([&] { g_data.push_back(lvl); });
 }
-mno::req<void> read_list(frk::pair p) {
-  auto [fourcc, data] = p;
-  if (fourcc != 'SKBN') {
-    silog::log(silog::error, "data file is not valid");
-    return {};
-  }
-  return frk::read_list(&data, read_level);
-}
-
-static mno::req<void> store_level(level &l, yoyo::writer *w) {
-  return w->write_u32(l.id).fmap([&] { return w->write(l.data, new_size); });
-}
-static mno::req<void> store_levels(level *l, level *end, yoyo::writer *w) {
-  if (l == end) {
-    return {};
-  }
-  return frk::push('LEVL', w, [&](auto) { return store_level(*l, w); })
-      .fmap([&] { return store_levels(l + 1, end, w); });
-}
-static mno::req<void> level_dump() {
-  return yoyo::file_writer::open("levels.dat")
-      .fmap([](auto &&w) {
-        return frk::push('SKBN', &w, [&](auto w) {
-          return store_levels(g_data.begin(), g_data.end(), w);
-        });
-      })
-      .trace("writing levels");
-}
 
 int main() {
-  bool success =
-      yoyo::file_reader::open("levels.dat")
-          .fmap([](auto &&r) { return frk::read(&r).fmap(read_list); })
-          .trace("loading levels")
-          .fmap(level_dump)
-          .map([] { return true; })
-          .log_error();
-  return success ? 0 : 1;
+  auto res = yoyo::file_reader::open("levels.dat")
+                 .fpeek(frk::assert("SKB"))
+                 .fpeek(frk::take_all("LEVL", read_level))
+                 .map(frk::end())
+                 .fmap([] { return yoyo::file_writer::open("levels.dat"); })
+                 .fpeek(frk::signature("SKB"));
+
+  for (auto &lvl : g_data) {
+    res = res.fpeek(frk::chunk("LEVL", lvl));
+  }
+
+  return res.map([](auto &) { return 0; }).log_error([] { return 1; });
 }
