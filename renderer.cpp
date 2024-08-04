@@ -20,7 +20,7 @@ static struct init {
     using namespace quack::donald;
     max_quads(sg::max_quads);
     push_constants(rpc);
-    atlas([](auto pd) { return voo::load_sires_image("atlas.png", pd); });
+    atlas("atlas.png");
   }
 } i;
 } // namespace

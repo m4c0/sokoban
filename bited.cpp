@@ -7,7 +7,6 @@ import silog;
 import sprites;
 import stubby;
 import traits;
-import voo;
 
 using namespace traits::ints;
 using namespace spr;
@@ -20,20 +19,6 @@ static unsigned g_cursor_x{};
 static unsigned g_cursor_y{};
 static bool g_cursor_hl{};
 static uint32_t g_pixies[image_h][image_w]{};
-
-static auto bitmap(auto pd) {
-  voo::h2l_image img{pd, image_w, image_h};
-
-  voo::mapmem m{img.host_memory()};
-  auto *buf = static_cast<uint32_t *>(*m);
-  for (auto y = 0; y < image_h; y++) {
-    for (auto x = 0; x < image_w; x++, buf++) {
-      *buf = g_pixies[y][x];
-    }
-  }
-
-  return img;
-}
 
 static unsigned update_data(quack::instance *i) {
   static constexpr const float inv_c = 1.0f / cols;
@@ -60,7 +45,7 @@ static unsigned update_data(quack::instance *i) {
   return quad_count;
 }
 
-void refresh_atlas() { quack::donald::atlas(bitmap); }
+void refresh_atlas() { quack::donald::atlas(g_pixies, image_w, image_h); }
 void refresh_batch() { quack::donald::data(update_data); }
 
 static void flip_cursor() {
