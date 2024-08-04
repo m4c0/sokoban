@@ -8,6 +8,7 @@
 #pragma leco add_build_dep "maped.cppm"
 export module sokoban;
 import casein;
+import dotz;
 import game;
 import quack;
 import save;
@@ -21,8 +22,9 @@ namespace sr = sokoban::renderer;
 using namespace spr;
 
 namespace ui {
-unsigned bg(quack::mapped_buffers &all, float w, float h, quack::colour cl);
-unsigned menu_bg(quack::mapped_buffers &all, float w, float h, quack::rect &r);
+unsigned bg(quack::instance *&, float w, float h, dotz::vec4 cl);
+unsigned menu_bg(quack::instance *&, float w, float h, dotz::vec2 &p,
+                 dotz::vec2 &s);
 } // namespace ui
 
 void setup_game();

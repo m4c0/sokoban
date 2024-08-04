@@ -3,19 +3,20 @@ import sprites;
 
 static unsigned max_level;
 
-static unsigned update_data(quack::mapped_buffers all) {
-  static constexpr const quack::colour cur_level_bg{0, 0, 0, 1};
+static unsigned update_data(quack::instance *all) {
+  static constexpr const dotz::vec4 cur_level_bg{0, 0, 0, 1};
 
-  quack::rect r{};
-  auto count = ui::menu_bg(all, 17, 13, r);
+  dotz::vec2 rp{};
+  dotz::vec2 rs{};
+  auto count = ui::menu_bg(all, 17, 13, rp, rs);
 
   for (auto i = 0; i <= max_level; i++) {
-    float x = r.x + (i % 10) * 1.5f;
-    float y = r.y + (i / 10) * 1.5f;
+    float x = rp.x + (i % 10) * 1.5f;
+    float y = rp.y + (i / 10) * 1.5f;
     if (i == sl::current_level()) {
       count += ui::bg(all, 1.5, 1, cur_level_bg);
-      all.positions[-1].x = x - 0.75f;
-      all.positions[-1].y = y;
+      all[-1].position.x = x - 0.75f;
+      all[-1].position.y = y;
     }
     count += spr::blit::number(all, i + 1, x, y);
   }
