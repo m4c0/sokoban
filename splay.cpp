@@ -93,10 +93,6 @@ static void up() { move(-sl::level_width); }
 static void left() { move(-1); }
 static void right() { move(1); }
 
-static void flip_fullscreen() {
-  casein::set_fullscreen(!casein::is_fullscreen());
-}
-
 void setup_game() {
   using namespace casein;
   handle(GESTURE, G_SWIPE_UP, &up);
@@ -122,8 +118,6 @@ void setup_game() {
 
   handle(KEY_DOWN, K_SPACE, &reset_level);
   handle(KEY_DOWN, K_ESCAPE, &open_menu);
-
-  handle(KEY_DOWN, K_F, &flip_fullscreen);
 
   quack::donald::data(update_data);
 }
