@@ -1,4 +1,5 @@
 #pragma leco app
+
 export module maped;
 import casein;
 import fork;
@@ -237,26 +238,22 @@ static void fill() {
 
 static void reset_pen() { g_pen = {}; }
 
-static mno::req<void> store_level(int l, yoyo::writer *w) {
-  const auto lw = sl::level_width;
-  const auto lh = sl::level_height;
-  jute::view lvl = (l == sl::current_level()) ? g_lvl_buf : sl::level(l);
-  return w->write_u32(l).fmap([&] { return w->write(lvl.data(), lw * lh); });
-}
-static mno::req<void> store_levels(int l, yoyo::writer *w) {
-  if (l >= sl::max_levels() && l != sl::current_level()) {
-    return {};
-  }
-  return frk::push('LEVL', w, [&](auto) { return store_level(l, w); })
-      .fmap([&] { return store_levels(l + 1, w); });
+static constexpr auto store_level(int l) {
+  return [=](auto &w) {
+    const auto lw = sl::level_width;
+    const auto lh = sl::level_height;
+    jute::view lvl = (l == sl::current_level()) ? g_lvl_buf : sl::level(l);
+    return w.write_u32(l).fmap([&] { return w.write(lvl.data(), lw * lh); });
+  };
 }
 static void level_dump() {
-  yoyo::file_writer::open("levels.dat")
-      .fmap([](auto &&w) {
-        return frk::push('SKBN', &w,
-                         [&](auto w) { return store_levels(0, w); });
-      })
-      .map([] { silog::log(silog::info, "Levels persisted"); })
+  auto res = yoyo::file_writer::open("levels.dat").fpeek(frk::signature("SKB"));
+
+  for (auto l = 0; l < sl::max_levels() || l == sl::current_level(); l++) {
+    res = res.fpeek(frk::chunk("LEVL", 10240, store_level(l)));
+  }
+
+  res.map([](auto &) { silog::log(silog::info, "Levels persisted"); })
       .trace("writing levels")
       .log_error();
 }
@@ -306,7 +303,7 @@ static void level_select() {
   set_level(0);
 }
 
-static unsigned validate_level(quack::mapped_buffers &all) {
+static unsigned validate_level(quack::instance *&all) {
   auto players = false;
   auto boxes = 0U;
   auto targets = 0U;
@@ -352,11 +349,9 @@ static void refresh() {
     if (g_cursor < 0)
       return count;
 
-    auto &c = all.colours[g_cursor];
-    c.r *= 0.2;
-    c.g *= 0.2;
-    c.b *= 0.2;
-    c.a = 1.0;
+    auto &c = all[g_cursor].colour;
+    c = c * 0.2;
+    c.w = 1.0;
     return count;
   });
 }
