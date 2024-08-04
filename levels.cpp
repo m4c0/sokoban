@@ -1,3 +1,4 @@
+#pragma leco add_resource "levels.dat"
 module game;
 import fork;
 import hai;
