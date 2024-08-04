@@ -17,7 +17,7 @@ static unsigned update_data(quack::mapped_buffers all) {
   s.y = r.y - 0.3f + g_sel * 1.5f;
 
   auto au = is_audio_enabled();
-  auto fs = casein::is_fullscreen();
+  auto fs = casein::fullscreen;
 
   count += spr::blit::level(all, r.x, r.y);
   count += spr::blit::number(all, sl::current_level() + 1, rr, r.y);
@@ -34,7 +34,8 @@ static void toggle_audio() {
   quack::donald::data(update_data);
 }
 static void toggle_fullscreen() {
-  casein::set_fullscreen(!casein::is_fullscreen());
+  casein::fullscreen = !casein::fullscreen;
+  casein::interrupt(casein::IRQ_FULLSCREEN);
   quack::donald::data(update_data);
 }
 
