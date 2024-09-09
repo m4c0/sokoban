@@ -25,8 +25,7 @@ static struct init {
 } i;
 } // namespace
 
-unsigned sr::update_data(quack::instance *&all) {
-  auto count = 0U;
+void sr::update_data(quack::instance *& all) {
   for (auto i = 0U; i < sl::level_quad_count(); i++) {
     auto b = sg::grid[i];
     if (sg::player_pos == i) {
@@ -34,10 +33,9 @@ unsigned sr::update_data(quack::instance *&all) {
     }
     float x = i % sl::level_width;
     float y = i / sl::level_width;
-    count += spr::blit::block(all, x, y, b);
+    spr::blit::block(all, x, y, b);
   }
 
-  count += spr::blit::level(all, 0, 0);
-  count += spr::blit::number(all, sl::current_level() + 1, 3.5, 0);
-  return count;
+  spr::blit::level(all, 0, 0);
+  spr::blit::number(all, sl::current_level() + 1, 3.5, 0);
 }

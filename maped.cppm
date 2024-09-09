@@ -303,7 +303,7 @@ static void level_select() {
   set_level(0);
 }
 
-static unsigned validate_level(quack::instance *&all) {
+static void validate_level(quack::instance *& all) {
   auto players = false;
   auto boxes = 0U;
   auto targets = 0U;
@@ -328,31 +328,23 @@ static unsigned validate_level(quack::instance *&all) {
     }
   }
 
-  auto count = 0U;
-  if (!players)
-    count += spr::blit::block(all, count, 1, player);
-  if (boxes > targets || targets == 0)
-    count += spr::blit::block(all, count, 1, target);
-  if (boxes < targets)
-    count += spr::blit::block(all, count, 1, box);
-
-  return count;
+  if (!players) spr::blit::block(all, 0, 1, player);
+  if (boxes > targets || targets == 0) spr::blit::block(all, 1, 1, target);
+  if (boxes < targets) spr::blit::block(all, 2, 1, box);
 }
 
 static void refresh() {
   using namespace quack::donald;
-  data([](auto all) -> unsigned {
-    auto all2 = all;
-    auto count = sr::update_data(all2);
-    count += validate_level(all2);
+  data([](quack::instance *& i) -> void {
+    auto * bi = i;
+    sr::update_data(i);
+    validate_level(i);
 
-    if (g_cursor < 0)
-      return count;
+    if (g_cursor < 0) return;
 
-    auto &c = all[g_cursor].colour;
+    auto &c = bi[g_cursor].colour;
     c = c * 0.2;
     c.w = 1.0;
-    return count;
   });
 }
 struct init {

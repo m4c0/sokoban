@@ -20,7 +20,7 @@ static unsigned g_cursor_y{};
 static bool g_cursor_hl{};
 static uint32_t g_pixies[image_h][image_w]{};
 
-static unsigned update_data(quack::instance *i) {
+static void update_data(quack::instance *& i) {
   static constexpr const float inv_c = 1.0f / cols;
   static constexpr const float inv_r = 1.0f / rows;
   for (auto y = 0; y < rows; y++) {
@@ -41,8 +41,6 @@ static unsigned update_data(quack::instance *i) {
       .colour = g_cursor_hl ? dotz::vec4{} : dotz::vec4{1, 0, 0, 1},
       .multiplier{1, 1, 1, 0},
   };
-
-  return quad_count;
 }
 
 void refresh_atlas() { quack::donald::atlas(g_pixies, image_w, image_h); }

@@ -3,8 +3,8 @@ import buoy;
 
 enum move_type { push, walk, none, push2tgt };
 
-static unsigned update_data(quack::instance *all) {
-  return sr::update_data(all);
+static void update_data(quack::instance *& all) {
+  sr::update_data(all);
 }
 
 static void set_level(unsigned idx) {

@@ -1,6 +1,6 @@
 module sokoban;
 
-static unsigned dim(quack::instance *&all) {
+static void dim(quack::instance *& all) {
   float w = sl::level_width * 2.0;
   float h = sl::level_height * 2.0;
 
@@ -10,10 +10,9 @@ static unsigned dim(quack::instance *&all) {
       .colour{0.f, 0.f, 0.f, 0.9f},
       .multiplier{1},
   };
-  return 1;
 }
 
-unsigned ui::bg(quack::instance *&all, float w, float h, dotz::vec4 cl) {
+void ui::bg(quack::instance *& all, float w, float h, dotz::vec4 cl) {
   float x = sl::level_width - w;
   float y = sl::level_height - h;
 
@@ -23,19 +22,16 @@ unsigned ui::bg(quack::instance *&all, float w, float h, dotz::vec4 cl) {
       .colour{cl},
       .multiplier{1},
   };
-  return 1;
 }
 
-unsigned ui::menu_bg(quack::instance *&all, float w, float h, dotz::vec2 &p,
-                     dotz::vec2 &s) {
+void ui::menu_bg(quack::instance *& all, float w, float h, dotz::vec2 & p, dotz::vec2 & s) {
   static constexpr const dotz::vec4 diag_bg{0.1f, 0.2f, 0.3f, 0.7f};
 
-  auto count = sr::update_data(all);
+  sr::update_data(all);
 
-  count += dim(all);
-  count += bg(all, w, h, diag_bg);
+  dim(all);
+  bg(all, w, h, diag_bg);
 
   p = all[-1].position + 2.0f;
   s = all[-1].size - 2.0f;
-  return count;
 }

@@ -67,7 +67,7 @@ constexpr float operator""_h(long double n) { return n * h; }
 constexpr float operator""_w(unsigned long long n) { return n * w; }
 constexpr float operator""_h(unsigned long long n) { return n * h; }
 
-unsigned digit(quack::instance *&i, unsigned d, float x, float y) {
+void digit(quack::instance *& i, unsigned d, float x, float y) {
   auto uu = (d % 6) * 0.5_w; // chars are half-w
   auto uv = (d / 6) * 1.0_h;
 
@@ -78,20 +78,17 @@ unsigned digit(quack::instance *&i, unsigned d, float x, float y) {
       .uv1{1.5_w + uu, 2_h + uv},
       .multiplier{1, 1, 1, 1},
   };
-  return 1;
 }
-unsigned number(quack::instance *&all, unsigned n, float x, float y) {
-  unsigned count{};
+void number(quack::instance *& all, unsigned n, float x, float y) {
   for (auto i = 0; i < 2; i++) {
-    count += digit(all, n % 10, x, y);
+    digit(all, n % 10, x, y);
 
     x -= 0.5;
     n /= 10;
   }
-  return count;
 }
 
-unsigned boolean(quack::instance *&i, bool val, float x, float y) {
+void boolean(quack::instance *& i, bool val, float x, float y) {
   float v = val ? 2_h : 3_h;
 
   *i++ = quack::instance{
@@ -101,10 +98,9 @@ unsigned boolean(quack::instance *&i, bool val, float x, float y) {
       .uv1{6_w, v + 1_h},
       .multiplier{1, 1, 1, 1},
   };
-  return 1;
 }
 
-unsigned level(quack::instance *&i, float x, float y) {
+void level(quack::instance *& i, float x, float y) {
   *i++ = quack::instance{
       .position{x, y},
       .size{3, 1},
@@ -112,9 +108,8 @@ unsigned level(quack::instance *&i, float x, float y) {
       .uv1{4_w, 1_h},
       .multiplier{1, 1, 1, 1},
   };
-  return 1;
 }
-unsigned sound(quack::instance *&i, float x, float y) {
+void sound(quack::instance *& i, float x, float y) {
   *i++ = quack::instance{
       .position{x, y},
       .size{3, 1},
@@ -122,9 +117,8 @@ unsigned sound(quack::instance *&i, float x, float y) {
       .uv1{7_w, 1_h},
       .multiplier{1, 1, 1, 1},
   };
-  return 1;
 }
-unsigned fullscreen(quack::instance *&i, float x, float y) {
+void fullscreen(quack::instance *& i, float x, float y) {
   *i++ = quack::instance{
       .position{x, y},
       .size{5, 1},
@@ -132,10 +126,9 @@ unsigned fullscreen(quack::instance *&i, float x, float y) {
       .uv1{9_w, 2_h},
       .multiplier{1, 1, 1, 1},
   };
-  return 1;
 }
 
-unsigned block(quack::instance *&i, float x, float y, blocks b) {
+void block(quack::instance *& i, float x, float y, blocks b) {
   auto uv = spr::uv(b);
   *i++ = {
       .position{x, y},
@@ -145,6 +138,5 @@ unsigned block(quack::instance *&i, float x, float y, blocks b) {
       .colour{colour(b)},
       .multiplier{1, 1, 1, 1},
   };
-  return 1;
 }
 } // namespace spr::blit
