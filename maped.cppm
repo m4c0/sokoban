@@ -19,6 +19,7 @@ using namespace spr;
 
 static char g_lvl_buf[sg::max_quads];
 
+static bool g_cursor_blink {};
 static int g_cursor{-1};
 static void (*g_pen)();
 
@@ -336,15 +337,13 @@ static void validate_level(quack::instance *& all) {
 static void refresh() {
   using namespace quack::donald;
   data([](quack::instance *& i) -> void {
-    auto * bi = i;
     sr::update_data(i);
     validate_level(i);
 
-    if (g_cursor < 0) return;
+    g_cursor_blink = !g_cursor_blink;
+    if (g_cursor < 0 || g_cursor_blink) return;
 
-    auto &c = bi[g_cursor].colour;
-    c = c * 0.2;
-    c.w = 1.0;
+    spr::blit::cursor(i, g_cursor % sl::level_width, g_cursor / sl::level_height);
   });
 }
 struct init {

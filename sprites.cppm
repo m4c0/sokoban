@@ -128,6 +128,14 @@ void fullscreen(quack::instance *& i, float x, float y) {
   };
 }
 
+void cursor(quack::instance *& i, float x, float y) {
+  *i++ = {
+      .position {x, y},
+      .size {1, 1},
+      .colour {0, 0, 0, 1},
+  };
+}
+
 void block(quack::instance *& i, float x, float y, blocks b) {
   auto uv = spr::uv(b);
   *i++ = {
