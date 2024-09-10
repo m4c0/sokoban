@@ -2,6 +2,7 @@
 #pragma leco add_impl renderer
 
 export module game;
+import hai;
 import jute;
 import missingno;
 import yoyo;
@@ -25,6 +26,7 @@ inline unsigned level_quad_count() { return level_width * level_height; }
 
 export namespace sokoban::renderer {
 void update_data(quack::instance *& i);
+void set_updater(hai::fn<void, quack::instance *&>);
 } // namespace sokoban::renderer
 
 export namespace sokoban::game {

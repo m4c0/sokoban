@@ -335,8 +335,7 @@ static void validate_level(quack::instance *& all) {
 }
 
 static void refresh() {
-  using namespace quack::donald;
-  data([](quack::instance *& i) -> void {
+  sr::set_updater([](quack::instance *& i) -> void {
     sr::update_data(i);
     validate_level(i);
 

@@ -31,7 +31,7 @@ static void change_level(int d) {
 
   sl::load_level(l);
 
-  quack::donald::data(update_data);
+  sokoban::renderer::set_updater(update_data);
 }
 
 static void left() { change_level(-1); }
@@ -54,5 +54,5 @@ void open_level_select() {
   handle(KEY_DOWN, K_DOWN, down);
   handle(KEY_DOWN, K_UP, up);
 
-  quack::donald::data(update_data);
+  sokoban::renderer::set_updater(update_data);
 }

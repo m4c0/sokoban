@@ -30,21 +30,21 @@ static void update_data(quack::instance *& all) {
 
 static void toggle_audio() {
   enable_audio(!is_audio_enabled());
-  quack::donald::data(update_data);
+  sokoban::renderer::set_updater(update_data);
 }
 static void toggle_fullscreen() {
   casein::fullscreen = !casein::fullscreen;
   casein::interrupt(casein::IRQ_FULLSCREEN);
-  quack::donald::data(update_data);
+  sokoban::renderer::set_updater(update_data);
 }
 
 static void sel_down() {
   g_sel = (g_sel + 1) % 3;
-  quack::donald::data(update_data);
+  sokoban::renderer::set_updater(update_data);
 }
 static void sel_up() {
   g_sel = (3 + g_sel - 1) % 3;
-  quack::donald::data(update_data);
+  sokoban::renderer::set_updater(update_data);
 }
 static void sel_activate() {
   switch (g_sel) {
@@ -71,5 +71,5 @@ void open_menu() {
   handle(KEY_DOWN, K_ENTER, &sel_activate);
 
   g_sel = 0;
-  quack::donald::data(update_data);
+  sokoban::renderer::set_updater(update_data);
 }

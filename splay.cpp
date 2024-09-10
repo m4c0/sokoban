@@ -9,7 +9,7 @@ static void update_data(quack::instance *& all) {
 
 static void set_level(unsigned idx) {
   sl::load_level(idx);
-  quack::donald::data(update_data);
+  sr::set_updater(update_data);
 
   auto max = save::read().max_level;
   if (idx > max)
@@ -83,7 +83,7 @@ static void move(unsigned p) {
     sg::player_pos += p;
     break;
   }
-  quack::donald::data(update_data);
+  sr::set_updater(update_data);;
 }
 
 static void reset_level() { set_level(sl::current_level()); }
@@ -119,5 +119,5 @@ void setup_game() {
   handle(KEY_DOWN, K_SPACE, &reset_level);
   handle(KEY_DOWN, K_ESCAPE, &open_menu);
 
-  quack::donald::data(update_data);
+  sr::set_updater(update_data);
 }

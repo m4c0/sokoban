@@ -39,3 +39,7 @@ void sr::update_data(quack::instance *& all) {
   spr::blit::level(all, 0, 0);
   spr::blit::number(all, sl::current_level() + 1, 3.5, 0);
 }
+
+void sr::set_updater(hai::fn<void, quack::instance *&> u) {
+  quack::donald::data(u);
+}
