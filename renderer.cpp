@@ -18,6 +18,7 @@ static struct init {
     rpc.grid_pos = rpc.grid_size / 2.0;
 
     using namespace quack::donald;
+    app_name("sokoban");
     max_quads(sg::max_quads);
     push_constants(rpc);
     atlas("atlas.png");

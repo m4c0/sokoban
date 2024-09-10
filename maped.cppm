@@ -351,8 +351,5 @@ struct init {
 
     using namespace casein;
     handle(TIMER, &refresh);
-
-    using namespace quack::donald;
-    app_name("maped");
   }
 } i;

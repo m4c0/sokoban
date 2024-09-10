@@ -38,8 +38,6 @@ struct init {
     casein::window_title = "Warehouse Game";
     enable_audio(true);
 
-    quack::donald::app_name("sokoban");
-
     sl::read_levels();
 
     int level = save::read().cur_level;
