@@ -11,17 +11,42 @@ namespace sl = sokoban::levels;
 namespace sr = sokoban::renderer;
 
 namespace {
-static struct init {
-  init() {
+  static hai::fn<void, quack::instance *&> g_updater;
+  static quack::buffer_updater * g_buffer;
+
+  static void updater(quack::instance *& i) { g_updater(i); }
+
+struct main : voo::casein_thread {
+  void run() override {
+    voo::device_and_queue dq { "sokoban" };
+
+    quack::pipeline_stuff ps { dq, 2 };
+    quack::buffer_updater u { &dq, sg::max_quads, &updater };
+    quack::image_updater a { &dq, &ps, voo::load_sires_image("atlas.png") };
+
+    g_buffer = &u;
+
     quack::upc rpc{};
     rpc.grid_size = {sl::level_width, sl::level_height};
     rpc.grid_pos = rpc.grid_size / 2.0;
 
-    using namespace quack::donald;
-    app_name("sokoban");
-    max_quads(sg::max_quads);
-    push_constants(rpc);
-    atlas("atlas.png");
+    while (!interrupted()) {
+      voo::swapchain_and_stuff sw { dq };
+
+      extent_loop(dq.queue(), sw, [&] {
+        sw.queue_one_time_submit(dq.queue(), [&](auto pcb) {
+          auto scb = sw.cmd_render_pass(pcb);
+          quack::run(&ps, {
+            .sw = &sw,
+            .scb = *scb,
+            .pc = &rpc,
+            .inst_buffer = u.data().local_buffer(),
+            .atlas_dset = a.dset(),
+            .count = u.count(),
+          });
+        });
+      });
+    }
   }
 } i;
 } // namespace
@@ -42,5 +67,6 @@ void sr::update_data(quack::instance *& all) {
 }
 
 void sr::set_updater(hai::fn<void, quack::instance *&> u) {
-  quack::donald::data(u);
+  g_updater = u;
+  if (g_buffer) g_buffer->run_once();
 }
