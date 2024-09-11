@@ -1,4 +1,6 @@
 #pragma leco add_resource "atlas.png"
+#pragma leco add_shader "sokoban.vert"
+#pragma leco add_shader "sokoban.frag"
 module game;
 import casein;
 import quack;
@@ -23,8 +25,22 @@ struct main : voo::casein_thread {
     quack::pipeline_stuff ps { dq, 2 };
     quack::buffer_updater u { &dq, sg::max_quads, &updater };
     quack::image_updater a { &dq, &ps, voo::load_sires_image("atlas.png") };
+    voo::one_quad quad { dq };
 
     g_buffer = &u;
+
+    vee::pipeline_layout pl = vee::create_pipeline_layout();
+    auto gp = vee::create_graphics_pipeline({
+        .pipeline_layout = *pl,
+        .render_pass = dq.render_pass(),
+        .shaders {
+            voo::shader("sokoban.vert.spv").pipeline_vert_stage(),
+            voo::shader("sokoban.frag.spv").pipeline_frag_stage(),
+        },
+        .bindings { quad.vertex_input_bind() },
+        .attributes { quad.vertex_attribute(0) },
+    });
+
 
     quack::upc rpc{};
     rpc.grid_size = {sl::level_width, sl::level_height};
@@ -36,6 +52,11 @@ struct main : voo::casein_thread {
       extent_loop(dq.queue(), sw, [&] {
         sw.queue_one_time_submit(dq.queue(), [&](auto pcb) {
           auto scb = sw.cmd_render_pass(pcb);
+          vee::cmd_set_viewport(*scb, sw.extent());
+          vee::cmd_set_scissor(*scb, sw.extent());
+          vee::cmd_bind_gr_pipeline(*scb, *gp);
+          quad.run(scb, 0, 1);
+
           quack::run(&ps, {
             .sw = &sw,
             .scb = *scb,
