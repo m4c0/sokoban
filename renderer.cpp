@@ -13,6 +13,10 @@ namespace sl = sokoban::levels;
 namespace sr = sokoban::renderer;
 
 namespace {
+  struct upc {
+    float aspect;
+  };
+
   static hai::fn<void, quack::instance *&> g_updater;
   static quack::buffer_updater * g_buffer;
 
@@ -29,7 +33,7 @@ struct main : voo::casein_thread {
 
     g_buffer = &u;
 
-    vee::pipeline_layout pl = vee::create_pipeline_layout();
+    vee::pipeline_layout pl = vee::create_pipeline_layout({ vee::vert_frag_push_constant_range<upc>() });
     auto gp = vee::create_graphics_pipeline({
         .pipeline_layout = *pl,
         .render_pass = dq.render_pass(),
@@ -51,10 +55,15 @@ struct main : voo::casein_thread {
 
       extent_loop(dq.queue(), sw, [&] {
         sw.queue_one_time_submit(dq.queue(), [&](auto pcb) {
+          upc pc {
+            .aspect = sw.aspect(),
+          };
+
           auto scb = sw.cmd_render_pass(pcb);
           vee::cmd_set_viewport(*scb, sw.extent());
           vee::cmd_set_scissor(*scb, sw.extent());
           vee::cmd_bind_gr_pipeline(*scb, *gp);
+          vee::cmd_push_vert_frag_constants(*scb, *pl, &pc);
           quad.run(scb, 0, 1);
 
           quack::run(&ps, {
