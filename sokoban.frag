@@ -6,5 +6,5 @@ layout(location = 0) in vec2 q_uv;
 layout(location = 0) out vec4 frag_color;
 
 void main() {
-  frag_color = vec4(q_uv, 1, 1);
+  frag_color = metal_floor(q_uv);
 }
