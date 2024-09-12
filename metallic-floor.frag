@@ -4,7 +4,7 @@ float hash(vec2 p) {
   return fract(cos(dot(p, vec2(91.52, -74.27))) * 939.24);
 }
 
-float value(vec2 o) {
+float value(vec2 p) {
   vec2 f = floor(p);
   vec2 s = p - f;
   vec4 m = (s * s * (3. - s - s)).xyxy;
@@ -108,7 +108,7 @@ vec4 metal_floor(vec2 uv) {
   return over(vec4(rc, 1.), c);
 }
 
-void main() {
-  vec2 uv = (fragCoord-iResolution.xy*.5)/iResolution.y*2.;
-  frag_colour = metal_floor(uv);  
-}
+// void main() {
+//   vec2 uv = (fragCoord-iResolution.xy*.5)/iResolution.y*2.;
+//   frag_colour = metal_floor(uv);  
+// }
