@@ -73,6 +73,8 @@ vec3 light(vec3 lp, vec3 lc, vec3 n, vec2 uv) {
 }
 
 vec4 metal_floor(vec2 uv) {
+  uv = uv * 5.0;
+
   float n0 = mat(uv, vec2(.0));
   float n1 = mat(uv, vec2(.001, .000));
   float n2 = mat(uv, vec2(.000, .001));
@@ -107,8 +109,3 @@ vec4 metal_floor(vec2 uv) {
   rc += light(l2v, l2c, n, uv);
   return over(vec4(rc, 1.), c);
 }
-
-// void main() {
-//   vec2 uv = (fragCoord-iResolution.xy*.5)/iResolution.y*2.;
-//   frag_colour = metal_floor(uv);  
-// }
