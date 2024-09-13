@@ -29,11 +29,13 @@ struct main : voo::casein_thread {
     quack::pipeline_stuff ps { dq, 2 };
     quack::buffer_updater u { &dq, sg::max_quads, &updater };
     quack::image_updater a { &dq, &ps, voo::load_sires_image("atlas.png") };
+    voo::updater<voo::h2l_image> map { dq.queue(), voo::h2l_image { dq.physical_device(), 32, 32 } };
     voo::one_quad quad { dq };
 
     g_buffer = &u;
 
-    vee::pipeline_layout pl = vee::create_pipeline_layout({ vee::vert_frag_push_constant_range<upc>() });
+    vee::descriptor_set_layout dsl = vee::create_descriptor_set_layout({ vee::dsl_fragment_sampler() });
+    vee::pipeline_layout pl = vee::create_pipeline_layout({ *dsl }, { vee::vert_frag_push_constant_range<upc>() });
     auto gp = vee::create_graphics_pipeline({
         .pipeline_layout = *pl,
         .render_pass = dq.render_pass(),
@@ -45,6 +47,11 @@ struct main : voo::casein_thread {
         .attributes { quad.vertex_attribute(0) },
     });
 
+    auto smp = vee::create_sampler(vee::nearest_sampler);
+
+    auto ds_pool = vee::create_descriptor_pool(1, { vee::combined_image_sampler(1) });
+    auto dset = vee::allocate_descriptor_set(*ds_pool, *dsl);
+    vee::update_descriptor_set(dset, 0, map.data().iv(), *smp);
 
     quack::upc rpc{};
     rpc.grid_size = {sl::level_width, sl::level_height};
@@ -63,6 +70,7 @@ struct main : voo::casein_thread {
           vee::cmd_set_viewport(*scb, sw.extent());
           vee::cmd_set_scissor(*scb, sw.extent());
           vee::cmd_bind_gr_pipeline(*scb, *gp);
+          vee::cmd_bind_descriptor_set(*scb, *pl, 0, dset);
           vee::cmd_push_vert_frag_constants(*scb, *pl, &pc);
           quad.run(scb, 0, 1);
 
