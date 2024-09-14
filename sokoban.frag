@@ -25,10 +25,8 @@ vec4 brick(vec2 p) {
   b = b - 0.5;
 
   float d = sd_box(b, vec2(0.5, 0.5));
-  float e = 1.0 ;//+ sign(d);
-  e = mix(e, 1.0, 1.0 - smoothstep(0.0, 0.005, abs(d)));
-  e *= 1.0 - exp(-16.0 * abs(d));
-  return vec4(vec3(e), 1);
+  d = 1.0 - exp(-16.0 * abs(d));
+  return vec4(vec3(d), 1);
 }
 
 void main() {
