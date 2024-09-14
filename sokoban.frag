@@ -12,6 +12,13 @@ layout(location = 0) in vec2 q_pos;
 
 layout(location = 0) out vec4 frag_color;
 
+vec4 brick(vec2 p) {
+  vec2 b = p * vec2(12, 24);
+  b.x += 0.5 * step(1.0, mod(b.y, 2));
+  b = mod(b, 1);
+  return vec4(b, 0, 1);
+}
+
 void main() {
   vec2 uv = q_pos;
   uv = floor(uv * 24.0 - vec2(0, 8)) / 32.0;
@@ -22,7 +29,7 @@ void main() {
 
   vec4 f;
   if (map.r == 88) { // 'X'
-    f = vec4(1);
+    f = brick(q_pos);
   } else {
     f = metal_floor(q_pos);
   }
