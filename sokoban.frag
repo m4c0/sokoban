@@ -35,19 +35,54 @@ vec4 brick(vec2 p) {
   return vec4(c, 1);
 }
 
-void main() {
-  vec2 uv = q_pos;
-  uv = floor(uv * 24.0 - vec2(0, 8)) / 32.0;
+uvec4 map_at(vec2 p, vec2 d) {
+  vec2 uv = p;
+  uv = floor(d + uv * 24.0 - vec2(0, 8)) / 32.0;
   uv = uv * 0.5 + 0.5;
   uv = clamp(uv, 0, 1);
+  return texture(u_map, uv);
+}
 
-  uvec4 map = texture(u_map, uv);
+vec4 outside(vec2 p) {
+  vec2 b = fract(p * vec2(24));
+  float m = 1.0f;
+
+  uvec4 map = map_at(p, vec2(0, -1));
+  float f = (map.r == 88) ? 0.0 : 1.0;
+  f = mix(f, 1.0, b.y); 
+  m = min(m, f);
+
+  map = map_at(p, vec2(0, 1));
+  f = (map.r == 88) ? 0.0 : 1.0;
+  f = mix(1.0, f, b.y); 
+  m = min(m, f);
+
+  map = map_at(p, vec2(1, 0));
+  f = (map.r == 88) ? 0.0 : 1.0;
+  f = mix(1.0, f, b.x); 
+  m = min(m, f);
+
+  map = map_at(p, vec2(-1, 0));
+  f = (map.r == 88) ? 0.0 : 1.0;
+  f = mix(f, 1.0, b.x); 
+  m = min(m, f);
+
+  m = 1.0 - exp(-5.0 * abs(m));
+  // m = smoothstep(0.1, 1.0, m);
+
+  vec4 c = metal_floor(p);
+  c.rgb = c.rgb * m;
+  return c;
+}
+
+void main() {
+  uvec4 map = map_at(q_pos, vec2(0));
 
   vec4 f;
-  if (map.r == 88) { // 'X'
+  if (map.r == 88) { // 'X' - wall
     f = brick(q_pos);
   } else {
-    f = metal_floor(q_pos);
+    f = outside(q_pos);
   }
 
   frag_color = f;
