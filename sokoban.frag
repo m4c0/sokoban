@@ -16,6 +16,7 @@ void main() {
   vec2 uv = q_pos;
   uv = floor(uv * 24.0 - vec2(0, 8)) / 32.0;
   uv = uv * 0.5 + 0.5;
+  uv = clamp(uv, 0, 1);
 
   uvec4 map = texture(u_map, uv);
 
