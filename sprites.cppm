@@ -49,13 +49,11 @@ static constexpr auto colour(char b) {
   case player_target:
     return dotz::vec4{0.f, 0.7f, 0.f, 1.f};
   case wall:
-    return dotz::vec4{0, 0, 1, 1};
   case outside:
-    return dotz::vec4{};
   case box:
   case player:
   case empty:
-    return dotz::vec4{0.f, 0.3f, 0.f, 1.f};
+    return dotz::vec4{};
   }
   return dotz::vec4{1, 0, 1, 1};
 }

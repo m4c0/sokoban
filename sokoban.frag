@@ -43,7 +43,7 @@ uvec4 map_at(vec2 p, vec2 d) {
   return texture(u_map, uv);
 }
 
-vec4 outside(vec2 p) {
+float shadow(vec2 p) {
   vec2 b = fract(p * vec2(24));
   float m = 1.0f;
 
@@ -68,10 +68,19 @@ vec4 outside(vec2 p) {
   m = min(m, f);
 
   m = 1.0 - exp(-5.0 * abs(m));
-  // m = smoothstep(0.1, 1.0, m);
 
+  return m;
+}
+
+vec4 outside(vec2 p) {
   vec4 c = metal_floor(p);
-  c.rgb = c.rgb * m;
+  c.rgb = c.rgb * shadow(p);
+  return c;
+}
+
+vec4 empty(vec2 p) {
+  vec4 c = vec4(0.1, 0.3, 0.2, 1.0);
+  c.rgb = c.rgb * shadow(p);
   return c;
 }
 
@@ -81,8 +90,10 @@ void main() {
   vec4 f;
   if (map.r == 88) { // 'X' - wall
     f = brick(q_pos);
-  } else {
+  } else if (map.r == 32) { // ' ' - outside
     f = outside(q_pos);
+  } else {
+    f = empty(q_pos);
   }
 
   frag_color = f;

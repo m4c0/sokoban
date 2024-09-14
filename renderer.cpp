@@ -125,6 +125,7 @@ void sr::update_data(quack::instance *& all) {
     float x = i % sl::level_width;
     float y = i / sl::level_width;
     if (b == spr::wall) continue;
+    if (b == spr::empty) continue;
     spr::blit::block(all, x, y, b);
   }
 
