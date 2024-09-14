@@ -24,12 +24,13 @@ vec4 brick(vec2 p) {
   vec2 i = floor(b);
   float h = hash(i);
   h = smoothstep(0.2, 0.8, h) * 0.3 + 0.5;
+  h = h * (noise(b) * 0.3 + 0.7);
 
   vec2 f = fract(b) - 0.5;
   float d = sd_box(f, vec2(0.5, 0.5));
   d = 1.0 - exp(-16.0 * abs(d));
 
-  vec3 c = vec3(h * d);
+  vec3 c = vec3(0.6, 0.3, 0.1) * h * d;
 
   return vec4(c, 1);
 }
