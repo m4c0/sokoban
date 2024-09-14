@@ -15,18 +15,17 @@ layout(location = 0) out vec4 frag_color;
 void main() {
   vec2 uv = q_pos;
   uv = floor(uv * 24.0 - vec2(0, 8)) / 32.0;
-  uv = uv * 0.5;
-  uv = uv + 0.5;
+  uv = uv * 0.5 + 0.5;
+
+  vec4 map = texture(u_map, uv);
+  float blk = map.r * 256.0f;
 
   vec4 f;
-  f = vec4(texture(u_map, uv).rgb, 1);
-/*
   if (blk == 88) { // 'X'
     f = vec4(1);
   } else {
-    f = metal_floor(q_uv);
+    f = metal_floor(q_pos);
   }
-*/
 
   frag_color = f;
 }
