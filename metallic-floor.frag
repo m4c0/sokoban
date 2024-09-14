@@ -1,5 +1,6 @@
 // Based on "Disco Floor" by andremichelle
 // https://www.shadertoy.com/view/WsVXW3
+
 float hash(vec2 p) {
   return fract(cos(dot(p, vec2(91.52, -74.27))) * 939.24);
 }

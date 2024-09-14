@@ -17,16 +17,21 @@ float sd_box(vec2 p, vec2 b) {
   return length(max(d, 0.0)) + min(max(d.x, d.y), 0.0);
 }
 
-
 vec4 brick(vec2 p) {
   vec2 b = p * vec2(12, 24);
   b.x += 0.5 * step(1.0, mod(b.y, 2));
-  b = mod(b, 1);
-  b = b - 0.5;
 
-  float d = sd_box(b, vec2(0.5, 0.5));
+  vec2 i = floor(b);
+  float h = hash(i);
+  h = smoothstep(0.2, 0.8, h) * 0.3 + 0.5;
+
+  vec2 f = fract(b) - 0.5;
+  float d = sd_box(f, vec2(0.5, 0.5));
   d = 1.0 - exp(-16.0 * abs(d));
-  return vec4(vec3(d), 1);
+
+  vec3 c = vec3(h * d);
+
+  return vec4(c, 1);
 }
 
 void main() {
