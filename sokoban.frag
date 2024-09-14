@@ -12,11 +12,23 @@ layout(location = 0) in vec2 q_pos;
 
 layout(location = 0) out vec4 frag_color;
 
+float sd_box(vec2 p, vec2 b) {
+  vec2 d = abs(p) - b;
+  return length(max(d, 0.0)) + min(max(d.x, d.y), 0.0);
+}
+
+
 vec4 brick(vec2 p) {
   vec2 b = p * vec2(12, 24);
   b.x += 0.5 * step(1.0, mod(b.y, 2));
   b = mod(b, 1);
-  return vec4(b, 0, 1);
+  b = b - 0.5;
+
+  float d = sd_box(b, vec2(0.5, 0.5));
+  float e = 1.0 ;//+ sign(d);
+  e = mix(e, 1.0, 1.0 - smoothstep(0.0, 0.005, abs(d)));
+  e *= 1.0 - exp(-16.0 * abs(d));
+  return vec4(vec3(e), 1);
 }
 
 void main() {
