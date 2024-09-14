@@ -53,7 +53,7 @@ struct main : voo::casein_thread {
     quack::pipeline_stuff ps { dq, 2 };
     quack::buffer_updater u { &dq, sg::max_quads, &updater };
     quack::image_updater a { &dq, &ps, voo::load_sires_image("atlas.png") };
-    voo::updater<voo::h2l_image> map { dq.queue(), voo::h2l_image { dq.physical_device(), 32, 32 }, &map_updater };
+    voo::updater<voo::h2l_image> map { dq.queue(), voo::h2l_image { dq.physical_device(), 32, 32, vee::image_format_rgba_uint }, &map_updater };
     voo::one_quad quad { dq };
 
     g_buffer = &u;
