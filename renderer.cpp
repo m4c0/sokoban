@@ -4,9 +4,13 @@
 module game;
 import casein;
 import quack;
+import silog;
 import sprites;
+import traits;
 import vee;
 import voo;
+
+using namespace traits::ints;
 
 namespace sg = sokoban::game;
 namespace sl = sokoban::levels;
@@ -16,11 +20,31 @@ namespace {
   struct upc {
     float aspect;
   };
+  struct map_t {
+    uint8_t type;
+    uint8_t pad[3];
+  };
 
   static hai::fn<void, quack::instance *&> g_updater;
   static quack::buffer_updater * g_buffer;
+  static voo::updater<voo::h2l_image> * g_map;
 
   static void updater(quack::instance *& i) { g_updater(i); }
+
+  static void map_updater(voo::h2l_image * img) {
+    auto mm = voo::mapmem { img->host_memory() };
+    auto ptr = static_cast<map_t *>(*mm);
+
+    for (auto i = 0U; i < sl::level_quad_count(); i++) {
+      auto b = sg::grid[i];
+      if (sg::player_pos == i) {
+        b = (b == spr::target) ? spr::player_target : spr::player;
+      }
+      int x = i % sl::level_width;
+      int y = i / sl::level_width;
+      ptr[y * 32 + x].type = b;
+    }
+  }
 
 struct main : voo::casein_thread {
   void run() override {
@@ -29,10 +53,13 @@ struct main : voo::casein_thread {
     quack::pipeline_stuff ps { dq, 2 };
     quack::buffer_updater u { &dq, sg::max_quads, &updater };
     quack::image_updater a { &dq, &ps, voo::load_sires_image("atlas.png") };
-    voo::updater<voo::h2l_image> map { dq.queue(), voo::h2l_image { dq.physical_device(), 32, 32 } };
+    voo::updater<voo::h2l_image> map { dq.queue(), voo::h2l_image { dq.physical_device(), 32, 32 }, &map_updater };
     voo::one_quad quad { dq };
 
     g_buffer = &u;
+    g_map = &map;
+
+    map.run_once();
 
     vee::descriptor_set_layout dsl = vee::create_descriptor_set_layout({ vee::dsl_fragment_sampler() });
     vee::pipeline_layout pl = vee::create_pipeline_layout({ *dsl }, { vee::vert_frag_push_constant_range<upc>() });
@@ -97,6 +124,7 @@ void sr::update_data(quack::instance *& all) {
     }
     float x = i % sl::level_width;
     float y = i / sl::level_width;
+    if (b == spr::wall) continue;
     spr::blit::block(all, x, y, b);
   }
 
@@ -107,4 +135,5 @@ void sr::update_data(quack::instance *& all) {
 void sr::set_updater(hai::fn<void, quack::instance *&> u) {
   g_updater = u;
   if (g_buffer) g_buffer->run_once();
+  if (g_map) g_map->run_once();
 }
