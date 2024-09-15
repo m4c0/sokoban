@@ -125,6 +125,8 @@ void main() {
     f = outside(q_pos);
   } else if (map.r == 42) { // '*' - target
     f = pow(empty(q_pos), vec4(1.0 / 1.6));
+  } else if (map.r == 48) { // '0' - target_box
+    f = pow(empty(q_pos), vec4(1.0 / 1.6));
   } else {
     f = empty(q_pos);
   }
