@@ -43,49 +43,26 @@ uvec4 map_at(vec2 p, vec2 d) {
   return texture(u_map, uv);
 }
 
+float shadow_side(vec2 p, vec2 d, float b, float m) {
+  uvec4 map = map_at(p, d);
+  float f = (map.r == 88) ? 0.0 : 1.0;
+  f = mix(f, 1.0, b); 
+  return min(m, f);
+}
+
 float shadow(vec2 p) {
   vec2 b = fract(p * vec2(24));
   float m = 1.0f;
 
-  uvec4 map = map_at(p, vec2(0, -1));
-  float f = (map.r == 88) ? 0.0 : 1.0;
-  f = mix(f, 1.0, b.y); 
-  m = min(m, f);
+  m = shadow_side(p, vec2(-1, 0), b.x, m);
+  m = shadow_side(p, vec2(+1, 0), 1.0 - b.x, m);
+  m = shadow_side(p, vec2(0, -1), b.y, m);
+  m = shadow_side(p, vec2(0, +1), 1.0 - b.y, m);
 
-  map = map_at(p, vec2(0, 1));
-  f = (map.r == 88) ? 0.0 : 1.0;
-  f = mix(1.0, f, b.y); 
-  m = min(m, f);
-
-  map = map_at(p, vec2(1, 0));
-  f = (map.r == 88) ? 0.0 : 1.0;
-  f = mix(1.0, f, b.x); 
-  m = min(m, f);
-
-  map = map_at(p, vec2(-1, 0));
-  f = (map.r == 88) ? 0.0 : 1.0;
-  f = mix(f, 1.0, b.x); 
-  m = min(m, f);
-
-  map = map_at(p, vec2(-1, -1));
-  f = (map.r == 88) ? 0.0 : 1.0;
-  f = mix(f, 1.0, max(b.x, b.y)); 
-  m = min(m, f);
-
-  map = map_at(p, vec2(-1, 1));
-  f = (map.r == 88) ? 0.0 : 1.0;
-  f = mix(f, 1.0, max(b.x, 1.0 - b.y)); 
-  m = min(m, f);
-
-  map = map_at(p, vec2(1, -1));
-  f = (map.r == 88) ? 0.0 : 1.0;
-  f = mix(f, 1.0, max(1.0 - b.x, b.y)); 
-  m = min(m, f);
-
-  map = map_at(p, vec2(1, 1));
-  f = (map.r == 88) ? 0.0 : 1.0;
-  f = mix(f, 1.0, max(1.0 - b.x, 1.0 - b.y)); 
-  m = min(m, f);
+  m = shadow_side(p, vec2(-1, -1), max(b.x, b.y), m);
+  m = shadow_side(p, vec2(-1, +1), max(b.x, 1.0 - b.y), m);
+  m = shadow_side(p, vec2(+1, -1), max(1.0 - b.x, b.y), m);
+  m = shadow_side(p, vec2(+1, +1), max(1.0 - b.x, 1.0 - b.y), m);
 
   return m;
 }
