@@ -42,21 +42,6 @@ static constexpr auto uv(char b) {
     return uv(sprite_empty);
   }
 }
-static constexpr auto colour(char b) {
-  switch (b) {
-  case target_box:
-  case target:
-  case player_target:
-    return dotz::vec4{0.f, 0.7f, 0.f, 1.f};
-  case wall:
-  case outside:
-  case box:
-  case player:
-  case empty:
-    return dotz::vec4{};
-  }
-  return dotz::vec4{1, 0, 1, 1};
-}
 } // namespace spr
 
 export namespace spr::blit {
@@ -141,7 +126,6 @@ void block(quack::instance *& i, float x, float y, blocks b) {
       .size{1, 1},
       .uv0{uv.x, uv.y},
       .uv1{uv.z, uv.w},
-      .colour{colour(b)},
       .multiplier{1, 1, 1, 1},
   };
 }

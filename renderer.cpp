@@ -37,9 +37,6 @@ namespace {
 
     for (auto i = 0U; i < sl::level_quad_count(); i++) {
       auto b = sg::grid[i];
-      if (sg::player_pos == i) {
-        b = (b == spr::target) ? spr::player_target : spr::player;
-      }
       int x = i % sl::level_width;
       int y = i / sl::level_width;
       ptr[y * 32 + x].type = b;

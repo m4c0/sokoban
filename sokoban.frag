@@ -123,6 +123,8 @@ void main() {
     f = brick(q_pos);
   } else if (map.r == 32) { // ' ' - outside
     f = outside(q_pos);
+  } else if (map.r == 42) { // '*' - target
+    f = pow(empty(q_pos), vec4(1.0 / 1.6));
   } else {
     f = empty(q_pos);
   }
