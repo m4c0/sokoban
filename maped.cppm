@@ -351,5 +351,6 @@ struct init {
 
     using namespace casein;
     handle(TIMER, &refresh);
+    refresh();
   }
 } i;
