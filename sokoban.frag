@@ -67,20 +67,31 @@ float shadow(vec2 p) {
   f = mix(f, 1.0, b.x); 
   m = min(m, f);
 
-  m = 1.0 - exp(-5.0 * abs(m));
-
   return m;
 }
 
 vec4 outside(vec2 p) {
+  float m = shadow(p);
+  m = 1.0 - exp(-6.0 * abs(m));
+
   vec4 c = metal_floor(p);
-  c.rgb = c.rgb * shadow(p);
+  c.rgb = c.rgb * m;
   return c;
 }
 
 vec4 empty(vec2 p) {
-  vec4 c = vec4(0.1, 0.3, 0.2, 1.0);
-  c.rgb = c.rgb * shadow(p);
+  float m = shadow(p);
+
+  float s = 1.0 - exp(-7.0 * abs(m));
+
+  float csel = step(0.5, m);
+  csel += 1.0 - step(0.3, m);
+
+  const vec4 flr = vec4(0.1, 0.3, 0.2, 1.0);
+  const vec4 ylw = vec4(0.5, 0.5, 0.1, 1.0);
+
+  vec4 c = mix(ylw, flr, csel);
+  c.rgb = c.rgb * s;
   return c;
 }
 
