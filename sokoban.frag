@@ -67,6 +67,26 @@ float shadow(vec2 p) {
   f = mix(f, 1.0, b.x); 
   m = min(m, f);
 
+  map = map_at(p, vec2(-1, -1));
+  f = (map.r == 88) ? 0.0 : 1.0;
+  f = mix(f, 1.0, max(b.x, b.y)); 
+  m = min(m, f);
+
+  map = map_at(p, vec2(-1, 1));
+  f = (map.r == 88) ? 0.0 : 1.0;
+  f = mix(f, 1.0, max(b.x, 1.0 - b.y)); 
+  m = min(m, f);
+
+  map = map_at(p, vec2(1, -1));
+  f = (map.r == 88) ? 0.0 : 1.0;
+  f = mix(f, 1.0, max(1.0 - b.x, b.y)); 
+  m = min(m, f);
+
+  map = map_at(p, vec2(1, 1));
+  f = (map.r == 88) ? 0.0 : 1.0;
+  f = mix(f, 1.0, max(1.0 - b.x, 1.0 - b.y)); 
+  m = min(m, f);
+
   return m;
 }
 
