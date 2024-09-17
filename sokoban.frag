@@ -13,6 +13,7 @@ layout(location = 0) in vec2 q_pos;
 layout(location = 0) out vec4 frag_color;
 
 const float pi = 3.14159265358979323;
+const float t = 0;
 
 float sd_box(vec2 p, vec2 b) {
   vec2 d = abs(p) - b;
@@ -97,13 +98,10 @@ vec4 empty(vec2 p) {
 vec4 target(vec2 p) {
   vec2 b = fract(p * vec2(12)) - 0.5;
   float d = length(b);
-  d *= 9 * 2 * pi;
-  d = clamp(d, 0, 3 * 2 * pi);
-  d = sin(d);
-  d = step(0.0, d);
+  d = exp(-d * d * 10) * sin(abs(d) * 30 - t);
 
   const vec4 t = vec4(0.7, 0.2, 0.1, 1);
-  return mix(t, empty(p), d);
+  return mix(empty(p), t, d);
 }
 
 void main() {
