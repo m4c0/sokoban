@@ -5,6 +5,7 @@ module game;
 import casein;
 import quack;
 import silog;
+import sitime;
 import sprites;
 import traits;
 import vee;
@@ -19,6 +20,7 @@ namespace sr = sokoban::renderer;
 namespace {
   struct upc {
     float aspect;
+    float time;
   };
   struct map_t {
     uint8_t type;
@@ -81,6 +83,8 @@ struct main : voo::casein_thread {
     rpc.grid_size = {sl::level_width, sl::level_height};
     rpc.grid_pos = rpc.grid_size / 2.0;
 
+    sitime::stopwatch t {};
+
     while (!interrupted()) {
       voo::swapchain_and_stuff sw { dq };
 
@@ -88,6 +92,7 @@ struct main : voo::casein_thread {
         sw.queue_one_time_submit(dq.queue(), [&](auto pcb) {
           upc pc {
             .aspect = sw.aspect(),
+            .time = t.millis() / 1000.0f,
           };
 
           auto scb = sw.cmd_render_pass(pcb);
