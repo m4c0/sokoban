@@ -98,10 +98,13 @@ vec4 empty(vec2 p) {
 vec4 target(vec2 p) {
   vec2 b = fract(p * vec2(12)) - 0.5;
   float d = length(b);
-  d = exp(-d * d * 10) * sin(abs(d) * 30 - pc.time);
+  d = exp(-d * d * 20) * sin(abs(d) * 30 - pc.time * 2);
 
-  const vec4 t = vec4(0.7, 0.2, 0.1, 1);
-  return mix(empty(p), t, d);
+  const vec3 t = vec3(4.0, 0.2, 0.1);
+
+  vec3 c = empty(p).rgb;
+  c = mix(c, t, d);
+  return vec4(c, 1);
 }
 
 void main() {
