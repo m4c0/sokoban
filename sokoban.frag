@@ -118,7 +118,7 @@ vec4 box(vec2 p, bool on_tgt) {
   float d = sd_rnd_box(b, vec2(0.3), 0.1);
   d = step(0, d);
 
-  vec3 box = vec3(1);
+  vec3 box = on_tgt ? vec3(0, 1, 0) : vec3(1);
 
   vec3 c = mix(box, flr.rgb, d);
   return vec4(c, 1);
