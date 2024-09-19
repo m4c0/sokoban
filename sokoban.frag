@@ -19,6 +19,9 @@ float sd_box(vec2 p, vec2 b) {
   vec2 d = abs(p) - b;
   return length(max(d, 0.0)) + min(max(d.x, d.y), 0.0);
 }
+float sd_rnd_box(vec2 p, vec2 b, float r) {
+  return sd_box(p, b) - r;
+}
 
 vec4 brick(vec2 p) {
   vec2 b = p * vec2(12, 24);
@@ -112,7 +115,7 @@ vec4 box(vec2 p, bool on_tgt) {
 
   vec4 flr = on_tgt ? target(p) : empty(p);
   
-  float d = sd_box(b, vec2(0.4));
+  float d = sd_rnd_box(b, vec2(0.3), 0.1);
   d = step(0, d);
 
   vec3 box = vec3(1);
