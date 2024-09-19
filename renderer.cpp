@@ -119,18 +119,9 @@ struct main : voo::casein_thread {
 } // namespace
 
 void sr::update_data(quack::instance *& all) {
-  for (auto i = 0U; i < sl::level_quad_count(); i++) {
-    auto b = sg::grid[i];
-    if (sg::player_pos == i) {
-      b = (b == spr::target) ? spr::player_target : spr::player;
-    }
-    float x = i % sl::level_width;
-    float y = i / sl::level_width;
-    if (b == spr::wall) continue;
-    if (b == spr::empty) continue;
-    if (b == spr::target) continue;
-    spr::blit::block(all, x, y, b);
-  }
+  float x = sg::player_pos % sl::level_width;
+  float y = sg::player_pos / sl::level_width;
+  spr::blit::block(all, x, y, spr::player);
 
   spr::blit::level(all, 0, 0);
   spr::blit::number(all, sl::current_level() + 1, 3.5, 0);

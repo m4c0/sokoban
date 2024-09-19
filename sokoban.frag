@@ -107,6 +107,20 @@ vec4 target(vec2 p) {
   return vec4(c, 1);
 }
 
+vec4 box(vec2 p, bool on_tgt) {
+  vec2 b = fract(p * vec2(12)) - 0.5;
+
+  vec4 flr = on_tgt ? target(p) : empty(p);
+  
+  float d = sd_box(b, vec2(0.4));
+  d = step(0, d);
+
+  vec3 box = vec3(1);
+
+  vec3 c = mix(box, flr.rgb, d);
+  return vec4(c, 1);
+}
+
 void main() {
   uvec4 map = map_at(q_pos, vec2(0));
 
@@ -118,7 +132,9 @@ void main() {
   } else if (map.r == 42) { // '*' - target
     f = target(q_pos);
   } else if (map.r == 48) { // '0' - target_box
-    f = target(q_pos);
+    f = box(q_pos, true);
+  } else if (map.r == 79) { // 'O' - box
+    f = box(q_pos, false);
   } else {
     f = empty(q_pos);
   }
