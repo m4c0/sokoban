@@ -116,11 +116,12 @@ vec4 box(vec2 p, bool on_tgt) {
   vec4 flr = on_tgt ? target(p) : empty(p);
   
   float d = sd_rnd_box(b, vec2(0.3), 0.1);
-  d = step(0, d);
+  float a = 1 - step(d, 0);
 
   vec3 box = on_tgt ? vec3(0, 1, 0) : vec3(1);
+  box *= 1.0 - smoothstep(d, -0.1, -0.0) * 0.5;
 
-  vec3 c = mix(box, flr.rgb, d);
+  vec3 c = mix(box, flr.rgb, a);
   return vec4(c, 1);
 }
 
