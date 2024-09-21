@@ -53,7 +53,6 @@ struct main : voo::casein_thread {
     quack::buffer_updater u { &dq, sg::max_quads, &updater };
     quack::image_updater a { &dq, &ps, voo::load_sires_image("atlas.png") };
     voo::updater<voo::h2l_image> map { dq.queue(), voo::h2l_image { dq.physical_device(), 32, 32, vee::image_format_rgba_uint }, &map_updater };
-    voo::one_quad quad { dq };
 
     g_buffer = &u;
     g_map = &map;
@@ -62,16 +61,7 @@ struct main : voo::casein_thread {
 
     vee::descriptor_set_layout dsl = vee::create_descriptor_set_layout({ vee::dsl_fragment_sampler() });
     vee::pipeline_layout pl = vee::create_pipeline_layout({ *dsl }, { vee::vert_frag_push_constant_range<upc>() });
-    auto gp = vee::create_graphics_pipeline({
-        .pipeline_layout = *pl,
-        .render_pass = dq.render_pass(),
-        .shaders {
-            voo::shader("sokoban.vert.spv").pipeline_vert_stage(),
-            voo::shader("sokoban.frag.spv").pipeline_frag_stage(),
-        },
-        .bindings { quad.vertex_input_bind() },
-        .attributes { quad.vertex_attribute(0) },
-    });
+    voo::one_quad_render oqr { "sokoban", &dq, *pl };
 
     auto smp = vee::create_sampler(vee::nearest_sampler);
 
@@ -96,12 +86,9 @@ struct main : voo::casein_thread {
           };
 
           auto scb = sw.cmd_render_pass(pcb);
-          vee::cmd_set_viewport(*scb, sw.extent());
-          vee::cmd_set_scissor(*scb, sw.extent());
-          vee::cmd_bind_gr_pipeline(*scb, *gp);
           vee::cmd_bind_descriptor_set(*scb, *pl, 0, dset);
           vee::cmd_push_vert_frag_constants(*scb, *pl, &pc);
-          quad.run(scb, 0, 1);
+          oqr.run(*scb, sw.extent());
 
           quack::run(&ps, {
             .sw = &sw,
