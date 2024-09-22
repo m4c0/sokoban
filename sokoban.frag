@@ -119,7 +119,7 @@ vec4 box(vec2 p, bool on_tgt) {
   float a = 1 - step(d, 0);
 
   vec3 box = on_tgt ? vec3(0, 1, 0) : vec3(1);
-  box *= 1.0 - smoothstep(d, -0.1, -0.0) * 0.5;
+  box *= 1.0 - smoothstep(d, -0.1, -0.0) * 0.5 * clamp(0.01 / (d * d), 0, 1);
 
   vec3 c = mix(box, flr.rgb, a);
   return vec4(c, 1);
