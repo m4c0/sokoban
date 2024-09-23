@@ -116,7 +116,8 @@ vec4 box(vec2 p, bool on_tgt) {
   float d = sd_rnd_box(b, vec2(0.3), 0.1);
 
   vec3 ins = vec3(0.5);
-  ins *= 1.0 - 0.005 / (d * d);
+  ins *= 1.0 - 0.01 / (d * d);
+  ins *= smoothstep(0.0, 0.2, fract(b.y * 5.0));
 
   vec3 brd = vec3(1.0);
   brd *= 0.1 * smoothstep(-0.1, 0.0, d) + 0.9;
