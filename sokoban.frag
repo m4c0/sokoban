@@ -115,10 +115,13 @@ vec4 box(vec2 p, bool on_tgt) {
 
   float d = sd_rnd_box(b, vec2(0.3), 0.1);
 
-  vec4 ins = vec4(vec3(0.5), 1.0);
-  vec4 brd = vec4(vec3(1.0), 1.0);
+  vec3 ins = vec3(0.5);
+  ins *= 1.0 - 0.005 / (d * d);
 
-  vec4 box = mix(ins, brd, step(-0.125, d));
+  vec3 brd = vec3(1.0);
+  brd *= 0.1 * smoothstep(-0.1, 0.0, d) + 0.9;
+
+  vec4 box = vec4(mix(ins, brd, step(-0.125, d)), 1.0);
 
   vec4 flr = on_tgt ? target(p) : empty(p);
   return mix(box, flr, step(0, d));
