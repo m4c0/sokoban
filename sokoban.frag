@@ -78,7 +78,7 @@ vec4 outside(vec2 p) {
   m = 1.0 - exp(-6.0 * abs(m));
 
   vec4 c = metal_floor(p);
-  c.rgb = c.rgb * m;
+  c.rgb = c.rgb * 0.2 * m;
   return c;
 }
 
