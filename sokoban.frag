@@ -113,7 +113,7 @@ vec4 target(vec2 p) {
 vec4 box(vec2 p, bool on_tgt) {
   vec2 b = fract(p * vec2(12)) - 0.5;
 
-  float d = sd_rnd_box(b, vec2(0.3), 0.1);
+  float d = sd_rnd_box(b, vec2(0.25), 0.1);
 
   vec3 ins = on_tgt ? vec3(0.5, 0.2, 0.1) : vec3(0.1, 0.4, 0.5);
   ins *= 1.0 - 0.01 / (d * d);
