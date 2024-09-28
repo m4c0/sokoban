@@ -2,6 +2,7 @@
 
 export module maped;
 import casein;
+import fff;
 import fork;
 import game;
 import jute;
@@ -346,11 +347,10 @@ static void refresh() {
   });
 }
 struct init {
+  fff::timer m_timer { 100, &refresh };
+
   init() {
     level_select();
-
-    using namespace casein;
-    handle(TIMER, &refresh);
     refresh();
   }
 } i;

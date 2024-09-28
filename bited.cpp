@@ -2,6 +2,7 @@
 
 import casein;
 import dotz;
+import fff;
 import quack;
 import silog;
 import sprites;
@@ -104,6 +105,8 @@ static constexpr bool sane_num_channels(const stbi::image &img) {
 }
 
 struct init {
+  fff::timer m_timer { 300, flip_cursor };
+
   init() {
     using namespace casein;
 
@@ -113,8 +116,6 @@ struct init {
     handle(KEY_DOWN, K_RIGHT, right);
     handle(KEY_DOWN, K_ENTER, save);
     handle(KEY_DOWN, K_SPACE, flip);
-
-    handle(TIMER, &flip_cursor);
 
     stbi::load("atlas.png")
         .assert(sane_image_width, "image is wider than buffer")
