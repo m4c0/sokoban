@@ -24,6 +24,16 @@ float sd_rnd_box(vec2 p, vec2 b, float r) {
   return sd_box(p, b) - r;
 }
 
+float sd_cut_dist(vec2 p, float r, float h) {
+  float w = sqrt(r * r - h * h);
+  p.x = abs(p.x);
+  float s = max((h - r) * p.x * p.x + w * w * (h + r - 2.0 * p.y),
+                h * p.x - w * p.y);
+  return (s < 0.0) ? length(p) - r : 
+         (p.x < w) ? h - p.y :
+         length(p - vec2(w, h));
+}
+
 vec4 brick(vec2 p) {
   vec2 b = p * vec2(12, 24);
   b.x += 0.5 * step(1.0, mod(b.y, 2));
@@ -131,7 +141,12 @@ vec4 box(vec2 p, vec2 b, bool on_tgt) {
 
 vec4 player(vec2 p, vec4 c) {
   vec2 b = q_pos * vec2(12) + 12 - pc.player_pos + vec2(4.0, 0.0) - vec2(0.5);
-  float d = length(b) - 0.4;
+
+  float hd_d = sd_circle(b + vec2(0.0, 0.2), 0.2);
+
+  float bd_d = sd_cut_dist(vec2(0.0, 0.2) - b, 0.3, -0.2);
+
+  float d = min(hd_d, bd_d);
   d = step(0, d);
 
   return mix(vec4(1), c, d);
