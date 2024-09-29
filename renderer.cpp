@@ -2,7 +2,7 @@
 #pragma leco add_shader "sokoban.vert"
 #pragma leco add_shader "sokoban.frag"
 module game;
-import casein;
+import dotz;
 import quack;
 import silog;
 import sitime;
@@ -19,6 +19,7 @@ namespace sr = sokoban::renderer;
 
 namespace {
   struct upc {
+    dotz::vec2 player_pos;
     float aspect;
     float time;
   };
@@ -81,6 +82,10 @@ struct main : voo::casein_thread {
       extent_loop(dq.queue(), sw, [&] {
         sw.queue_one_time_submit(dq.queue(), [&](auto pcb) {
           upc pc {
+            .player_pos = {
+              sg::player_pos % sl::level_width,
+              sg::player_pos / sl::level_width,
+            },
             .aspect = sw.aspect(),
             .time = t.millis() / 1000.0f,
           };

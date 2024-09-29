@@ -3,6 +3,7 @@
 #include "metallic-floor.frag"
 
 layout(push_constant) uniform upc {
+  vec2 player_pos;
   float aspect;
   float time;
 } pc;
@@ -98,8 +99,7 @@ vec4 empty(vec2 p) {
   return c;
 }
 
-vec4 target(vec2 p) {
-  vec2 b = fract(p * vec2(12)) - 0.5;
+vec4 target(vec2 p, vec2 b) {
   float d = length(b);
   d = exp(-d * d * 20) * sin(abs(d) * 30 - pc.time * 2);
 
@@ -110,9 +110,7 @@ vec4 target(vec2 p) {
   return vec4(c, 1);
 }
 
-vec4 box(vec2 p, bool on_tgt) {
-  vec2 b = fract(p * vec2(12)) - 0.5;
-
+vec4 box(vec2 p, vec2 b, bool on_tgt) {
   float d = sd_rnd_box(b, vec2(0.25), 0.1);
 
   vec3 ins = on_tgt ? vec3(0.5, 0.2, 0.1) : vec3(0.1, 0.4, 0.5);
@@ -125,14 +123,23 @@ vec4 box(vec2 p, bool on_tgt) {
   vec4 box = vec4(mix(ins, brd, step(-0.125, d)), 1.0);
   box *= 0.5 * hash(b) + 0.5;
 
-  vec4 flr = on_tgt ? target(p) : empty(p);
+  vec4 flr = on_tgt ? target(p, b) : empty(p);
   flr *= 0.5 * smoothstep(0.0, 0.1, d) + 0.5;
 
   return mix(box, flr, step(0, d));
 }
 
+vec4 player(vec2 p, vec4 c) {
+  vec2 b = q_pos * vec2(12) + 12 - pc.player_pos + vec2(4.0, 0.0) - vec2(0.5);
+  float d = length(b) - 0.4;
+  d = step(0, d);
+
+  return mix(vec4(1), c, d);
+}
+
 void main() {
   uvec4 map = map_at(q_pos, vec2(0));
+  vec2 b = fract(q_pos * vec2(12)) - 0.5;
 
   vec4 f;
   if (map.r == 88) { // 'X' - wall
@@ -140,14 +147,16 @@ void main() {
   } else if (map.r == 32) { // ' ' - outside
     f = outside(q_pos);
   } else if (map.r == 42) { // '*' - target
-    f = target(q_pos);
+    f = target(q_pos, b);
   } else if (map.r == 48) { // '0' - target_box
-    f = box(q_pos, true);
+    f = box(q_pos, b, true);
   } else if (map.r == 79) { // 'O' - box
-    f = box(q_pos, false);
+    f = box(q_pos, b, false);
   } else {
     f = empty(q_pos);
   }
+
+  f = player(q_pos, f);
 
   frag_color = vec4(f.rgb, 1);
 }

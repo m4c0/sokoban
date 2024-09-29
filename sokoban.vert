@@ -1,7 +1,9 @@
 #version 450
 
 layout(push_constant) uniform upc {
+  vec2 player_pos;
   float aspect;
+  float time;
 } pc;
 
 layout(location = 0) in vec2 pos;
