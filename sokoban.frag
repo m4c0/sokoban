@@ -34,7 +34,7 @@ float sd_cut_dist(vec2 p, float r, float h) {
          length(p - vec2(w, h));
 }
 
-vec4 brick(vec2 p) {
+vec3 brick(vec2 p) {
   vec2 b = p * vec2(12, 24);
   b.x += 0.5 * step(1.0, mod(b.y, 2));
 
@@ -48,8 +48,7 @@ vec4 brick(vec2 p) {
   d = 1.0 - exp(-16.0 * abs(d));
 
   vec3 c = vec3(0.6, 0.3, 0.1) * h * d;
-
-  return vec4(c, 1);
+  return c;
 }
 
 uvec4 map_at(vec2 p, vec2 d) {
@@ -84,16 +83,16 @@ float shadow(vec2 p) {
   return m;
 }
 
-vec4 outside(vec2 p) {
+vec3 outside(vec2 p) {
   float m = shadow(p);
   m = 1.0 - exp(-6.0 * abs(m));
 
-  vec4 c = metal_floor(p);
-  c.rgb = c.rgb * 0.2 * m;
+  vec3 c = metal_floor(p).rgb;
+  c = c * 0.2 * m;
   return c;
 }
 
-vec4 empty(vec2 p) {
+vec3 empty(vec2 p) {
   float m = shadow(p);
 
   float s = 1.0 - exp(-7.0 * abs(m));
@@ -101,26 +100,26 @@ vec4 empty(vec2 p) {
   float csel = step(0.5, m);
   csel += 1.0 - step(0.3, m);
 
-  const vec4 flr = vec4(0.05, 0.15, 0.1, 1.0);
-  const vec4 ylw = vec4(0.5, 0.5, 0.1, 1.0) * 0.5;
+  const vec3 flr = vec3(0.05, 0.15, 0.1);
+  const vec3 ylw = vec3(0.5, 0.5, 0.1) * 0.5;
 
-  vec4 c = mix(ylw, flr, csel);
+  vec3 c = mix(ylw, flr, csel);
   c.rgb = c.rgb * s;
   return c;
 }
 
-vec4 target(vec2 p, vec2 b) {
+vec3 target(vec2 p, vec2 b) {
   float d = length(b);
   d = exp(-d * d * 20) * sin(abs(d) * 30 - pc.time * 2);
 
   const vec3 t = vec3(4.0, 0.2, 0.1);
 
-  vec3 c = empty(p).rgb;
+  vec3 c = empty(p);
   c = mix(c, t, d);
-  return vec4(c, 1);
+  return c;
 }
 
-vec4 box(vec2 p, vec2 b, bool on_tgt) {
+vec3 box(vec2 p, vec2 b, bool on_tgt) {
   float d = sd_rnd_box(b, vec2(0.25), 0.1);
 
   vec3 ins = on_tgt ? vec3(0.5, 0.2, 0.1) : vec3(0.1, 0.4, 0.5);
@@ -130,33 +129,36 @@ vec4 box(vec2 p, vec2 b, bool on_tgt) {
   vec3 brd = on_tgt ? vec3(1.0, 0.3, 0.1) : vec3(0.1, 0.7, 1.0);
   brd *= 0.1 * smoothstep(-0.1, 0.0, d) + 0.9;
 
-  vec4 box = vec4(mix(ins, brd, step(-0.125, d)), 1.0);
+  vec3 box = mix(ins, brd, step(-0.125, d));
   box *= 0.5 * hash(b) + 0.5;
 
-  vec4 flr = on_tgt ? target(p, b) : empty(p);
+  vec3 flr = on_tgt ? target(p, b) : empty(p);
   flr *= 0.5 * smoothstep(0.0, 0.1, d) + 0.5;
 
   return mix(box, flr, step(0, d));
 }
 
-vec4 player(vec2 p, vec4 c) {
+vec3 player(vec2 p, vec3 c) {
   vec2 b = q_pos * vec2(12) + 12 - pc.player_pos + vec2(4.0, 0.0) - vec2(0.5);
 
   float hd_d = sd_circle(b + vec2(0.0, 0.2), 0.2);
+  float hd_msk = step(0, hd_d);
+  vec3 hd = vec3(1, 0, 0);
 
   float bd_d = sd_cut_dist(vec2(0.0, 0.2) - b, 0.3, -0.2);
+  float bd_msk = step(0, bd_d);
+  vec3 bd = vec3(0, 1, 0);
 
-  float d = min(hd_d, bd_d);
-  d = step(0, d);
-
-  return mix(vec4(1), c, d);
+  c = mix(bd, c, bd_msk);
+  c = mix(hd, c, hd_msk);
+  return c;
 }
 
 void main() {
   uvec4 map = map_at(q_pos, vec2(0));
   vec2 b = fract(q_pos * vec2(12)) - 0.5;
 
-  vec4 f;
+  vec3 f;
   if (map.r == 88) { // 'X' - wall
     f = brick(q_pos);
   } else if (map.r == 32) { // ' ' - outside
@@ -173,5 +175,5 @@ void main() {
 
   f = player(q_pos, f);
 
-  frag_color = vec4(f.rgb, 1);
+  frag_color = vec4(f, 1);
 }
