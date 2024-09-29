@@ -111,10 +111,6 @@ struct main : voo::casein_thread {
 } // namespace
 
 void sr::update_data(quack::instance *& all) {
-  float x = sg::player_pos % sl::level_width;
-  float y = sg::player_pos / sl::level_width;
-  spr::blit::block(all, x, y, spr::player);
-
   spr::blit::level(all, 0, 0);
   spr::blit::number(all, sl::current_level() + 1, 3.5, 0);
 }
