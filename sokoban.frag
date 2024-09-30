@@ -149,6 +149,10 @@ vec3 player(vec2 p, vec3 c) {
   float bd_msk = step(0, bd_d);
   vec3 bd = vec3(0, 1, 0);
 
+  float d = min(hd_d, bd_d);
+  d = smoothstep(0.0, 0.1, d) * 0.7 + 0.3;
+
+  c = c * d;
   c = mix(bd, c, bd_msk);
   c = mix(hd, c, hd_msk);
   return c;
