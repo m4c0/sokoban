@@ -141,13 +141,22 @@ vec3 box(vec2 p, vec2 b, bool on_tgt) {
 vec3 player(vec2 p, vec3 c) {
   vec2 b = q_pos * vec2(12) + 12 - pc.player_pos + vec2(4.0, 0.0) - vec2(0.5);
 
-  float hd_d = sd_circle(b + vec2(0.0, 0.2), 0.2);
+  vec2 hd_p = b + vec2(0.0, 0.2);
+  float hd_d = sd_circle(hd_p, 0.2);
   float hd_msk = step(0, hd_d);
-  vec3 hd = vec3(1, 0, 0);
 
-  float bd_d = sd_cut_dist(vec2(0.0, 0.2) - b, 0.3, -0.2);
+  float hlm_d = step(0, hd_p.y);
+  vec3 hlm = vec3(1, 0.7, 0);
+  vec3 fc = vec3(0, 0.3, 0.7);
+  vec3 hd = mix(hlm, fc, hlm_d);
+
+  vec2 bd_p = vec2(0.0, 0.2) - b;
+  float bd_d = sd_cut_dist(bd_p, 0.3, -0.2);
   float bd_msk = step(0, bd_d);
-  vec3 bd = vec3(0, 1, 0);
+  vec3 clt = vec3(0.4, 0.8, 1.0);
+  vec3 jkt = vec3(1.0, 0.5, 0.0);
+  float jkt_d = sd_box(bd_p, vec2(0.2, 0.3));
+  vec3 bd = mix(jkt, clt, step(0, jkt_d));
 
   float d = min(hd_d, bd_d);
   d = smoothstep(0.0, 0.1, d) * 0.7 + 0.3;
