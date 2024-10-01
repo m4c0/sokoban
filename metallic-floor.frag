@@ -90,23 +90,7 @@ vec4 metal_floor(vec2 uv) {
   mat2 m1 = rot(-t *1.4 + .7) * sin(t * .6 + .5);
   mat2 m2 = rot( t *1.4 + .9) * cos(t * .8 + .9);
 
-  // light colors
-  vec3 l0c = vec3(1., .3, 1.);
-  vec3 l1c = vec3(.1, .3, 1.);
-  vec3 l2c = vec3(.1, 1., 1.);
-  // light positions
-  vec3 l0v = vec3(vec2(.99, 0.) * m0, 1.5);
-  vec3 l1v = vec3(vec2(.70, 0.) * m1, 1.5);
-  vec3 l2v = vec3(vec2(.00, 1.) * m2, 1.5);
-  // light intensity
-  float li0 = pow(distance(uv, l0v.xy), -1.4);
-  float li1 = pow(distance(uv, l1v.xy), -1.4);
-  float li2 = pow(distance(uv, l2v.xy), -1.4);
-
   vec3 rc = vec3(.05 + n0 * n0 * n0 * n0 * .1);
   rc += pow(max(.0, n.z), 2.) * .12;
-  rc += light(l0v, l0c, n, uv);
-  rc += light(l1v, l1c, n, uv);
-  rc += light(l2v, l2c, n, uv);
   return over(vec4(rc, 1.), c);
 }
