@@ -4,11 +4,13 @@
 
 layout(push_constant) uniform upc {
   vec2 player_pos;
+  vec2 label_pos;
   float aspect;
   float time;
 } pc;
 
 layout(set = 0, binding = 0) uniform usampler2D u_map;
+layout(set = 0, binding = 1) uniform usampler2D u_atlas;
 
 layout(location = 0) in vec2 q_pos;
 
@@ -138,8 +140,12 @@ vec3 box(vec2 p, vec2 b, bool on_tgt) {
   return mix(box, flr, step(0, d));
 }
 
+vec2 g2l(vec2 p) {
+  return q_pos * vec2(12) + 12 - p + vec2(4.0, 0.0) - vec2(0.5);
+}
+
 vec3 player(vec2 p, vec3 c) {
-  vec2 b = q_pos * vec2(12) + 12 - pc.player_pos + vec2(4.0, 0.0) - vec2(0.5);
+  vec2 b = g2l(p);
 
   vec2 hd_p = b + vec2(0.0, 0.2);
   float hd_d = sd_circle(hd_p, 0.2);
@@ -167,6 +173,14 @@ vec3 player(vec2 p, vec3 c) {
   return c;
 }
 
+vec3 level_label(vec3 f) {
+  const float w = 1.25;
+  vec2 pp = g2l(pc.label_pos + vec2(w * 0.5, 0));
+  float d = sd_box(pp, vec2(w, 0.5));
+  f = f * step(0, d);
+  return f;
+}
+
 void main() {
   uvec4 map = map_at(q_pos, vec2(0));
   vec2 b = fract(q_pos * vec2(12)) - 0.5;
@@ -187,6 +201,7 @@ void main() {
   }
 
   f = player(q_pos, f);
+  f = level_label(f);
 
   frag_color = vec4(f, 1);
 }

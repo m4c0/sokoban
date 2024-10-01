@@ -20,6 +20,7 @@ namespace sr = sokoban::renderer;
 namespace {
   struct upc {
     dotz::vec2 player_pos;
+    dotz::vec2 label_pos;
     float aspect;
     float time;
   };
@@ -31,6 +32,7 @@ namespace {
   static hai::fn<void, quack::instance *&> g_updater;
   static quack::buffer_updater * g_buffer;
   static voo::updater<voo::h2l_image> * g_map;
+  static dotz::vec2 g_lbl_pos {};
 
   static void updater(quack::instance *& i) { g_updater(i); }
 
@@ -60,15 +62,16 @@ struct main : voo::casein_thread {
 
     map.run_once();
 
-    vee::descriptor_set_layout dsl = vee::create_descriptor_set_layout({ vee::dsl_fragment_sampler() });
-    vee::pipeline_layout pl = vee::create_pipeline_layout({ *dsl }, { vee::vert_frag_push_constant_range<upc>() });
+    vee::descriptor_set_layout dsl = vee::create_descriptor_set_layout({ vee::dsl_fragment_sampler(), vee::dsl_fragment_sampler() });
+    vee::pipeline_layout pl = vee::create_pipeline_layout({ *dsl }, { vee::vert_frag_push_constant_range<upc>(2) });
     voo::one_quad_render oqr { "sokoban", &dq, *pl };
 
     auto smp = vee::create_sampler(vee::nearest_sampler);
 
-    auto ds_pool = vee::create_descriptor_pool(1, { vee::combined_image_sampler(1) });
+    auto ds_pool = vee::create_descriptor_pool(1, { vee::combined_image_sampler(2) });
     auto dset = vee::allocate_descriptor_set(*ds_pool, *dsl);
     vee::update_descriptor_set(dset, 0, map.data().iv(), *smp);
+    vee::update_descriptor_set(dset, 1, a.data().iv(), *smp);
 
     quack::upc rpc{};
     rpc.grid_size = {sl::level_width, sl::level_height};
@@ -86,6 +89,7 @@ struct main : voo::casein_thread {
               sg::player_pos % sl::level_width,
               sg::player_pos / sl::level_width,
             },
+            .label_pos = g_lbl_pos,
             .aspect = sw.aspect(),
             .time = t.millis() / 1000.0f,
           };
@@ -134,6 +138,7 @@ static auto find_label_y() {
 void sr::update_data(quack::instance *& all) {
   float draw_y = find_label_y();
   float draw_x = find_label_x();
+  g_lbl_pos = { draw_x, draw_y };
 
   spr::blit::level(all, draw_x, draw_y);
   spr::blit::number(all, sl::current_level() + 1, draw_x + 3.5, draw_y);
