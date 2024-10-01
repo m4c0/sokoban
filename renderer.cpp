@@ -110,9 +110,33 @@ struct main : voo::casein_thread {
 } i;
 } // namespace
 
+static auto find_label_x() {
+  for (auto x = 0; x < sl::level_width; x++) {
+    for (auto y = 0; y < sl::level_height; y++) {
+      auto p = y * sl::level_width + x;
+      if (sg::grid[p] != spr::outside) return x;
+    }
+  }
+  // Should not happen
+  return 0;
+}
+static auto find_label_y() {
+  for (auto y = 0; y < sl::level_height; y++) {
+    for (auto x = 0; x < sl::level_width; x++) {
+      auto p = y * sl::level_width + x;
+      if (sg::grid[p] != spr::outside) return y - 1;
+    }
+  }
+  // Should not happen
+  return 0;
+}
+
 void sr::update_data(quack::instance *& all) {
-  spr::blit::level(all, 0, 0);
-  spr::blit::number(all, sl::current_level() + 1, 3.5, 0);
+  float draw_y = find_label_y();
+  float draw_x = find_label_x();
+
+  spr::blit::level(all, draw_x, draw_y);
+  spr::blit::number(all, sl::current_level() + 1, draw_x + 3.5, draw_y);
 }
 
 void sr::set_updater(hai::fn<void, quack::instance *&> u) {
