@@ -21,6 +21,7 @@ namespace {
   struct upc {
     dotz::vec2 player_pos;
     dotz::vec2 label_pos;
+    float level;
     float aspect;
     float time;
   };
@@ -90,6 +91,7 @@ struct main : voo::casein_thread {
               sg::player_pos / sl::level_width,
             },
             .label_pos = g_lbl_pos,
+            .level = sl::current_level() + 1.0f,
             .aspect = sw.aspect(),
             .time = t.millis() / 1000.0f,
           };
@@ -139,8 +141,6 @@ void sr::update_data(quack::instance *& all) {
   float draw_y = find_label_y();
   float draw_x = find_label_x();
   g_lbl_pos = { draw_x, draw_y };
-
-  spr::blit::number(all, sl::current_level() + 1, draw_x + 3.5, draw_y);
 }
 
 void sr::set_updater(hai::fn<void, quack::instance *&> u) {

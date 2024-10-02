@@ -5,6 +5,7 @@
 layout(push_constant) uniform upc {
   vec2 player_pos;
   vec2 label_pos;
+  float level;
   float aspect;
   float time;
 } pc;
@@ -173,17 +174,37 @@ vec3 player(vec3 c) {
   return c;
 }
 
-vec3 level_label(vec3 f) {
-  vec2 sz = vec2(3.0, 1.0);
+vec4 atlas(vec2 p, vec2 sz, vec2 uv0, vec2 uv1) {
+  const vec2 uv_sz = vec2(16, 4);
+
   // TODO: find where it got misaligned
-  vec2 pp = g2l(pc.label_pos + vec2(1.0, 0.0));
+  vec2 pp = g2l(p);
   vec2 uv = (pp + sz * 0.5) / sz;
   float d = sd_box(pp, sz * 0.5);
 
-  uv = mix(vec2(1, 0), vec2(4, 1), uv) / vec2(16, 4);
-  vec4 a = mix(texture(u_atlas, uv), vec4(0), step(0, d));;
+  uv = mix(uv0, uv1, uv) / uv_sz;
+  return mix(texture(u_atlas, uv), vec4(0), step(0, d));
+}
+vec3 atlas_digit(vec2 p, int d, vec3 f) {
+  vec2 uv = vec2((d % 6) * 0.5, d / 6);
 
-  f = mix(f, a.rgb, a.r);
+  vec4 d0 = atlas(p, vec2(0.5, 1.0), vec2(1, 1) + uv, vec2(1.5, 2) + uv);
+  return mix(f, d0.rgb, d0.r);
+}
+
+vec3 level_label(vec3 f) {
+  vec2 p = pc.label_pos + vec2(1.0, 0.0);
+  vec4 lbl = atlas(p, vec2(3.0, 1.0), vec2(1, 0), vec2(4, 1));
+  f = mix(f, lbl.rgb, lbl.r);
+
+  int d = int(pc.level) % 10;
+  p = pc.label_pos + vec2(3.0, 0.0);
+  f = atlas_digit(p, d, f);
+
+  d = int(pc.level) / 10;
+  p = pc.label_pos + vec2(2.5, 0.0);
+  f = atlas_digit(p, d, f);
+
   return f;
 }
 
