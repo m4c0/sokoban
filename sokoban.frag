@@ -174,11 +174,11 @@ vec3 player(vec3 c) {
 }
 
 vec3 level_label(vec3 f) {
-  const float w = 1.5;
+  vec2 sz = vec2(3.0, 1.0);
   // TODO: find where it got misaligned
   vec2 pp = g2l(pc.label_pos + vec2(1.0, 0.0));
-  vec2 uv = (pp + vec2(w, 0.5)) / vec2(w * 2.0, 1.0);
-  float d = sd_box(pp, vec2(w, 0.5));
+  vec2 uv = (pp + sz * 0.5) / sz;
+  float d = sd_box(pp, sz * 0.5);
 
   uv = mix(vec2(1, 0), vec2(4, 1), uv) / vec2(16, 4);
   vec4 a = mix(texture(u_atlas, uv), vec4(0), step(0, d));;
