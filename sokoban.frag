@@ -176,8 +176,9 @@ vec3 player(vec2 p, vec3 c) {
 vec3 level_label(vec3 f) {
   const float w = 1.25;
   vec2 pp = g2l(pc.label_pos + vec2(w * 0.5, 0));
+  vec2 uv = pp + vec2(w, 0.5);
   float d = sd_box(pp, vec2(w, 0.5));
-  f = f * step(0, d);
+  f = mix(vec3(uv, 1), f, step(0, d));
   return f;
 }
 
