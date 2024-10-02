@@ -144,8 +144,8 @@ vec2 g2l(vec2 p) {
   return q_pos * vec2(12) + 12 - p + vec2(4.0, 0.0) - vec2(0.5);
 }
 
-vec3 player(vec2 p, vec3 c) {
-  vec2 b = g2l(p);
+vec3 player(vec3 c) {
+  vec2 b = g2l(pc.player_pos);
 
   vec2 hd_p = b + vec2(0.0, 0.2);
   float hd_d = sd_circle(hd_p, 0.2);
@@ -206,7 +206,7 @@ void main() {
     f = empty(q_pos);
   }
 
-  f = player(q_pos, f);
+  f = player(f);
   f = level_label(f);
 
   frag_color = vec4(f, 1);
