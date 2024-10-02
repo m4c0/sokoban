@@ -140,7 +140,6 @@ void sr::update_data(quack::instance *& all) {
   float draw_x = find_label_x();
   g_lbl_pos = { draw_x, draw_y };
 
-  spr::blit::level(all, draw_x, draw_y);
   spr::blit::number(all, sl::current_level() + 1, draw_x + 3.5, draw_y);
 }
 

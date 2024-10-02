@@ -10,7 +10,7 @@ layout(push_constant) uniform upc {
 } pc;
 
 layout(set = 0, binding = 0) uniform usampler2D u_map;
-layout(set = 0, binding = 1) uniform usampler2D u_atlas;
+layout(set = 0, binding = 1) uniform sampler2D u_atlas;
 
 layout(location = 0) in vec2 q_pos;
 
@@ -174,11 +174,16 @@ vec3 player(vec2 p, vec3 c) {
 }
 
 vec3 level_label(vec3 f) {
-  const float w = 1.25;
-  vec2 pp = g2l(pc.label_pos + vec2(w * 0.5, 0));
-  vec2 uv = pp + vec2(w, 0.5);
+  const float w = 1.5;
+  // TODO: find where it got misaligned
+  vec2 pp = g2l(pc.label_pos + vec2(1.0, 0.0));
+  vec2 uv = (pp + vec2(w, 0.5)) / vec2(w * 2.0, 1.0);
   float d = sd_box(pp, vec2(w, 0.5));
-  f = mix(vec3(uv, 1), f, step(0, d));
+
+  uv = mix(vec2(1, 0), vec2(4, 1), uv) / vec2(16, 4);
+  vec4 a = mix(texture(u_atlas, uv), vec4(0), step(0, d));;
+
+  f = mix(f, a.rgb, a.r);
   return f;
 }
 
