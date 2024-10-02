@@ -63,7 +63,7 @@ struct main : voo::casein_thread {
     map.run_once();
 
     vee::descriptor_set_layout dsl = vee::create_descriptor_set_layout({ vee::dsl_fragment_sampler(), vee::dsl_fragment_sampler() });
-    vee::pipeline_layout pl = vee::create_pipeline_layout({ *dsl }, { vee::vert_frag_push_constant_range<upc>(2) });
+    vee::pipeline_layout pl = vee::create_pipeline_layout({ *dsl }, { vee::vert_frag_push_constant_range<upc>() });
     voo::one_quad_render oqr { "sokoban", &dq, *pl };
 
     auto smp = vee::create_sampler(vee::nearest_sampler);
