@@ -67,12 +67,13 @@ struct main : voo::casein_thread {
     vee::pipeline_layout pl = vee::create_pipeline_layout({ *dsl }, { vee::vert_frag_push_constant_range<upc>() });
     voo::one_quad_render oqr { "sokoban", &dq, *pl };
 
-    auto smp = vee::create_sampler(vee::nearest_sampler);
+    auto n_smp = vee::create_sampler(vee::nearest_sampler);
+    auto l_smp = vee::create_sampler(vee::linear_sampler);
 
     auto ds_pool = vee::create_descriptor_pool(1, { vee::combined_image_sampler(2) });
     auto dset = vee::allocate_descriptor_set(*ds_pool, *dsl);
-    vee::update_descriptor_set(dset, 0, map.data().iv(), *smp);
-    vee::update_descriptor_set(dset, 1, a.data().iv(), *smp);
+    vee::update_descriptor_set(dset, 0, map.data().iv(), *n_smp);
+    vee::update_descriptor_set(dset, 1, a.data().iv(), *l_smp);
 
     quack::upc rpc{};
     rpc.grid_size = {sl::level_width, sl::level_height};
