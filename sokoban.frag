@@ -188,8 +188,8 @@ vec4 atlas(vec2 p, vec2 sz, vec2 uv0, vec2 uv1) {
 vec3 atlas_d(vec2 p, vec2 sz, vec2 uv0, vec2 uv1, vec3 f) {
   vec4 c = atlas(p, sz, uv0, uv1);
   float x = c.x;
-  f = mix(f, vec3(0), step(0.7, x));
-  f = mix(f, vec3(1), smoothstep(0.95, 1.0, sin(x * 3.14 - 0.6)));
+  f = mix(f, vec3(1.0, 1.0, 0.0), step(0.7, x));
+  f = mix(f, vec3(0.0), smoothstep(0.3, 1.0, sin(x * 3.14 - 0.6)));
   return f;
 }
 vec3 atlas_digit(vec2 p, int digit, vec3 f) {
