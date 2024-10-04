@@ -213,6 +213,15 @@ vec3 level_label(vec3 f) {
   return f;
 }
 
+vec3 menu(vec3 f) {
+  float d = sd_rnd_box(q_pos, pc.menu_size / 12, 0.05);
+
+  float en = step(0.001, length(pc.menu_size));
+  f = f * (1.0 - 0.6 * en);
+  f = mix(vec3(0.1, 0.2, 0.3), f, step(0, d) * 0.6 + 0.4);
+  return f;
+}
+
 void main() {
   uvec4 map = map_at(q_pos, vec2(0));
   vec2 b = fract(q_pos * vec2(12)) - 0.5;
@@ -234,7 +243,7 @@ void main() {
 
   f = player(f);
   f = level_label(f);
-  f = f * (1.0 - 0.6 * step(0.001, length(pc.menu_size)));
+  f = menu(f);
 
   frag_color = vec4(f, 1);
 }
