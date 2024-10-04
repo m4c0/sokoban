@@ -25,7 +25,8 @@ inline unsigned level_quad_count() { return level_width * level_height; }
 } // namespace sokoban::levels
 
 export namespace sokoban::renderer {
-void update_data(quack::instance *& i);
+void update_data(quack::instance *& i, float dim);
+void update_data(quack::instance *& i) { update_data(i, 1.0); }
 void set_updater(hai::fn<void, quack::instance *&>);
 } // namespace sokoban::renderer
 

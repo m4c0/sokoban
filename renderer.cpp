@@ -35,6 +35,7 @@ namespace {
   static quack::buffer_updater * g_buffer;
   static voo::updater<voo::h2l_image> * g_map;
   static dotz::vec2 g_lbl_pos {};
+  static float g_dim { 1 };
 
   static void updater(quack::instance *& i) { g_updater(i); }
 
@@ -96,7 +97,7 @@ struct main : voo::casein_thread {
             .level = sl::current_level() + 1.0f,
             .aspect = sw.aspect(),
             .time = t.millis() / 1000.0f,
-            .dim = 1.0,
+            .dim = g_dim,
           };
 
           auto scb = sw.cmd_render_pass(pcb);
@@ -140,10 +141,11 @@ static auto find_label_y() {
   return 0;
 }
 
-void sr::update_data(quack::instance *& all) {
+void sr::update_data(quack::instance *& all, float dim) {
   float draw_y = find_label_y();
   float draw_x = find_label_x();
   g_lbl_pos = { draw_x, draw_y };
+  g_dim = dim;
 }
 
 void sr::set_updater(hai::fn<void, quack::instance *&> u) {
