@@ -24,6 +24,7 @@ namespace {
     float level;
     float aspect;
     float time;
+    float dim;
   };
   struct map_t {
     uint8_t type;
@@ -95,6 +96,7 @@ struct main : voo::casein_thread {
             .level = sl::current_level() + 1.0f,
             .aspect = sw.aspect(),
             .time = t.millis() / 1000.0f,
+            .dim = 1.0,
           };
 
           auto scb = sw.cmd_render_pass(pcb);
