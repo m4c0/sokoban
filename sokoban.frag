@@ -5,10 +5,10 @@
 layout(push_constant) uniform upc {
   vec2 player_pos;
   vec2 label_pos;
+  vec2 menu_size;
   float level;
   float aspect;
   float time;
-  float dim;
 } pc;
 
 layout(set = 0, binding = 0) uniform usampler2D u_map;
@@ -234,7 +234,7 @@ void main() {
 
   f = player(f);
   f = level_label(f);
-  f = f * pc.dim;
+  f = f * (1.0 - 0.6 * step(0.001, length(pc.menu_size)));
 
   frag_color = vec4(f, 1);
 }

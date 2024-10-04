@@ -21,10 +21,10 @@ namespace {
   struct upc {
     dotz::vec2 player_pos;
     dotz::vec2 label_pos;
+    dotz::vec2 menu_size;
     float level;
     float aspect;
     float time;
-    float dim;
   };
   struct map_t {
     uint8_t type;
@@ -35,7 +35,7 @@ namespace {
   static quack::buffer_updater * g_buffer;
   static voo::updater<voo::h2l_image> * g_map;
   static dotz::vec2 g_lbl_pos {};
-  static float g_dim { 1 };
+  static dotz::vec2 g_menu_size {};
 
   static void updater(quack::instance *& i) { g_updater(i); }
 
@@ -94,10 +94,10 @@ struct main : voo::casein_thread {
               sg::player_pos / sl::level_width,
             },
             .label_pos = g_lbl_pos,
+            .menu_size = g_menu_size,
             .level = sl::current_level() + 1.0f,
             .aspect = sw.aspect(),
             .time = t.millis() / 1000.0f,
-            .dim = g_dim,
           };
 
           auto scb = sw.cmd_render_pass(pcb);
@@ -141,11 +141,11 @@ static auto find_label_y() {
   return 0;
 }
 
-void sr::update_data(quack::instance *& all, float dim) {
+void sr::update_data(quack::instance *& all, dotz::vec2 menu_sz) {
   float draw_y = find_label_y();
   float draw_x = find_label_x();
   g_lbl_pos = { draw_x, draw_y };
-  g_dim = dim;
+  g_menu_size = menu_sz;
 }
 
 void sr::set_updater(hai::fn<void, quack::instance *&> u) {

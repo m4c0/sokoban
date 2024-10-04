@@ -3,6 +3,7 @@
 layout(push_constant) uniform upc {
   vec2 player_pos;
   vec2 label_pos;
+  vec2 menu_size;
   float level;
   float aspect;
   float time;
