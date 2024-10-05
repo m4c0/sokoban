@@ -216,10 +216,16 @@ vec3 level_label(vec3 f) {
 vec3 menu(vec3 f) {
   float d = sd_rnd_box(q_pos, pc.menu_size / 12, 0.05);
 
-  float en = step(0.001, length(pc.menu_size));
-  f = f * (1.0 - 0.6 * en);
-  f = mix(vec3(0.1, 0.2, 0.3), f, step(0, d) * 0.6 + 0.4);
-  return f;
+  float cd = smoothstep(0.4, 1, 0.005 / abs(d));
+  
+  vec3 c0 = vec3(0.10, 0.12, 0.14);
+  vec3 c1 = vec3(0.80, 0.82, 0.84);
+  vec3 c = mix(c0, c1, cd);
+
+  float a = 0.7 - 0.6 * step(0, d);
+  a *= step(0.001, length(pc.menu_size));
+
+  return mix(f, c, a);
 }
 
 void main() {
