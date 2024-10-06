@@ -34,8 +34,7 @@ namespace {
   static hai::fn<void, quack::instance *&> g_updater;
   static quack::buffer_updater * g_buffer;
   static voo::updater<voo::h2l_image> * g_map;
-  static dotz::vec2 g_lbl_pos {};
-  static dotz::vec2 g_menu_size {};
+  static upc g_pc {};
 
   static void updater(quack::instance *& i) { g_updater(i); }
 
@@ -88,21 +87,15 @@ struct main : voo::casein_thread {
 
       extent_loop(dq.queue(), sw, [&] {
         sw.queue_one_time_submit(dq.queue(), [&](auto pcb) {
-          upc pc {
-            .player_pos = {
-              sg::player_pos % sl::level_width,
-              sg::player_pos / sl::level_width,
-            },
-            .label_pos = g_lbl_pos,
-            .menu_size = g_menu_size,
-            .level = sl::current_level() + 1.0f,
-            .aspect = sw.aspect(),
-            .time = t.millis() / 1000.0f,
-          };
+          g_pc.player_pos.x = sg::player_pos % sl::level_width;
+          g_pc.player_pos.y = sg::player_pos / sl::level_width;
+          g_pc.level = sl::current_level() + 1.0f;
+          g_pc.aspect = sw.aspect();
+          g_pc.time = t.millis() / 1000.0f;
 
           auto scb = sw.cmd_render_pass(pcb);
           vee::cmd_bind_descriptor_set(*scb, *pl, 0, dset);
-          vee::cmd_push_vert_frag_constants(*scb, *pl, &pc);
+          vee::cmd_push_vert_frag_constants(*scb, *pl, &g_pc);
           oqr.run(*scb, sw.extent());
 
           quack::run(&ps, {
@@ -144,8 +137,8 @@ static auto find_label_y() {
 void sr::update_data(quack::instance *& all, dotz::vec2 menu_sz) {
   float draw_y = find_label_y();
   float draw_x = find_label_x();
-  g_lbl_pos = { draw_x, draw_y };
-  g_menu_size = menu_sz;
+  g_pc.label_pos = { draw_x, draw_y };
+  g_pc.menu_size = menu_sz;
 }
 
 void sr::set_updater(hai::fn<void, quack::instance *&> u) {
