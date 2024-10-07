@@ -145,7 +145,7 @@ vec3 box(vec2 p, vec2 b, bool on_tgt) {
 }
 
 vec2 g2l(vec2 p) {
-  vec2 magic = vec2(4.0 + (12.0 - aw), 0.0);
+  vec2 magic = vec2(4.0, 0.0) + (12.0 - aw);
   return q_pos * vec2(aw) + aw - p + magic - vec2(0.5);
 }
 
