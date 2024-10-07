@@ -9,17 +9,19 @@ static void update_data(quack::instance *& all) {
 
   dotz::vec2 rp{};
   dotz::vec2 rs{};
-  ui::menu_bg(all, 18, 10, rp, rs);
+  ui::menu_bg(all, 10, 4, rp, rs);
 
-  auto rr = rp.x + rs.x - 2;
+  auto rr = rp.x + rs.x;
 
   ui::bg(all, 16, 1.5, sel_bg);
   auto &s = all[-1].position;
-  s.y = rp.y - 0.3f + g_sel * 1.5f;
+  s.y = rp.y - 1.0 + g_sel * 1.5f;
 
   auto au = is_audio_enabled();
   auto fs = casein::fullscreen;
 
+  rp.x -= 0.5;
+  rp.y -= 0.7;
   spr::blit::level(all, rp.x, rp.y);
   spr::blit::number(all, sl::current_level() + 1, rr, rp.y);
   spr::blit::sound(all, rp.x, rp.y + 1.5f);

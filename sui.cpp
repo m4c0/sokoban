@@ -18,6 +18,6 @@ void ui::menu_bg(quack::instance *& all, float w, float h, dotz::vec2 & p, dotz:
   float x = sl::level_width - w;
   float y = sl::level_height - h;
 
-  p = dotz::vec2 { x, y } * 0.5f + 2.0f;
-  s = dotz::vec2 { w, h } - 2.0f;
+  p = dotz::vec2 { x, y } * 0.5f;
+  s = dotz::vec2 { w, h };
 }
