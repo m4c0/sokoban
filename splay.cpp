@@ -119,5 +119,10 @@ void setup_game() {
   handle(KEY_DOWN, K_SPACE, &reset_level);
   handle(KEY_DOWN, K_ESCAPE, &open_menu);
 
+  handle(GESTURE, G_SWIPE_UP, &up);
+  handle(GESTURE, G_SWIPE_DOWN, &down);
+  handle(GESTURE, G_SWIPE_LEFT, &left);
+  handle(GESTURE, G_SWIPE_RIGHT, &right);
+
   sr::set_updater(update_data);
 }
