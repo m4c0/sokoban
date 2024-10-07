@@ -59,7 +59,7 @@ vec3 brick(vec2 p) {
 
 uvec4 map_at(vec2 p, vec2 d) {
   vec2 uv = p;
-  uv = floor(d + uv * 24.0 - vec2(0, 8)) / 32.0;
+  uv = floor(d + uv * aww - vec2(0, 8)) / 32.0;
   uv = uv * 0.5 + 0.5;
   uv = clamp(uv, 0, 1);
   return texture(u_map, uv);
@@ -73,7 +73,7 @@ float shadow_side(vec2 p, vec2 d, float b, float m) {
 }
 
 float shadow(vec2 p) {
-  vec2 b = fract(p * vec2(24));
+  vec2 b = fract(p * vec2(aww));
   float m = 1.0f;
 
   m = shadow_side(p, vec2(-1, 0), b.x, m);
@@ -145,7 +145,8 @@ vec3 box(vec2 p, vec2 b, bool on_tgt) {
 }
 
 vec2 g2l(vec2 p) {
-  return q_pos * vec2(aw) + aw - p + vec2(4.0, 0.0) - vec2(0.5);
+  vec2 magic = vec2(4.0 + (12.0 - aw), 0.0);
+  return q_pos * vec2(aw) + aw - p + magic - vec2(0.5);
 }
 
 vec3 player(vec3 c) {
