@@ -19,6 +19,8 @@ layout(location = 0) in vec2 q_pos;
 layout(location = 0) out vec4 frag_color;
 
 const float pi = 3.14159265358979323;
+const float aw = 12;
+const float aww = aw * 2;
 
 float sd_box(vec2 p, vec2 b) {
   vec2 d = abs(p) - b;
@@ -39,7 +41,7 @@ float sd_cut_dist(vec2 p, float r, float h) {
 }
 
 vec3 brick(vec2 p) {
-  vec2 b = p * vec2(12, 24);
+  vec2 b = p * vec2(aw, aww);
   b.x += 0.5 * step(1.0, mod(b.y, 2));
 
   vec2 i = floor(b);
@@ -143,7 +145,7 @@ vec3 box(vec2 p, vec2 b, bool on_tgt) {
 }
 
 vec2 g2l(vec2 p) {
-  return q_pos * vec2(12) + 12 - p + vec2(4.0, 0.0) - vec2(0.5);
+  return q_pos * vec2(aw) + aw - p + vec2(4.0, 0.0) - vec2(0.5);
 }
 
 vec3 player(vec3 c) {
@@ -214,7 +216,7 @@ vec3 level_label(vec3 f) {
 }
 
 vec3 menu(vec3 f) {
-  float d = sd_rnd_box(q_pos, pc.menu_size / 12, 0.05);
+  float d = sd_rnd_box(q_pos, pc.menu_size / aw, 0.05);
 
   float cd = smoothstep(0.4, 1, 0.005 / abs(d));
   
@@ -230,7 +232,7 @@ vec3 menu(vec3 f) {
 
 void main() {
   uvec4 map = map_at(q_pos, vec2(0));
-  vec2 b = fract(q_pos * vec2(12)) - 0.5;
+  vec2 b = fract(q_pos * vec2(aw)) - 0.5;
 
   vec3 f;
   if (map.r == 88) { // 'X' - wall
