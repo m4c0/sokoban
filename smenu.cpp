@@ -38,25 +38,25 @@ static void toggle_fullscreen() {
   sokoban::renderer::set_updater(update_data);
 }
 
+static void restart_level() {
+  sl::load_level(sl::current_level());
+  sokoban::renderer::set_updater(update_data);
+}
+
 static void sel_down() {
-  g_sel = (g_sel + 1) % 3;
+  g_sel = (g_sel + 1) % 4;
   sokoban::renderer::set_updater(update_data);
 }
 static void sel_up() {
-  g_sel = (3 + g_sel - 1) % 3;
+  g_sel = (4 + g_sel - 1) % 4;
   sokoban::renderer::set_updater(update_data);
 }
 static void sel_activate() {
   switch (g_sel) {
-  case 0:
-    open_level_select();
-    break;
-  case 1:
-    toggle_audio();
-    break;
-  case 2:
-    toggle_fullscreen();
-    break;
+  case 0: open_level_select(); break;
+  case 1: toggle_audio(); break;
+  case 2: toggle_fullscreen(); break;
+  case 3: restart_level(); break;
   }
 }
 
