@@ -12,8 +12,7 @@ static void set_level(unsigned idx) {
   sr::set_updater(update_data);
 
   auto max = save::read().max_level;
-  if (idx > max)
-    max = idx;
+  if (idx > max) max = idx;
   save::write({
       .cur_level = idx,
       .max_level = max,
