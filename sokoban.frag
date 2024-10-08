@@ -232,7 +232,7 @@ vec3 menu(vec3 f) {
 }
 
 void main() {
-  aw = 12 - pc.label_pos.y;
+  aw = clamp(16 - pc.label_pos.y, 8, 12);
   aww = aw * 2;
 
   uvec4 map = map_at(q_pos, vec2(0));
