@@ -19,8 +19,8 @@ layout(location = 0) in vec2 q_pos;
 layout(location = 0) out vec4 frag_color;
 
 const float pi = 3.14159265358979323;
-const float aw = 12;
-const float aww = aw * 2;
+float aw;
+float aww;
 
 float sd_box(vec2 p, vec2 b) {
   vec2 d = abs(p) - b;
@@ -232,6 +232,9 @@ vec3 menu(vec3 f) {
 }
 
 void main() {
+  aw = 12 - pc.label_pos.y;
+  aww = aw * 2;
+
   uvec4 map = map_at(q_pos, vec2(0));
   vec2 b = fract(q_pos * vec2(aw)) - 0.5;
 
