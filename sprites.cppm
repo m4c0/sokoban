@@ -118,6 +118,7 @@ void restart(quack::instance *& i, float x, float y) {
       .uv1{11_w, 1_h},
       .multiplier{1, 1, 1, 1},
   };
+  level(i, x + 4, y);
 }
 
 void cursor(quack::instance *& i, float x, float y) {
