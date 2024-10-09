@@ -82,6 +82,17 @@ static void cursor_down() {
     g_pen();
 }
 
+static void mouse_move() {
+  quack::upc rpc{};
+  rpc.grid_size = {sl::level_width, sl::level_height};
+  rpc.grid_pos = rpc.grid_size / 2.0;
+
+  auto [x, y] = quack::mouse_pos(rpc);
+  if (x < 0 || x >= lw || y < 0 || y >= lh) return;
+
+  g_cursor = static_cast<int>(y) * lw + static_cast<int>(x);
+}
+
 static void clear_player() {
   if (sg::player_pos >= sl::level_width * sl::level_height)
     return;
@@ -291,6 +302,9 @@ static void edit_level() {
   handle(KEY_UP, K_X, &reset_pen);
   handle(KEY_UP, K_T, &reset_pen);
   handle(KEY_UP, K_SPACE, &reset_pen);
+
+  handle(MOUSE_MOVE, mouse_move);
+
   g_cursor = 0;
 }
 static void level_select() {
