@@ -4,19 +4,19 @@ import sprites;
 static unsigned max_level;
 
 static void update_data(quack::instance *& all) {
-  static constexpr const dotz::vec4 cur_level_bg{0, 0, 0, 1};
+  static constexpr const dotz::vec4 sel_bg{0.1f, 0.4f, 0.3f, 0.7f};
 
   dotz::vec2 rp{};
   dotz::vec2 rs{};
-  ui::menu_bg(all, 17, 13, rp, rs);
+  ui::menu_bg(all, 16, 9, rp, rs);
 
   for (auto i = 0; i <= max_level; i++) {
-    float x = rp.x + (i % 10) * 1.5f;
-    float y = rp.y + (i / 10) * 1.5f;
+    float x = rp.x + (i % 10) * 2.0f;
+    float y = rp.y + (i / 10) * 2.0f;
     if (i == sl::current_level()) {
-      ui::bg(all, 1.5, 1, cur_level_bg);
-      all[-1].position.x = x - 0.75f;
-      all[-1].position.y = y;
+      ui::bg(all, 2.0, 1.75, sel_bg);
+      all[-1].position.x = x - 1.0f;
+      all[-1].position.y = y - 0.5f;
     }
     spr::blit::number(all, i + 1, x, y);
   }

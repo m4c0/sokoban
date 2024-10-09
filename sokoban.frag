@@ -225,7 +225,7 @@ vec3 menu(vec3 f) {
   vec3 c1 = vec3(0.80, 0.82, 0.84);
   vec3 c = mix(c0, c1, cd);
 
-  float a = 1.0 - 0.3 * step(0, d);
+  float a = 0.9 - 0.3 * step(0, d);
   a *= step(0.001, length(pc.menu_size));
 
   return mix(f, c, a);
