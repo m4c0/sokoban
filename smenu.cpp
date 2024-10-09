@@ -44,6 +44,7 @@ static void toggle_fullscreen() {
 static void restart_level() {
   sl::load_level(sl::current_level());
   sokoban::renderer::set_updater(update_data);
+  setup_game();
 }
 
 static void sel_down() {
