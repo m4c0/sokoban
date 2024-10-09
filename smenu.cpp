@@ -28,6 +28,7 @@ static void update_data(quack::instance *& all) {
   spr::blit::boolean(all, au, rr - 1.0, rp.y + 1.5f);
   spr::blit::fullscreen(all, rp.x, rp.y + 3.0f);
   spr::blit::boolean(all, fs, rr - 1.0, rp.y + 3.0f);
+  spr::blit::restart(all, rp.x, rp.y + 4.5f);
 }
 
 static void toggle_audio() {

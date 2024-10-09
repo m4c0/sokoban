@@ -110,6 +110,15 @@ void fullscreen(quack::instance *& i, float x, float y) {
       .multiplier{1, 1, 1, 1},
   };
 }
+void restart(quack::instance *& i, float x, float y) {
+  *i++ = quack::instance{
+      .position{x, y},
+      .size{4, 1},
+      .uv0{7_w, 0_h},
+      .uv1{11_w, 1_h},
+      .multiplier{1, 1, 1, 1},
+  };
+}
 
 void cursor(quack::instance *& i, float x, float y) {
   *i++ = {
