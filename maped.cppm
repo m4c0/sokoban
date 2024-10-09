@@ -345,7 +345,7 @@ static void refresh() {
     g_cursor_blink = !g_cursor_blink;
     if (g_cursor < 0 || g_cursor_blink) return;
 
-    spr::blit::cursor(i, g_cursor % sl::level_width, g_cursor / sl::level_height);
+    spr::blit::cursor(i, g_cursor % sl::level_width, g_cursor / sl::level_width);
   });
 }
 struct init {
