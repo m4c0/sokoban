@@ -217,7 +217,7 @@ vec3 level_label(vec3 f) {
 }
 
 vec3 menu(vec3 f) {
-  float d = sd_rnd_box(q_pos, pc.menu_size / aw, 0.05);
+  float d = sd_rnd_box(q_pos, pc.menu_size / 8, 0.05);
 
   float cd = smoothstep(0.4, 1, 0.005 / abs(d));
   
