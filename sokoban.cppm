@@ -24,7 +24,6 @@ using namespace spr;
 
 namespace ui {
 void bg(quack::instance *&, float w, float h, dotz::vec4 cl);
-void menu_bg(quack::instance *&, float w, float h, dotz::vec2 & p, dotz::vec2 & s);
 } // namespace ui
 
 void setup_game();
