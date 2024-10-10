@@ -2,7 +2,7 @@ module sokoban;
 import casein;
 import sprites;
 
-static unsigned g_sel{};
+static unsigned g_sel {};
 
 static void update_data(quack::instance *& all) {
   static constexpr const float w = 5.0f;
@@ -57,10 +57,10 @@ static void sel_up() {
 }
 static void sel_activate() {
   switch (g_sel) {
-  case 0: open_level_select(); break;
-  case 1: toggle_audio(); break;
-  case 2: toggle_fullscreen(); break;
-  case 3: restart_level(); break;
+    case 0: open_level_select(); break;
+    case 1: toggle_audio(); break;
+    case 2: toggle_fullscreen(); break;
+    case 3: restart_level(); break;
   }
 }
 

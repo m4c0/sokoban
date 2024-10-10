@@ -23,10 +23,8 @@ static void update_data(quack::instance *& all) {
 
 static void change_level(int d) {
   int l = sl::current_level() + d;
-  if (l < 0)
-    return;
-  if (l > max_level)
-    return;
+  if (l < 0) return;
+  if (l > max_level) return;
 
   sl::load_level(l);
 
