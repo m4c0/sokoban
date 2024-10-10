@@ -5,7 +5,6 @@ import sprites;
 static unsigned g_sel{};
 
 static void update_data(quack::instance *& all) {
-  static constexpr const dotz::vec4 sel_bg{0.1f, 0.4f, 0.3f, 0.7f};
   static constexpr const float w = 5.0f;
   static constexpr const float h = 2.0f;
 
@@ -13,7 +12,7 @@ static void update_data(quack::instance *& all) {
   auto rr = rp.x + w * 2.0f;
 
   sr::update_data(all, { w, h });
-  ui::bg(all, 16, 1.5, sel_bg);
+  ui::bg(all, 16, 1.5);
 
   auto &s = all[-1].position;
   s.y = rp.y - 1.0 + g_sel * 1.5f;

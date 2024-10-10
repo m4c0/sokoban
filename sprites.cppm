@@ -139,4 +139,15 @@ void block(quack::instance *& i, float x, float y, blocks b) {
       .multiplier{1, 1, 1, 1},
   };
 }
+
+void selection(quack::instance *& all, float x, float y, float w, float h) {
+  static constexpr const dotz::vec4 cl{0.1f, 0.4f, 0.3f, 0.7f};
+
+  *all++ = quack::instance{
+      .position{x, y},
+      .size{w, h},
+      .colour{cl},
+      .multiplier{1},
+  };
+}
 } // namespace spr::blit

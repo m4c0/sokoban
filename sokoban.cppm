@@ -23,7 +23,7 @@ namespace sr = sokoban::renderer;
 using namespace spr;
 
 namespace ui {
-void bg(quack::instance *&, float w, float h, dotz::vec4 cl);
+void bg(quack::instance *&, float w, float h);
 } // namespace ui
 
 void setup_game();

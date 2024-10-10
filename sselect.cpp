@@ -4,7 +4,6 @@ import sprites;
 static unsigned max_level;
 
 static void update_data(quack::instance *& all) {
-  static constexpr const dotz::vec4 sel_bg{0.1f, 0.4f, 0.3f, 0.7f};
   static constexpr const float w = 8.0f;
   static constexpr const float h = 4.5f;
 
@@ -16,7 +15,7 @@ static void update_data(quack::instance *& all) {
     float x = rp.x + (i % 10) * 2.0f;
     float y = rp.y + (i / 10) * 2.0f;
     if (i == sl::current_level()) {
-      ui::bg(all, 2.0, 1.75, sel_bg);
+      ui::bg(all, 2.0, 1.75);
       all[-1].position.x = x - 1.0f;
       all[-1].position.y = y - 0.5f;
     }
