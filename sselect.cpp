@@ -15,9 +15,7 @@ static void update_data(quack::instance *& all) {
     float x = rp.x + (i % 10) * 2.0f;
     float y = rp.y + (i / 10) * 2.0f;
     if (i == sl::current_level()) {
-      ui::bg(all, 2.0, 1.75);
-      all[-1].position.x = x - 1.0f;
-      all[-1].position.y = y - 0.5f;
+      spr::blit::selection(all, x - 1.0f, y - 0.5f, 2.0f, 1.75f);
     }
     spr::blit::number(all, i + 1, x, y);
   }

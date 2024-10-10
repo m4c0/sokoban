@@ -5,7 +5,6 @@
 #pragma leco add_impl smenu
 #pragma leco add_impl splay
 #pragma leco add_impl sselect
-#pragma leco add_impl sui
 #pragma leco add_build_dep "maped.cppm"
 export module sokoban;
 import casein;
@@ -21,10 +20,6 @@ namespace sg = sokoban::game;
 namespace sl = sokoban::levels;
 namespace sr = sokoban::renderer;
 using namespace spr;
-
-namespace ui {
-void bg(quack::instance *&, float w, float h);
-} // namespace ui
 
 void setup_game();
 void open_menu();

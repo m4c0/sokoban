@@ -12,10 +12,10 @@ static void update_data(quack::instance *& all) {
   auto rr = rp.x + w * 2.0f;
 
   sr::update_data(all, { w, h });
-  ui::bg(all, 16, 1.5);
 
-  auto &s = all[-1].position;
-  s.y = rp.y - 1.0 + g_sel * 1.5f;
+  auto sx = sl::level_width * 0.5f - 8.0f;
+  auto sy = rp.y - 1.0 + g_sel * 1.5f;
+  spr::blit::selection(all, sx, sy, 16.0, 1.5);
 
   auto au = is_audio_enabled();
   auto fs = casein::fullscreen;
