@@ -11,7 +11,7 @@ static void update_data(quack::instance *& all) {
   dotz::vec2 rp { sl::level_width * 0.5f - w, sl::level_height * 0.5f - h };
   auto rr = rp.x + w * 2.0f;
 
-  sr::update_data(all, { w, h });
+  sr::update_data(all, { w, h }, {});
 
   auto sx = sl::level_width * 0.5f - 8.0f;
   auto sy = rp.y - 1.0 + g_sel * 1.5f;

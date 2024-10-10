@@ -19,6 +19,7 @@ namespace sr = sokoban::renderer;
 
 namespace {
   struct upc {
+    dotz::vec4 sel_rect;
     dotz::vec2 player_pos;
     dotz::vec2 label_pos;
     dotz::vec2 menu_size;
@@ -134,11 +135,12 @@ static auto find_label_y() {
   return 0;
 }
 
-void sr::update_data(quack::instance *& all, dotz::vec2 menu_sz) {
+void sr::update_data(quack::instance *& all, dotz::vec2 menu_sz, dotz::vec4 sel) {
   float draw_y = find_label_y();
   float draw_x = find_label_x();
   g_pc.label_pos = { draw_x, draw_y };
   g_pc.menu_size = menu_sz;
+  g_pc.sel_rect = sel;
 }
 
 void sr::set_updater(hai::fn<void, quack::instance *&> u) {

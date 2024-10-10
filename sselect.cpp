@@ -9,7 +9,7 @@ static void update_data(quack::instance *& all) {
 
   dotz::vec2 rp { sl::level_width * 0.5f - w, sl::level_height * 0.5f - h };
 
-  sr::update_data(all, { w, h });
+  sr::update_data(all, { w, h }, {});
 
   for (auto i = 0; i <= max_level; i++) {
     float x = rp.x + (i % 10) * 2.0f;
