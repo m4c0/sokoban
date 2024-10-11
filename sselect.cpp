@@ -7,16 +7,14 @@ static void update_data(quack::instance *& all) {
   static constexpr const float w = 8.0f;
   static constexpr const float h = 4.5f;
 
+  auto sx = 1.5f * ((sl::current_level() % 10) - 5.0f + 0.5f);
+  auto sy = 1.5f * ((sl::current_level() / 10) - 3.0f + 0.5f);
+  sr::update_data(all, { w, h }, { sx, sy, 0.8f, 0.6f });
+
   dotz::vec2 rp { sl::level_width * 0.5f - w, sl::level_height * 0.5f - h };
-
-  sr::update_data(all, { w, h }, {});
-
   for (auto i = 0; i <= max_level; i++) {
     float x = rp.x + (i % 10) * 2.0f;
     float y = rp.y + (i / 10) * 2.0f;
-    if (i == sl::current_level()) {
-      spr::blit::selection(all, x - 1.0f, y - 0.5f, 2.0f, 1.75f);
-    }
     spr::blit::number(all, i + 1, x, y);
   }
 }

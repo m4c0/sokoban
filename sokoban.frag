@@ -232,6 +232,16 @@ vec3 menu(vec3 f) {
   return mix(f, c, a);
 }
 
+vec3 selection(vec3 f) {
+  float d = sd_box(q_pos - pc.sel_rect.xy / 8, pc.sel_rect.zw / 8);
+
+  vec3 c = vec3(0.1, 0.4, 0.3);
+
+  float a = 0.3 - 0.3 * step(0, d);
+  a *= step(0.001, length(pc.sel_rect.zw));
+  return mix(f, c, a);
+}
+
 void main() {
   aw = clamp(16 - pc.label_pos.y, 8, 12);
   aww = aw * 2;
@@ -257,6 +267,7 @@ void main() {
   f = player(f);
   f = level_label(f);
   f = menu(f);
+  f = selection(f);
 
   frag_color = vec4(f, 1);
 }
