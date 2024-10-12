@@ -18,8 +18,7 @@ static void update_data(quack::instance *& all) {
   }
 }
 
-static void change_level(int d) {
-  int l = sl::current_level() + d;
+static void set_level(int l) {
   if (l < 0) return;
   if (l > max_level) return;
 
@@ -27,11 +26,32 @@ static void change_level(int d) {
 
   sokoban::renderer::set_updater(update_data);
 }
+static void change_level(int d) {
+  int l = sl::current_level() + d;
+  set_level(l);
+}
 
 static void left() { change_level(-1); }
 static void right() { change_level(1); }
 static void down() { change_level(10); }
 static void up() { change_level(-10); }
+
+static void mouse_move() {
+  auto lw = sl::level_width;
+  auto lh = sl::level_height;
+
+  quack::upc rpc {};
+  rpc.grid_size = { lw, lh };
+  rpc.grid_pos = rpc.grid_size / 2.0;
+
+  auto p = quack::mouse_pos(rpc);
+  p = (p - 5.0f) / 2.24f;
+
+  int x = p.x;
+  int y = p.y;
+  if (x < 0 || x >= lw || y < 0 || y >= lh) return;
+  set_level(y * 10 + x);
+}
 
 void open_level_select() {
   max_level = save::read().max_level;
@@ -47,6 +67,8 @@ void open_level_select() {
   handle(KEY_DOWN, K_RIGHT, right);
   handle(KEY_DOWN, K_DOWN, down);
   handle(KEY_DOWN, K_UP, up);
+
+  handle(MOUSE_MOVE, mouse_move);
 
   sokoban::renderer::set_updater(update_data);
 }
