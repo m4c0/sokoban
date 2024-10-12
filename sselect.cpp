@@ -37,19 +37,12 @@ static void down() { change_level(10); }
 static void up() { change_level(-10); }
 
 static void mouse_move() {
-  auto lw = sl::level_width;
-  auto lh = sl::level_height;
-
-  quack::upc rpc {};
-  rpc.grid_size = { lw, lh };
-  rpc.grid_pos = rpc.grid_size / 2.0;
-
-  auto p = quack::mouse_pos(rpc);
+  auto p = sr::mouse_pos();
   p = (p - 5.0f) / 2.24f;
 
   int x = p.x;
   int y = p.y;
-  if (x < 0 || x >= lw || y < 0 || y >= lh) return;
+  if (x < 0 || x >= 10 || y < 0 || y >= 5) return;
   set_level(y * 10 + x);
 }
 

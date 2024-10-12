@@ -148,3 +148,14 @@ void sr::set_updater(hai::fn<void, quack::instance *&> u) {
   if (g_buffer) g_buffer->run_once();
   if (g_map) g_map->run_once();
 }
+
+dotz::vec2 sr::mouse_pos() {
+  auto lw = sl::level_width;
+  auto lh = sl::level_height;
+
+  quack::upc rpc {};
+  rpc.grid_size = { lw, lh };
+  rpc.grid_pos = rpc.grid_size / 2.0;
+
+  return quack::mouse_pos(rpc);
+}
