@@ -7,9 +7,6 @@ export namespace spr {
 constexpr const unsigned cols = 1 << 4;
 constexpr const unsigned rows = 1 << 2;
 
-constexpr const auto w = 1.0f / static_cast<float>(cols);
-constexpr const auto h = 1.0f / static_cast<float>(rows);
-
 enum blocks : char {
   player = 'P',
   player_target = 'p',
@@ -23,6 +20,9 @@ enum blocks : char {
 } // namespace spr
 
 namespace spr {
+constexpr const auto w = 1.0f / static_cast<float>(cols);
+constexpr const auto h = 1.0f / static_cast<float>(rows);
+
 enum atlas_sprites { sprite_empty, sprite_player, sprite_box, sprite_target };
 static constexpr auto uv(atlas_sprites s) {
   const auto n = static_cast<unsigned>(s);
