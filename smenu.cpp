@@ -4,11 +4,13 @@ import sprites;
 
 static unsigned g_sel {};
 
-static void update_data(quack::instance *& all) {
-  static constexpr const float w = 5.0f;
-  static constexpr const float h = 2.0f;
+static constexpr const float w = 5.0f;
+static constexpr const float h = 2.0f;
+static constexpr const dotz::vec2 half_sz { w, h };
 
-  dotz::vec2 rp { sl::level_width * 0.5f - w, sl::level_height * 0.5f - h };
+static void update_data(quack::instance *& all) {
+  dotz::vec2 rp { sl::level_width, sl::level_height };
+  rp = rp * 0.5f - half_sz;
   auto rr = rp.x + w * 2.0f;
 
   float sy = static_cast<float>(g_sel) - 1.5f;
@@ -61,6 +63,20 @@ static void sel_activate() {
   }
 }
 
+static void mouse_move() {
+  auto p = sr::mouse_pos();
+
+  dotz::vec2 rp { sl::level_width, sl::level_height };
+  p = p - (rp * 0.5 - half_sz);
+
+  if (p.x < -3 || p.x > w * 2.0 + 3) return;
+
+  int y = dotz::floor((p.y + 0.9f) / 1.5f);
+  if (y < 0 || y > 3) return;
+  g_sel = y;
+  sokoban::renderer::set_updater(update_data);
+}
+
 void open_menu() {
   using namespace casein;
   reset_g(GESTURE);
@@ -70,6 +86,8 @@ void open_menu() {
   handle(KEY_DOWN, K_UP, &sel_up);
   handle(KEY_DOWN, K_DOWN, &sel_down);
   handle(KEY_DOWN, K_ENTER, &sel_activate);
+
+  handle(MOUSE_MOVE, mouse_move);
 
   g_sel = 0;
   sokoban::renderer::set_updater(update_data);
