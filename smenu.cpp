@@ -63,18 +63,25 @@ static void sel_activate() {
   }
 }
 
-static void mouse_move() {
+static auto mouse_sel() {
   auto p = sr::mouse_pos();
 
   dotz::vec2 rp { sl::level_width, sl::level_height };
   p = p - (rp * 0.5 - half_sz);
 
-  if (p.x < -3 || p.x > w * 2.0 + 3) return;
+  if (p.x < -3 || p.x > w * 2.0 + 3) return -1;
 
   int y = dotz::floor((p.y + 0.4f) / 1.5f);
-  if (y < 0 || y > 3) return;
-  g_sel = y;
+  if (y < 0 || y > 3) return -1;
+  return y;
+}
+static void mouse_move() {
+  auto y = mouse_sel();
+  if (y >= 0) g_sel = y;
   sokoban::renderer::set_updater(update_data);
+}
+static void mouse_up() {
+  if (mouse_sel() == g_sel) sel_activate();
 }
 
 void open_menu() {
@@ -88,9 +95,11 @@ void open_menu() {
   handle(KEY_DOWN, K_ENTER, &sel_activate);
 
   handle(MOUSE_MOVE, mouse_move);
+  handle(MOUSE_UP, mouse_up);
+
   handle(TOUCH_MOVE, mouse_move);
   handle(TOUCH_DOWN, mouse_move);
-  handle(TOUCH_UP, mouse_move);
+  handle(TOUCH_UP, mouse_up);
 
   g_sel = 0;
   sokoban::renderer::set_updater(update_data);
