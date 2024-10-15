@@ -51,6 +51,16 @@ namespace {
     }
   }
 
+  static quack::upc pc() {
+    auto lw = sl::level_width;
+    auto lh = sl::level_height;
+
+    quack::upc rpc {};
+    rpc.grid_size = { lw, lh };
+    rpc.grid_pos = rpc.grid_size / 2.0;
+    return rpc;
+  }
+
 struct main : voo::casein_thread {
   void run() override {
     voo::device_and_queue dq { "sokoban" };
@@ -77,9 +87,7 @@ struct main : voo::casein_thread {
     vee::update_descriptor_set(dset, 0, map.data().iv(), *n_smp);
     vee::update_descriptor_set(dset, 1, a.data().iv(), *l_smp);
 
-    quack::upc rpc{};
-    rpc.grid_size = {sl::level_width, sl::level_height};
-    rpc.grid_pos = rpc.grid_size / 2.0;
+    auto rpc = pc();
 
     sitime::stopwatch t {};
 
@@ -150,12 +158,6 @@ void sr::set_updater(hai::fn<void, quack::instance *&> u) {
 }
 
 dotz::vec2 sr::mouse_pos() {
-  auto lw = sl::level_width;
-  auto lh = sl::level_height;
-
-  quack::upc rpc {};
-  rpc.grid_size = { lw, lh };
-  rpc.grid_pos = rpc.grid_size / 2.0;
-
+  auto rpc = pc();
   return quack::mouse_pos(rpc);
 }
