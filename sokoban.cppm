@@ -29,6 +29,18 @@ bool is_audio_enabled();
 void enable_audio(bool);
 void play_tone(unsigned);
 
+void reset_casein() {
+  using namespace casein;
+  reset_k(KEY_DOWN);
+  reset_g(GESTURE);
+  reset(MOUSE_DOWN);
+  reset(MOUSE_UP);
+  reset(MOUSE_MOVE);
+  reset(TOUCH_DOWN);
+  reset(TOUCH_UP);
+  reset(TOUCH_MOVE);
+}
+
 struct init {
   init() {
     casein::window_title = "Warehouse Game";

@@ -50,8 +50,7 @@ void open_level_select() {
   max_level = save::read().max_level;
 
   using namespace casein;
-  reset_g(GESTURE);
-  reset_k(KEY_DOWN);
+  reset_casein();
 
   handle(KEY_DOWN, K_ESCAPE, open_menu);
   handle(KEY_DOWN, K_ENTER, open_menu);

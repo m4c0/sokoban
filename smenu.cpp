@@ -86,8 +86,7 @@ static void mouse_up() {
 
 void open_menu() {
   using namespace casein;
-  reset_g(GESTURE);
-  reset_k(KEY_DOWN);
+  reset_casein();
 
   handle(KEY_DOWN, K_ESCAPE, &setup_game);
   handle(KEY_DOWN, K_UP, &sel_up);

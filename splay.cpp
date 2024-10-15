@@ -94,6 +94,8 @@ static void right() { move(1); }
 
 void setup_game() {
   using namespace casein;
+  reset_casein();
+
   handle(GESTURE, G_SWIPE_UP, &up);
   handle(GESTURE, G_SWIPE_DOWN, &down);
   handle(GESTURE, G_SWIPE_LEFT, &left);
