@@ -89,6 +89,8 @@ void open_menu() {
 
   handle(MOUSE_MOVE, mouse_move);
   handle(TOUCH_MOVE, mouse_move);
+  handle(TOUCH_DOWN, mouse_move);
+  handle(TOUCH_UP, mouse_move);
 
   g_sel = 0;
   sokoban::renderer::set_updater(update_data);

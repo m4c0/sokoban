@@ -63,6 +63,8 @@ void open_level_select() {
 
   handle(MOUSE_MOVE, mouse_move);
   handle(TOUCH_MOVE, mouse_move);
+  handle(TOUCH_DOWN, mouse_move);
+  handle(TOUCH_UP, mouse_move);
 
   sokoban::renderer::set_updater(update_data);
 }
