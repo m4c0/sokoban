@@ -4,11 +4,11 @@ import sprites;
 static unsigned max_level;
 
 static void update_data(quack::instance *& all) {
-  static constexpr const float w = 8.0f;
-  static constexpr const float h = 4.5f;
+  static constexpr const float w = 10.0f;
+  static constexpr const float h = 6.0f;
 
-  auto sx = 1.5f * ((sl::current_level() % 10) - 5.0f + 0.5f);
-  auto sy = 1.5f * ((sl::current_level() / 10) - 3.0f + 0.5f);
+  auto sx = 1.5f * ((sl::current_level() % 10) - 5.0f + 0.5f) / 0.8f;
+  auto sy = 1.5f * ((sl::current_level() / 10) - 3.0f + 0.5f) / 0.8f;
   sr::update_data(all, { w, h }, { sx, sy, 0.8f, 0.6f });
 
   for (auto i = 0; i <= max_level; i++) {
