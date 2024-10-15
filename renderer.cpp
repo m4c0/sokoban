@@ -52,12 +52,11 @@ namespace {
   }
 
   static quack::upc pc() {
-    auto lw = sl::level_width;
-    auto lh = sl::level_height;
+    dotz::vec2 l { sl::level_width, sl::level_height };
 
     quack::upc rpc {};
-    rpc.grid_size = { lw, lh };
-    rpc.grid_pos = rpc.grid_size / 2.0;
+    rpc.grid_size = l * 0.8;
+    rpc.grid_pos = l / 2.0;
     return rpc;
   }
 
