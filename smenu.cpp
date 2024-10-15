@@ -4,8 +4,8 @@ import sprites;
 
 static unsigned g_sel {};
 
-static constexpr const float w = 5.0f;
-static constexpr const float h = 2.0f;
+static constexpr const float w = 6.0f;
+static constexpr const float h = 2.5f;
 static constexpr const dotz::vec2 half_sz { w, h };
 
 static void update_data(quack::instance *& all) {
@@ -13,14 +13,14 @@ static void update_data(quack::instance *& all) {
   rp = rp * 0.5f - half_sz;
   auto rr = rp.x + w * 2.0f;
 
-  float sy = static_cast<float>(g_sel) - 1.5f;
+  float sy = static_cast<float>(g_sel) / 0.8f - 1.5f / 0.8f;
   sr::update_data(all, { w, h }, { 0.0f, sy, w, 0.5f });
 
   auto au = is_audio_enabled();
   auto fs = casein::fullscreen;
 
   rp.x -= 0.5;
-  rp.y -= 0.7;
+  rp.y -= 0.2;
   spr::blit::level(all, rp.x, rp.y);
   spr::blit::number(all, sl::current_level() + 1, rr, rp.y);
   spr::blit::sound(all, rp.x, rp.y + 1.5f);
@@ -71,7 +71,7 @@ static void mouse_move() {
 
   if (p.x < -3 || p.x > w * 2.0 + 3) return;
 
-  int y = dotz::floor((p.y + 0.9f) / 1.5f);
+  int y = dotz::floor((p.y + 0.4f) / 1.5f);
   if (y < 0 || y > 3) return;
   g_sel = y;
   sokoban::renderer::set_updater(update_data);
