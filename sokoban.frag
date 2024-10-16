@@ -252,6 +252,16 @@ vec3 back_btn(vec3 f) {
   return mix(f, c, a);
 }
 
+vec3 menu_btn(vec3 f) {
+  float d = sd_box(q_pos - vec2(pc.aspect - 0.1, -0.9), vec2(0.1));
+
+  vec3 c = vec3(1.0);
+
+  float a = 1.0 - step(0, d);
+
+  return mix(f, c, a);
+}
+
 void main() {
   aw = clamp(16 - pc.label_pos.y, 8, 12);
   aww = aw * 2;
@@ -279,6 +289,7 @@ void main() {
   f = menu(f);
   f = selection(f);
   f = back_btn(f);
+  f = menu_btn(f);
 
   frag_color = vec4(f, 1);
 }
