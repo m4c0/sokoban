@@ -144,12 +144,14 @@ static auto find_label_y() {
   return 0;
 }
 
-void sr::update_data(quack::instance *& all, dotz::vec2 menu_sz, dotz::vec4 sel) {
+void sr::update_data(quack::instance *& all, dotz::vec2 menu_sz, dotz::vec4 sel, bool back_btn, bool menu_btn) {
   float draw_y = find_label_y();
   float draw_x = find_label_x();
   g_pc.label_pos = { draw_x, draw_y };
   g_pc.menu_size = menu_sz;
   g_pc.sel_rect = sel;
+  g_pc.back_btn_dim = back_btn;
+  g_pc.menu_btn_dim = menu_btn;
 }
 
 void sr::set_updater(hai::fn<void, quack::instance *&> u) {

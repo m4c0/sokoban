@@ -14,7 +14,7 @@ static void update_data(quack::instance *& all) {
   auto rr = rp.x + w * 2.0f;
 
   float sy = static_cast<float>(g_sel) / 0.8f - 1.5f / 0.8f;
-  sr::update_data(all, { w, h }, { 0.0f, sy, w, 0.5f });
+  sr::update_data(all, { w, h }, { 0.0f, sy, w, 0.5f }, true, false);
 
   auto au = is_audio_enabled();
   auto fs = casein::fullscreen;

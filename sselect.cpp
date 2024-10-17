@@ -9,7 +9,7 @@ static void update_data(quack::instance *& all) {
 
   auto sx = 1.5f * ((sl::current_level() % 10) - 5.0f + 0.5f) / 0.8f;
   auto sy = 1.5f * ((sl::current_level() / 10) - 3.0f + 0.5f) / 0.8f;
-  sr::update_data(all, { w, h }, { sx, sy, 0.8f, 0.6f });
+  sr::update_data(all, { w, h }, { sx, sy, 0.8f, 0.6f }, true, false);
 
   for (auto i = 0; i <= max_level; i++) {
     float x = 6.0f + (i % 10) * 2.24f;
