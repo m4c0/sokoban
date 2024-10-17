@@ -269,8 +269,12 @@ vec3 back_btn(vec3 f) {
 vec3 menu_btn(vec3 f) {
   vec2 center = vec2(pc.aspect - 0.1, -0.9);
   float dc = sd_circle(q_pos - center, 0.03);
-  float d = dc;
-  return btn(f, d);
+
+  float gr = 0.1;
+  float dg = sd_circle(q_pos - center, gr);
+
+  vec3 res = btn(f, dc);
+  return btn(res, dg);
 }
 
 void main() {
