@@ -31,6 +31,13 @@ float sd_rnd_box(vec2 p, vec2 b, float r) {
   return sd_box(p, b) - r;
 }
 
+float sd_line(vec2 p, vec2 a, vec2 b) {
+  vec2 pa = p - a;
+  vec2 ba = b - a;
+  float h = clamp(dot(pa, ba) / dot(ba, ba), 0.0, 1.0);
+  return length(pa - ba * h);
+}
+
 float sd_cut_dist(vec2 p, float r, float h) {
   float w = sqrt(r * r - h * h);
   p.x = abs(p.x);
@@ -243,11 +250,15 @@ vec3 selection(vec3 f) {
 }
 
 vec3 back_btn(vec3 f) {
-  float d = sd_box(q_pos + vec2(pc.aspect - 0.1, 0.9), vec2(0.1));
+  vec2 center = -vec2(pc.aspect - 0.1, 0.9);
+  float d0 = sd_line(q_pos, center - vec2(0.05, 0), center + vec2(0.05, -0.1));
+  float d1 = sd_line(q_pos, center - vec2(0.05, 0), center + vec2(0.05, +0.1));
+  float d = min(d0, d1);
 
   vec3 c = vec3(1.0);
 
-  float a = 1.0 - step(0, d);
+  float a = 0.01 / abs(d);
+  a = smoothstep(0.1, 1.0, a);
 
   return mix(f, c, a);
 }
