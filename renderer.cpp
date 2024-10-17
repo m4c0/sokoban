@@ -28,6 +28,7 @@ namespace {
     float time;
     float back_btn_dim;
     float menu_btn_dim;
+    float btn_selected;
   };
   struct map_t {
     uint8_t type;
