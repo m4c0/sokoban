@@ -252,14 +252,14 @@ vec3 selection(vec3 f) {
 vec3 btn(vec3 f, float d) {
   vec3 c = vec3(1.0);
 
-  float a = 0.003 / abs(d);
+  float a = 0.002 / abs(d);
   a = smoothstep(0.1, 1.0, a);
 
   return mix(f, c, a);
 }
 
 vec3 back_btn(vec3 f) {
-  vec2 center = -vec2(pc.aspect - 0.1, 0.9);
+  vec2 center = -vec2(pc.aspect - 0.2, 0.8);
   float d0 = sd_line(q_pos, center - vec2(0.05, 0), center + vec2(0.05, -0.1));
   float d1 = sd_line(q_pos, center - vec2(0.05, 0), center + vec2(0.05, +0.1));
   float d = min(d0, d1);
@@ -267,7 +267,7 @@ vec3 back_btn(vec3 f) {
 }
 
 vec3 menu_btn(vec3 f) {
-  vec2 center = vec2(pc.aspect - 0.1, -0.9);
+  vec2 center = vec2(pc.aspect - 0.2, -0.8);
   float dc = sd_circle(q_pos - center, 0.03);
 
   vec2 p = q_pos - center;
