@@ -252,7 +252,7 @@ vec3 selection(vec3 f) {
 vec3 btn(vec3 f, float d) {
   vec3 c = vec3(1.0);
 
-  float a = 0.005 / abs(d);
+  float a = 0.003 / abs(d);
   a = smoothstep(0.1, 1.0, a);
 
   return mix(f, c, a);
@@ -270,8 +270,10 @@ vec3 menu_btn(vec3 f) {
   vec2 center = vec2(pc.aspect - 0.1, -0.9);
   float dc = sd_circle(q_pos - center, 0.03);
 
-  float gr = 0.1;
-  float dg = sd_circle(q_pos - center, gr);
+  vec2 p = q_pos - center;
+  float angle = atan(p.y / p.x);
+  float gr = smoothstep(-0.6, 0.6, sin(angle * 8)) * 0.02 + 0.08;
+  float dg = sd_circle(p, gr);
 
   vec3 res = btn(f, dc);
   return btn(res, dg);
