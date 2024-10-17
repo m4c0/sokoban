@@ -249,28 +249,28 @@ vec3 selection(vec3 f) {
   return mix(f, c, a);
 }
 
-vec3 back_btn(vec3 f) {
-  vec2 center = -vec2(pc.aspect - 0.1, 0.9);
-  float d0 = sd_line(q_pos, center - vec2(0.05, 0), center + vec2(0.05, -0.1));
-  float d1 = sd_line(q_pos, center - vec2(0.05, 0), center + vec2(0.05, +0.1));
-  float d = min(d0, d1);
-
+vec3 btn(vec3 f, float d) {
   vec3 c = vec3(1.0);
 
-  float a = 0.01 / abs(d);
+  float a = 0.005 / abs(d);
   a = smoothstep(0.1, 1.0, a);
 
   return mix(f, c, a);
 }
 
+vec3 back_btn(vec3 f) {
+  vec2 center = -vec2(pc.aspect - 0.1, 0.9);
+  float d0 = sd_line(q_pos, center - vec2(0.05, 0), center + vec2(0.05, -0.1));
+  float d1 = sd_line(q_pos, center - vec2(0.05, 0), center + vec2(0.05, +0.1));
+  float d = min(d0, d1);
+  return btn(f, d);
+}
+
 vec3 menu_btn(vec3 f) {
-  float d = sd_box(q_pos - vec2(pc.aspect - 0.1, -0.9), vec2(0.1));
-
-  vec3 c = vec3(1.0);
-
-  float a = 1.0 - step(0, d);
-
-  return mix(f, c, a);
+  vec2 center = vec2(pc.aspect - 0.1, -0.9);
+  float dc = sd_circle(q_pos - center, 0.03);
+  float d = dc;
+  return btn(f, d);
 }
 
 void main() {
