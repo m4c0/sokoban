@@ -10,6 +10,8 @@ layout(push_constant) uniform upc {
   float level;
   float aspect;
   float time;
+  float back_btn_dim;
+  float menu_btn_dim;
 } pc;
 
 layout(set = 0, binding = 0) uniform usampler2D u_map;
@@ -249,13 +251,13 @@ vec3 selection(vec3 f) {
   return mix(f, c, a);
 }
 
-vec3 btn(vec3 f, float d) {
+vec3 btn(vec3 f, float d, float dim) {
   vec3 c = vec3(1.0);
 
   float a = 0.002 / abs(d);
   a = smoothstep(0.1, 1.0, a);
 
-  return mix(f, c, a);
+  return mix(f, c, a * dim);
 }
 
 vec3 back_btn(vec3 f) {
@@ -263,7 +265,7 @@ vec3 back_btn(vec3 f) {
   float d0 = sd_line(q_pos, center - vec2(0.05, 0), center + vec2(0.05, -0.1));
   float d1 = sd_line(q_pos, center - vec2(0.05, 0), center + vec2(0.05, +0.1));
   float d = min(d0, d1);
-  return btn(f, d);
+  return btn(f, d, pc.back_btn_dim);
 }
 
 vec3 menu_btn(vec3 f) {
@@ -275,8 +277,8 @@ vec3 menu_btn(vec3 f) {
   float gr = smoothstep(-0.6, 0.6, sin(angle * 8)) * 0.02 + 0.08;
   float dg = sd_circle(p, gr);
 
-  vec3 res = btn(f, dc);
-  return btn(res, dg);
+  vec3 res = btn(f, dc, pc.menu_btn_dim);
+  return btn(res, dg, pc.menu_btn_dim);
 }
 
 void main() {

@@ -8,6 +8,8 @@ layout(push_constant) uniform upc {
   float level;
   float aspect;
   float time;
+  float back_btn_dim;
+  float menu_btn_dim;
 } pc;
 
 layout(location = 0) in vec2 pos;
