@@ -96,10 +96,8 @@ static void right() { move(1); }
 
 static void mouse_move() {
   auto p = casein::mouse_pos / casein::window_size;
-  auto asp = casein::window_size.x / casein::window_size.y;
-
-  if (p.y > 0.2) return;
-  g_btn_over = p.x > 0.8 * asp;
+  // TODO: fix this math. This only works "normal" aspects, like 4:3 or 16:9
+  g_btn_over = p.x > 0.9 && p.y < 0.2 && p.x < 1.0 && p.y > 0.0;
   update_data();
 }
 
