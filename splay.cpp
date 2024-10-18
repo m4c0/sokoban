@@ -3,13 +3,13 @@ import buoy;
 
 enum move_type { push, walk, none, push2tgt };
 
-static void update_data(quack::instance *& all) {
-  sr::update_data(all);
+static void update_data() {
+  sr::set_updater(sr::update_data);
 }
 
 static void set_level(unsigned idx) {
   sl::load_level(idx);
-  sr::set_updater(update_data);
+  update_data();
 
   auto max = save::read().max_level;
   if (idx > max) max = idx;
@@ -82,7 +82,7 @@ static void move(unsigned p) {
     sg::player_pos += p;
     break;
   }
-  sr::set_updater(update_data);;
+  update_data();
 }
 
 static void reset_level() { set_level(sl::current_level()); }
@@ -91,6 +91,9 @@ static void down() { move(sl::level_width); }
 static void up() { move(-sl::level_width); }
 static void left() { move(-1); }
 static void right() { move(1); }
+
+static void mouse_move() {
+}
 
 void setup_game() {
   using namespace casein;
@@ -125,5 +128,7 @@ void setup_game() {
   handle(GESTURE, G_SWIPE_LEFT, &left);
   handle(GESTURE, G_SWIPE_RIGHT, &right);
 
-  sr::set_updater(update_data);
+  handle(MOUSE_MOVE, mouse_move);
+  
+  update_data();
 }
