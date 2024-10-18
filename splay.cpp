@@ -3,6 +3,8 @@ import buoy;
 
 enum move_type { push, walk, none, push2tgt };
 
+static bool g_btn_over {};
+
 static void update_data() {
   sr::set_updater(sr::update_data);
 }
@@ -93,6 +95,12 @@ static void left() { move(-1); }
 static void right() { move(1); }
 
 static void mouse_move() {
+  auto p = casein::mouse_pos / casein::window_size;
+  auto asp = casein::window_size.x / casein::window_size.y;
+
+  if (p.y > 0.2) return;
+  g_btn_over = p.x > 0.8 * asp;
+  update_data();
 }
 
 void setup_game() {
