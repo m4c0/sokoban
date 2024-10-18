@@ -45,6 +45,11 @@ static void mouse_move() {
   if (x < 0 || x >= 10 || y < 0 || y >= 5) return;
   set_level(y * 10 + x);
 }
+static void mouse_up() {
+  auto p = casein::mouse_pos / casein::window_size;
+  // TODO: fix this math. This only works "normal" aspects, like 4:3 or 16:9
+  if (p.x > 0.0 && p.y < 0.2 && p.x < 0.1 && p.y > 0.0) return open_menu();
+}
 
 void open_level_select() {
   max_level = save::read().max_level;
@@ -64,6 +69,8 @@ void open_level_select() {
   handle(TOUCH_MOVE, mouse_move);
   handle(TOUCH_DOWN, mouse_move);
   handle(TOUCH_UP, mouse_move);
+
+  handle(GESTURE, G_TAP_1, mouse_up);
 
   sokoban::renderer::set_updater(update_data);
 }
