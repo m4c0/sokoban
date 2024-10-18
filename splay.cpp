@@ -94,11 +94,17 @@ static void up() { move(-sl::level_width); }
 static void left() { move(-1); }
 static void right() { move(1); }
 
-static void mouse_move() {
+static bool mouse_over() {
   auto p = casein::mouse_pos / casein::window_size;
   // TODO: fix this math. This only works "normal" aspects, like 4:3 or 16:9
-  g_btn_over = p.x > 0.9 && p.y < 0.2 && p.x < 1.0 && p.y > 0.0;
+  return p.x > 0.9 && p.y < 0.2 && p.x < 1.0 && p.y > 0.0;
+}
+static void mouse_move() {
+  g_btn_over = mouse_over();
   update_data();
+}
+static void mouse_up() {
+  if (mouse_over()) open_menu();
 }
 
 void setup_game() {
@@ -109,7 +115,7 @@ void setup_game() {
   handle(GESTURE, G_SWIPE_DOWN, &down);
   handle(GESTURE, G_SWIPE_LEFT, &left);
   handle(GESTURE, G_SWIPE_RIGHT, &right);
-  handle(GESTURE, G_SHAKE, &reset_level);
+  // handle(GESTURE, G_SHAKE, &reset_level);
 
   handle(KEY_DOWN, K_UP, &up);
   handle(KEY_DOWN, K_DOWN, &down);
@@ -135,6 +141,9 @@ void setup_game() {
   handle(GESTURE, G_SWIPE_RIGHT, &right);
 
   handle(MOUSE_MOVE, mouse_move);
+  handle(MOUSE_UP, mouse_up);
+  handle(TOUCH_MOVE, mouse_move);
+  handle(GESTURE, G_TAP_1, mouse_up);
   
   update_data();
 }
