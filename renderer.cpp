@@ -28,7 +28,6 @@ namespace {
     float time;
     float back_btn_dim;
     float menu_btn_dim;
-    float btn_selected;
   };
   struct map_t {
     uint8_t type;
@@ -145,7 +144,7 @@ static auto find_label_y() {
   return 0;
 }
 
-void sr::update_data(quack::instance *& all, dotz::vec2 menu_sz, dotz::vec4 sel, bool back_btn, bool menu_btn) {
+void sr::update_data(quack::instance *& all, dotz::vec2 menu_sz, dotz::vec4 sel, float back_btn, float menu_btn) {
   float draw_y = find_label_y();
   float draw_x = find_label_x();
   g_pc.label_pos = { draw_x, draw_y };

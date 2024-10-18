@@ -6,7 +6,7 @@ enum move_type { push, walk, none, push2tgt };
 static bool g_btn_over {};
 
 static void update_data() {
-  sr::set_updater([](quack::instance *& i) { sr::update_data(i, {}, {}, false, true); });
+  sr::set_updater([](quack::instance *& i) { sr::update_data(i, {}, {}, false, g_btn_over ? 2.0 : 1.0); });
 }
 
 static void set_level(unsigned idx) {

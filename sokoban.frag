@@ -12,7 +12,6 @@ layout(push_constant) uniform upc {
   float time;
   float back_btn_dim;
   float menu_btn_dim;
-  float btn_selected;
 } pc;
 
 layout(set = 0, binding = 0) uniform usampler2D u_map;
@@ -255,11 +254,11 @@ vec3 selection(vec3 f) {
 vec3 btn(vec3 f, float d, float dim) {
   vec3 c = vec3(1.0);
 
-  float s = mix(0.002, 0.004, pc.btn_selected);
+  float s = mix(0.002, 0.004, step(1.1, dim));
   float a = s / abs(d);
   a = smoothstep(0.1, 1.0, a);
 
-  return mix(f, c, a * dim);
+  return mix(f, c, a * step(0.1, dim));
 }
 
 vec3 back_btn(vec3 f) {
