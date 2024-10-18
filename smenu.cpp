@@ -81,6 +81,10 @@ static void mouse_move() {
   sokoban::renderer::set_updater(update_data);
 }
 static void mouse_up() {
+  auto p = casein::mouse_pos / casein::window_size;
+  // TODO: fix this math. This only works "normal" aspects, like 4:3 or 16:9
+  if (p.x > 0.0 && p.y < 0.2 && p.x < 0.1 && p.y > 0.0) return setup_game();
+
   if (mouse_sel() == g_sel) sel_activate();
 }
 
@@ -99,6 +103,8 @@ void open_menu() {
   handle(TOUCH_MOVE, mouse_move);
   handle(TOUCH_DOWN, mouse_move);
   handle(TOUCH_UP, mouse_up);
+
+  handle(GESTURE, G_TAP_1, mouse_up);
 
   g_sel = 0;
   sokoban::renderer::set_updater(update_data);
