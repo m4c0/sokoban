@@ -353,7 +353,7 @@ static void validate_level(quack::instance *& all) {
 
 static void refresh() {
   sr::set_updater([](quack::instance *& i) -> void {
-    sr::update_data(i);
+    sr::update_data(i, {}, {}, false, false);
     validate_level(i);
 
     g_cursor_blink = !g_cursor_blink;
