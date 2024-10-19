@@ -17,7 +17,6 @@ static void update_data(quack::instance *& all) {
   sr::update_data(all, { w, h }, { 0.0f, sy, w, 0.5f }, true, false);
 
   auto au = is_audio_enabled();
-  auto fs = casein::fullscreen;
 
   rp.x -= 0.5;
   rp.y -= 0.2;
@@ -25,8 +24,11 @@ static void update_data(quack::instance *& all) {
   spr::blit::number(all, sl::current_level() + 1, rr, rp.y);
   spr::blit::sound(all, rp.x, rp.y + 1.5f);
   spr::blit::boolean(all, au, rr - 1.0, rp.y + 1.5f);
+#ifndef LECO_TARGET_IOS
+  auto fs = casein::fullscreen;
   spr::blit::fullscreen(all, rp.x, rp.y + 3.0f);
   spr::blit::boolean(all, fs, rr - 1.0, rp.y + 3.0f);
+#endif
   spr::blit::restart(all, rp.x, rp.y + 4.5f);
 }
 
@@ -34,11 +36,13 @@ static void toggle_audio() {
   enable_audio(!is_audio_enabled());
   sokoban::renderer::set_updater(update_data);
 }
+#ifndef LECO_TARGET_IOS
 static void toggle_fullscreen() {
   casein::fullscreen = !casein::fullscreen;
   casein::interrupt(casein::IRQ_FULLSCREEN);
   sokoban::renderer::set_updater(update_data);
 }
+#endif
 
 static void restart_level() {
   sl::load_level(sl::current_level());
@@ -48,17 +52,25 @@ static void restart_level() {
 
 static void sel_down() {
   g_sel = (g_sel + 1) % 4;
+#ifdef LECO_TARGET_IOS
+  if (g_sel == 2) g_sel = 3;
+#endif
   sokoban::renderer::set_updater(update_data);
 }
 static void sel_up() {
   g_sel = (4 + g_sel - 1) % 4;
+#ifdef LECO_TARGET_IOS
+  if (g_sel == 2) g_sel = 1;
+#endif
   sokoban::renderer::set_updater(update_data);
 }
 static void sel_activate() {
   switch (g_sel) {
     case 0: open_level_select(); break;
     case 1: toggle_audio(); break;
+#ifndef LECO_TARGET_IOS
     case 2: toggle_fullscreen(); break;
+#endif
     case 3: restart_level(); break;
   }
 }
@@ -73,6 +85,9 @@ static auto mouse_sel() {
 
   int y = dotz::floor((p.y + 0.4f) / 1.5f);
   if (y < 0 || y > 3) return -1;
+#ifdef LECO_TARGET_IOS
+  if (y == 2) return-1;
+#endif
   return y;
 }
 static void mouse_move() {
