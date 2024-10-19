@@ -263,19 +263,19 @@ vec3 btn(vec3 f, float d, float dim) {
 
 vec3 back_btn(vec3 f) {
   vec2 center = -vec2(pc.aspect - 0.2, 0.8);
-  float d0 = sd_line(q_pos, center - vec2(0.05, 0), center + vec2(0.05, -0.1));
-  float d1 = sd_line(q_pos, center - vec2(0.05, 0), center + vec2(0.05, +0.1));
+  float d0 = sd_line(q_pos, center - vec2(0.03, 0), center + vec2(0.03, -0.05));
+  float d1 = sd_line(q_pos, center - vec2(0.03, 0), center + vec2(0.03, +0.05));
   float d = min(d0, d1);
   return btn(f, d, pc.back_btn_dim);
 }
 
 vec3 menu_btn(vec3 f) {
   vec2 center = vec2(pc.aspect - 0.2, -0.8);
-  float dc = sd_circle(q_pos - center, 0.03);
+  float dc = sd_circle(q_pos - center, 0.02);
 
   vec2 p = q_pos - center;
   float angle = atan(p.y / p.x);
-  float gr = smoothstep(-0.6, 0.6, sin(angle * 8)) * 0.02 + 0.08;
+  float gr = smoothstep(-0.6, 0.6, sin(angle * 8)) * 0.015 + 0.045;
   float dg = sd_circle(p, gr);
 
   vec3 res = btn(f, dc, pc.menu_btn_dim);
