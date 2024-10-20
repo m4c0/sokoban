@@ -1,5 +1,4 @@
 module sokoban;
-import buoy;
 
 enum move_type { push, walk, none, push2tgt };
 
