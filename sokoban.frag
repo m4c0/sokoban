@@ -256,7 +256,7 @@ vec3 selection(vec3 f) {
 }
 
 vec3 btn(vec3 f, float d, float dim) {
-  float x = smoothstep(0.015, 0.0, d) * dim;
+  float x = smoothstep(0.015, 0.0, d) * min(1.0, dim);
   f = mix(f, vec3(0.1, 0.7, 1.0), step(0.7, x));
   f = mix(f, vec3(0.0), smoothstep(0.3, 1.0, sin(x * 3.14 - 0.6)));
   return f;
