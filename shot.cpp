@@ -2,8 +2,12 @@
 #pragma leco app
 #endif
 
+#include <stdio.h>
+
 import casein;
 import game;
+import silog;
+import stubby;
 import vee;
 import voo;
 
@@ -21,6 +25,8 @@ static void set_level(int dl) {
 }
 
 static void render_at(unsigned w, unsigned h) {
+  silog::log(silog::info, "render for %dx%d", w, h);
+
   vee::extent ext { w, h };
   auto pd = sr::g_dq->physical_device();
  
@@ -54,18 +60,33 @@ static void render_at(unsigned w, unsigned h) {
   auto cp = vee::create_command_pool(sr::g_dq->queue_family());
   auto cb = vee::allocate_primary_command_buffer(*cp);
 
-  voo::cmd_buf_one_time_submit pcb{cb};
-  vee::cmd_begin_render_pass({
-      .command_buffer = cb,
-      .render_pass = sr::g_dq->render_pass(),
-      .framebuffer = *fb,
-      .extent = ext,
-      .clear_color = {{0.01, 0.02, 0.05, 1.0}},
-      .use_secondary_cmd_buf = false,
-  });
+  {
+    voo::cmd_buf_one_time_submit pcb{cb};
+    vee::cmd_begin_render_pass({
+        .command_buffer = cb,
+        .render_pass = sr::g_dq->render_pass(),
+        .framebuffer = *fb,
+        .extent = ext,
+        .clear_color = {{0.01, 0.02, 0.05, 1.0}},
+        .use_secondary_cmd_buf = false,
+    });
+
+    vee::cmd_end_render_pass(cb);
+
+    vee::cmd_pipeline_barrier(cb, *t_img, vee::from_pipeline_to_host);
+    vee::cmd_copy_image_to_buffer(cb, ext, *t_img, *o_buf);
+  }
 
   sr::g_dq->queue()->queue_submit({ .command_buffer = cb });
   sr::g_dq->queue()->device_wait_idle();
+
+  char filename[1024];
+  snprintf(filename, 1024, "out/shot-%dx%d.jpg", ext.width, ext.height);
+
+  auto mem = vee::map_memory(*o_mem);
+  auto *data = static_cast<stbi::pixel *>(mem);
+  stbi::write_rgba_unsafe(filename, ext.width, ext.height, data);
+  vee::unmap_memory(*o_mem);
 }
 
 static void render_shots() {
