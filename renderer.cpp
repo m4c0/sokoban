@@ -65,6 +65,7 @@ namespace {
 struct main : voo::casein_thread {
   void run() override {
     voo::device_and_queue dq { "sokoban" };
+    sr::g_dq = &dq;
 
     quack::pipeline_stuff ps { dq, 2 };
     quack::buffer_updater u { &dq, sg::max_quads, &updater };
@@ -164,3 +165,5 @@ dotz::vec2 sr::mouse_pos() {
   auto rpc = pc();
   return quack::mouse_pos(rpc);
 }
+
+voo::device_and_queue * sr::g_dq;
