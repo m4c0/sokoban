@@ -10,6 +10,7 @@ import yoyo;
 import quack;
 import siaudio;
 import sprites;
+import vee;
 import voo;
 
 export namespace sokoban::levels {
@@ -27,6 +28,7 @@ inline unsigned level_quad_count() { return level_width * level_height; }
 
 export namespace sokoban::renderer {
   extern voo::device_and_queue * g_dq;
+  extern hai::fn<void, vee::command_buffer, vee::extent, float> g_render;
 void update_data(quack::instance *& i, dotz::vec2 menu_sz, dotz::vec4 sel, float back_btn, float menu_btn);
 void set_updater(hai::fn<void, quack::instance *&>);
 dotz::vec2 mouse_pos();

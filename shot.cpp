@@ -59,6 +59,7 @@ static void render_at(unsigned w, unsigned h) {
 
   auto cp = vee::create_command_pool(sr::g_dq->queue_family());
   auto cb = vee::allocate_primary_command_buffer(*cp);
+  auto aspect = static_cast<float>(w) / static_cast<float>(h);
 
   {
     voo::cmd_buf_one_time_submit pcb{cb};
@@ -70,7 +71,7 @@ static void render_at(unsigned w, unsigned h) {
         .clear_color = {{0.01, 0.02, 0.05, 1.0}},
         .use_secondary_cmd_buf = false,
     });
-
+    sr::g_render(cb, ext, aspect);
     vee::cmd_end_render_pass(cb);
 
     vee::cmd_pipeline_barrier(cb, *t_img, vee::from_pipeline_to_host);

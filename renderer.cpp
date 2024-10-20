@@ -93,21 +93,26 @@ struct main : voo::casein_thread {
 
     sitime::stopwatch t {};
 
+    sr::g_render = [&](auto cb, auto extent, auto aspect) {
+      g_pc.player_pos.x = sg::player_pos % sl::level_width;
+      g_pc.player_pos.y = sg::player_pos / sl::level_width;
+      g_pc.level = sl::current_level() + 1.0f;
+      g_pc.aspect = aspect;
+      g_pc.time = t.millis() / 1000.0f;
+
+      vee::cmd_bind_descriptor_set(cb, *pl, 0, dset);
+      vee::cmd_push_vert_frag_constants(cb, *pl, &g_pc);
+      oqr.run(cb, extent);
+    };
+
     while (!interrupted()) {
       voo::swapchain_and_stuff sw { dq };
 
       extent_loop(dq.queue(), sw, [&] {
         sw.queue_one_time_submit(dq.queue(), [&](auto pcb) {
-          g_pc.player_pos.x = sg::player_pos % sl::level_width;
-          g_pc.player_pos.y = sg::player_pos / sl::level_width;
-          g_pc.level = sl::current_level() + 1.0f;
-          g_pc.aspect = sw.aspect();
-          g_pc.time = t.millis() / 1000.0f;
-
           auto scb = sw.cmd_render_pass(pcb);
-          vee::cmd_bind_descriptor_set(*scb, *pl, 0, dset);
-          vee::cmd_push_vert_frag_constants(*scb, *pl, &g_pc);
-          oqr.run(*scb, sw.extent());
+          auto ext = sw.extent();
+          sr::g_render(*scb, ext, sw.aspect());
 
           quack::run(&ps, {
             .sw = &sw,
@@ -167,3 +172,4 @@ dotz::vec2 sr::mouse_pos() {
 }
 
 voo::device_and_queue * sr::g_dq;
+hai::fn<void, vee::command_buffer, vee::extent, float> sr::g_render;
