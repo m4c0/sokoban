@@ -266,7 +266,7 @@ vec3 back_btn(vec3 f) {
   vec2 center = -vec2(pc.aspect - 0.2, 0.8);
   float d0 = sd_line(q_pos, center - vec2(0.03, 0), center + vec2(0.03, -0.05));
   float d1 = sd_line(q_pos, center - vec2(0.03, 0), center + vec2(0.03, +0.05));
-  float d = min(d0, d1);
+  float d = min(d0, d1) - 0.005;
   return btn(f, d, pc.back_btn_dim);
 }
 
