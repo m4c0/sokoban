@@ -256,12 +256,10 @@ vec3 selection(vec3 f) {
 }
 
 vec3 btn(vec3 f, float d, float dim) {
-  vec3 c = vec3(1.0);
-
-  float a = 0.002 / abs(d);
-  a = smoothstep(0.1, 1.0, a);
-
-  return mix(f, c, a * step(0.1, dim));
+  float x = smoothstep(0.015, 0.0, d) * dim;
+  f = mix(f, vec3(0.1, 0.7, 1.0), step(0.7, x));
+  f = mix(f, vec3(0.0), smoothstep(0.3, 1.0, sin(x * 3.14 - 0.6)));
+  return f;
 }
 
 vec3 back_btn(vec3 f) {
