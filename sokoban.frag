@@ -50,6 +50,10 @@ float sd_cut_dist(vec2 p, float r, float h) {
          length(p - vec2(w, h));
 }
 
+float op_xor(float a, float b) {
+  return max(min(a, b), -max(a, b));
+}
+
 vec3 brick(vec2 p) {
   vec2 b = p * vec2(aw, aww);
   b.x += 0.5 * step(1.0, mod(b.y, 2));
@@ -277,8 +281,8 @@ vec3 menu_btn(vec3 f) {
   float gr = smoothstep(-0.6, 0.6, sin(angle * 8)) * 0.015 + 0.045;
   float dg = sd_circle(p, gr);
 
-  vec3 res = btn(f, dc, pc.menu_btn_dim);
-  return btn(res, dg, pc.menu_btn_dim);
+  float d = op_xor(dc, dg);
+  return btn(f, d, pc.menu_btn_dim);
 }
 
 void main() {
