@@ -91,8 +91,9 @@ static void render_at(unsigned w, unsigned h) {
 }
 
 static void render_shots() {
-  render_at(1024, 768);
-  render_at(800, 600);
+  render_at(2796, 1290);
+  render_at(2778, 1284);
+  render_at(2732, 2048);
 }
 
 struct init {
