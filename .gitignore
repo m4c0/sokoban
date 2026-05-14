@@ -1,3 +1,5 @@
-out
-build
-
+build-ios
+build-osx
+*.app
+*.dylib
+*.o
