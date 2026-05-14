@@ -57,11 +57,12 @@ static VkSurfaceKHR       vlk_surf;
 static unsigned           vlk_qf;
 static unsigned           vlk_swc_count;
 
-static VkBuffer              vlk_vbuf;
+static VkDeviceMemory vlk_atlas_mem;
+static VkImage        vlk_atlas_img;
+
 static VkDescriptorPool      vlk_dpool;
 static VkDescriptorSetLayout vlk_dsl;
 static VkDescriptorSet       vlk_dset;
-static VkDeviceMemory        vlk_vmem;
 static VkPipelineLayout      vlk_pl;
 static VkPipeline            vlk_ppl;
 static VkSampler             vlk_smp;
@@ -426,6 +427,47 @@ static int vlk_find_host_memory() {
   return host;
 }
 
+static void vlk_load_image() {
+  FILE * f = vlk_open("atlas.png");
+  assert(f);
+  assert(0 == fseek(f, 0, SEEK_END));
+  long sz = ftell(f);
+  assert(sz);
+  assert(0 == fseek(f, 0, SEEK_SET));
+
+  VkBufferCreateInfo buf_info = {
+    .sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
+    .size  = sz,
+    .usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+  };
+  VkBuffer buf;
+  _(vkCreateBuffer(vlk_dev, &buf_info, NULL, &buf));
+
+  VkMemoryAllocateInfo mem_info = {
+    .sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
+    .allocationSize = VBUF_SIZE,
+    .memoryTypeIndex = vlk_find_host_memory(),
+  };
+  VkDeviceMemory mem;
+  _(vkAllocateMemory(vlk_dev, &mem_info, NULL, &mem));
+  _(vkBindBufferMemory(vlk_dev, buf, mem, 0));
+
+  void * data;
+  _(vkMapMemory(vlk_dev, mem, 0, VK_WHOLE_SIZE, 0, &data));
+  assert(1 == fread(data, sz, 1, f));
+  fclose(f);
+
+  VkImageCreateInfo img_info = {
+    .sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
+  };
+  _(vkCreateImage(vlk_dev, &img_info, NULL, &vlk_atlas_img));
+
+  vkDeviceWaitIdle(vlk_dev);
+
+  vkDestroyBuffer(vlk_dev, buf, NULL);
+  vkFreeMemory(vlk_dev, mem, NULL);
+}
+
 void vlk_init() {
 #if !TARGET_OS_IPHONE
   _(volkInitialize());
@@ -444,20 +486,7 @@ void vlk_init() {
 
   vlk_create_swc();
 
-  VkBufferCreateInfo vbuf_info = {
-    .sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
-    .size = VBUF_SIZE,
-    .usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
-  };
-  _(vkCreateBuffer(vlk_dev, &vbuf_info, NULL, &vlk_vbuf));
-
-  VkMemoryAllocateInfo vmem_info = {
-    .sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
-    .allocationSize = VBUF_SIZE,
-    .memoryTypeIndex = vlk_find_host_memory(),
-  };
-  _(vkAllocateMemory(vlk_dev, &vmem_info, NULL, &vlk_vmem));
-  _(vkBindBufferMemory(vlk_dev, vlk_vbuf, vlk_vmem, 0));
+  vlk_load_image();
 
   VkDescriptorSetLayoutCreateInfo dsl_info = {
     .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
@@ -481,11 +510,8 @@ void vlk_init() {
     .maxSets = 1,
     .poolSizeCount = 1,
     .pPoolSizes = (VkDescriptorPoolSize[]) {{
-      .type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-      .descriptorCount = 1,
-    }, {
       .type = VK_DESCRIPTOR_TYPE_SAMPLER,
-      .descriptorCount = 1,
+      .descriptorCount = 2,
     }},
   };
   _(vkCreateDescriptorPool(vlk_dev, &dpool_info, NULL, &vlk_dpool));
@@ -677,13 +703,14 @@ void vlk_deinit() {
     vkDestroySemaphore(vlk_dev, vlk_sema_present[i], NULL);
   }
 
+  vkDestroyImage (vlk_dev, vlk_atlas_img, NULL);
+  vkFreeMemory   (vlk_dev, vlk_atlas_mem, NULL);
+
   vkDestroySampler             (vlk_dev, vlk_smp,   NULL);
-  vkDestroyBuffer              (vlk_dev, vlk_vbuf,  NULL);
   vkDestroyDescriptorSetLayout (vlk_dev, vlk_dsl,   NULL);
   vkDestroyDescriptorPool      (vlk_dev, vlk_dpool, NULL);
   vkDestroyPipeline            (vlk_dev, vlk_ppl,   NULL);
   vkDestroyPipelineLayout      (vlk_dev, vlk_pl,    NULL);
-  vkFreeMemory                 (vlk_dev, vlk_vmem,  NULL);
 
   vkDestroyCommandPool(vlk_dev, vlk_cpool, NULL);
   vkDestroyRenderPass(vlk_dev, vlk_rp, NULL);
