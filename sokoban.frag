@@ -201,7 +201,7 @@ vec4 atlas(vec2 p, vec2 sz, vec2 uv0, vec2 uv1) {
   float d = sd_box(pp, sz * 0.5);
 
   uv = mix(uv0, uv1, uv) / uv_sz;
-  return mix(texture(u_atlas, uv), vec4(0), step(0, d));
+  return mix(texture(u_atlas, uv).rrrr, vec4(0), step(0, d));
 }
 vec3 atlas_d(vec2 p, vec2 sz, vec2 uv0, vec2 uv1, vec3 f) {
   vec4 c = atlas(p, sz, uv0, uv1);

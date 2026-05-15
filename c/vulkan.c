@@ -61,6 +61,10 @@ static VkDeviceMemory vlk_atlas_mem;
 static VkImage        vlk_atlas_img;
 static VkImageView    vlk_atlas_iv;
 
+static VkDeviceMemory vlk_map_mem;
+static VkImage        vlk_map_img;
+static VkImageView    vlk_map_iv;
+
 static VkDescriptorPool      vlk_dpool;
 static VkDescriptorSetLayout vlk_dsl;
 static VkDescriptorSet       vlk_dset;
@@ -443,7 +447,47 @@ static VkDeviceMemory vlk_allocate_memory(VkDeviceSize sz, int idx) {
   return mem;
 }
 
-static void vlk_load_image() {
+static VkImage vlk_create_image(unsigned w, unsigned h, VkFormat fmt) {
+  VkImageCreateInfo img_info = {
+    .sType       = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
+    .imageType   = VK_IMAGE_TYPE_2D,
+    .extent      = (VkExtent3D) { w, h, 1 },
+    .usage       = VK_IMAGE_USAGE_SAMPLED_BIT,
+    .samples     = VK_SAMPLE_COUNT_1_BIT,
+    .format      = fmt,
+    .mipLevels   = 1,
+    .arrayLayers = 1,
+  };
+  VkImage img;
+  _(vkCreateImage(vlk_dev, &img_info, NULL, &img));
+  return img;
+}
+static VkDeviceMemory vlk_allocate_image_memory(VkImage img) {
+  VkMemoryRequirements req;
+  vkGetImageMemoryRequirements(vlk_dev, img, &req);
+
+  VkDeviceMemory mem = vlk_allocate_memory(req.size, vlk_find_local_memory());
+  _(vkBindImageMemory(vlk_dev, img, mem, 0));
+  return mem;
+}
+static VkImageView vlk_create_image_view(VkImage img, VkFormat fmt) {
+  VkImageViewCreateInfo iv_info = {
+    .sType        = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
+    .image        = img,
+    .format       = fmt,
+    .viewType     = VK_IMAGE_VIEW_TYPE_2D,
+    .subresourceRange = {
+      .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+      .levelCount = 1,
+      .layerCount = 1,
+    },
+  };
+  VkImageView iv;
+  _(vkCreateImageView(vlk_dev, &iv_info, NULL, &iv));
+  return iv;
+}
+
+static void vlk_load_atlas() {
   FILE * f = vlk_open("atlas", "png");
   assert(f);
   assert(0 == fseek(f, 0, SEEK_END));
@@ -467,41 +511,44 @@ static void vlk_load_image() {
   assert(1 == fread(data, sz, 1, f));
   fclose(f);
 
-  VkImageCreateInfo img_info = {
-    .sType       = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
-    .imageType   = VK_IMAGE_TYPE_2D,
-    .extent      = (VkExtent3D) { 512, 128, 1 },
-    .usage       = VK_IMAGE_USAGE_SAMPLED_BIT,
-    .samples     = VK_SAMPLE_COUNT_1_BIT,
-    .format      = VK_FORMAT_R8_UINT,
-    .mipLevels   = 1,
-    .arrayLayers = 1,
+  vlk_atlas_img = vlk_create_image(512, 128, VK_FORMAT_R8_UNORM);
+  vlk_atlas_mem = vlk_allocate_image_memory(vlk_atlas_img);
+  vlk_atlas_iv  = vlk_create_image_view(vlk_atlas_img, VK_FORMAT_R8_UNORM);
+
+  VkCommandBufferAllocateInfo info = {
+    .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
+    .commandPool = vlk_cpool,
+    .commandBufferCount = 1,
   };
-  _(vkCreateImage(vlk_dev, &img_info, NULL, &vlk_atlas_img));
+  VkCommandBuffer cb;
+  _(vkAllocateCommandBuffers(vlk_dev, &info, &cb));
 
-  VkMemoryRequirements req;
-  vkGetImageMemoryRequirements(vlk_dev, vlk_atlas_img, &req);
-
-  vlk_atlas_mem = vlk_allocate_memory(req.size, vlk_find_local_memory());
-  _(vkBindImageMemory(vlk_dev, vlk_atlas_img, vlk_atlas_mem, 0));
-
-  VkImageViewCreateInfo iv_info = {
-    .sType        = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
-    .image        = vlk_atlas_img,
-    .format       = VK_FORMAT_R8_UINT,
-    .viewType     = VK_IMAGE_VIEW_TYPE_2D,
-    .subresourceRange = {
-      .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
-      .levelCount = 1,
-      .layerCount = 1,
-    },
+  VkCommandBufferBeginInfo binfo = {
+    .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
   };
-  _(vkCreateImageView(vlk_dev, &iv_info, NULL, &vlk_atlas_iv));
+  vkBeginCommandBuffer(cb, &binfo);
+
+  // TODO: enqueue a copy
+
+  vkEndCommandBuffer(cb);
+
+  VkSubmitInfo submit = {
+    .sType              = VK_STRUCTURE_TYPE_SUBMIT_INFO,
+    .pCommandBuffers    = &cb,
+    .commandBufferCount = 1,
+  };
+  _(vkQueueSubmit(vlk_q, 1, &submit, NULL));
 
   vkDeviceWaitIdle(vlk_dev);
 
   vkDestroyBuffer(vlk_dev, buf, NULL);
   vkFreeMemory(vlk_dev, mem, NULL);
+}
+
+void vlk_create_map() {
+  vlk_map_img = vlk_create_image(32, 32, VK_FORMAT_R8G8B8A8_UINT);
+  vlk_map_mem = vlk_allocate_image_memory(vlk_map_img);
+  vlk_map_iv  = vlk_create_image_view(vlk_map_img, VK_FORMAT_R8G8B8A8_UINT);
 }
 
 void vlk_init() {
@@ -522,19 +569,20 @@ void vlk_init() {
 
   vlk_create_swc();
 
-  vlk_load_image();
+  vlk_load_atlas();
+  vlk_create_map();
 
   VkDescriptorSetLayoutCreateInfo dsl_info = {
     .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
     .bindingCount = 2,
     .pBindings = (VkDescriptorSetLayoutBinding[]) {{
       .binding = 0,
-      .descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,
+      .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
       .descriptorCount = 1,
       .stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
     }, {
       .binding = 1,
-      .descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,
+      .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
       .descriptorCount = 1,
       .stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
     }},
@@ -546,7 +594,7 @@ void vlk_init() {
     .maxSets = 1,
     .poolSizeCount = 1,
     .pPoolSizes = (VkDescriptorPoolSize[]) {{
-      .type = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,
+      .type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
       .descriptorCount = 2,
     }},
   };
@@ -569,22 +617,22 @@ void vlk_init() {
     .sType           = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
     .dstSet          = vlk_dset,
     .descriptorCount = 1,
-    .descriptorType  = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,
+    .descriptorType  = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
     .pImageInfo      = (VkDescriptorImageInfo[]) {{
       .sampler       = vlk_smp,
-      .imageView     = NULL,
-      .imageLayout   = VK_IMAGE_LAYOUT_GENERAL,
+      .imageView     = vlk_map_iv,
+      .imageLayout   = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
     }},
   }, {
     .sType           = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
     .dstSet          = vlk_dset,
     .dstBinding      = 1,
     .descriptorCount = 1,
-    .descriptorType  = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,
+    .descriptorType  = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
     .pImageInfo      = (VkDescriptorImageInfo[]) {{
       .sampler       = vlk_smp,
-      .imageView     = NULL,
-      .imageLayout   = VK_IMAGE_LAYOUT_GENERAL,
+      .imageView     = vlk_atlas_iv,
+      .imageLayout   = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
     }},
   }};
   vkUpdateDescriptorSets(vlk_dev, 2, wds, 0, NULL);
@@ -739,8 +787,13 @@ void vlk_deinit() {
     vkDestroySemaphore(vlk_dev, vlk_sema_present[i], NULL);
   }
 
-  vkDestroyImage (vlk_dev, vlk_atlas_img, NULL);
-  vkFreeMemory   (vlk_dev, vlk_atlas_mem, NULL);
+  vkDestroyImageView (vlk_dev, vlk_atlas_iv, NULL);
+  vkDestroyImage     (vlk_dev, vlk_atlas_img, NULL);
+  vkFreeMemory       (vlk_dev, vlk_atlas_mem, NULL);
+
+  vkDestroyImageView (vlk_dev, vlk_map_iv, NULL);
+  vkDestroyImage     (vlk_dev, vlk_map_img, NULL);
+  vkFreeMemory       (vlk_dev, vlk_map_mem, NULL);
 
   vkDestroySampler             (vlk_dev, vlk_smp,   NULL);
   vkDestroyDescriptorSetLayout (vlk_dev, vlk_dsl,   NULL);
