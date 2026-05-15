@@ -66,6 +66,9 @@ static VkDeviceMemory  vlk_map_mem;
 static VkImage         vlk_map_img;
 static VkImageView     vlk_map_iv;
 
+static VkBuffer        vlk_map_h_buf;
+static VkDeviceMemory  vlk_map_h_mem;
+
 static VkDescriptorPool      vlk_dpool;
 static VkDescriptorSetLayout vlk_dsl;
 static VkDescriptorSet       vlk_dset;
@@ -342,6 +345,87 @@ static void vlk_allocate_command_buffers(int count, VkCommandBuffer * cbs) {
   _(vkAllocateCommandBuffers(vlk_dev, &info, cbs));
 }
 
+static VkCommandBuffer vlk_record_buf2img(VkBuffer buf, VkImage img, int w, int h) {
+  VkCommandBuffer cb;
+  vlk_allocate_command_buffers(1, &cb);
+
+  VkCommandBufferBeginInfo binfo = {
+    .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
+    .flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT,
+  };
+  vkBeginCommandBuffer(cb, &binfo);
+
+  VkDependencyInfoKHR di = {
+    .sType                    = VK_STRUCTURE_TYPE_DEPENDENCY_INFO_KHR,
+    .bufferMemoryBarrierCount = 1,
+    .pBufferMemoryBarriers    = (VkBufferMemoryBarrier2KHR[]) {{
+      .sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER_2_KHR,
+      .srcStageMask  = VK_PIPELINE_STAGE_HOST_BIT,
+      .dstStageMask  = VK_PIPELINE_STAGE_TRANSFER_BIT,
+      .srcAccessMask = VK_ACCESS_HOST_WRITE_BIT,
+      .dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT,
+      .buffer        = buf,
+      .size          = VK_WHOLE_SIZE,
+    }},
+    .imageMemoryBarrierCount = 1,
+    .pImageMemoryBarriers    = (VkImageMemoryBarrier2KHR[]) {{
+      .sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2_KHR,
+      .srcStageMask     = VK_PIPELINE_STAGE_HOST_BIT,
+      .dstStageMask     = VK_PIPELINE_STAGE_TRANSFER_BIT,
+      .dstAccessMask    = VK_ACCESS_TRANSFER_WRITE_BIT,
+      .newLayout        = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+      .image            = img,
+      .subresourceRange = {
+        .aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
+        .levelCount     = 1,
+        .layerCount     = 1,
+      },
+    }},
+  };
+  vkCmdPipelineBarrier2KHR(cb, &di);
+
+  VkBufferImageCopy bic = {
+    .imageExtent = (VkExtent3D) { w, h, 1 },
+    .imageSubresource = {
+      .aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
+      .layerCount     = 1,
+    },
+  };
+  vkCmdCopyBufferToImage(cb, buf, img, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &bic);
+
+  di = (VkDependencyInfoKHR) {
+    .sType                   = VK_STRUCTURE_TYPE_DEPENDENCY_INFO_KHR,
+    .imageMemoryBarrierCount = 1,
+    .pImageMemoryBarriers    = (VkImageMemoryBarrier2KHR[]) {{
+      .sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2_KHR,
+      .srcStageMask     = VK_PIPELINE_STAGE_TRANSFER_BIT,
+      .dstStageMask     = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+      .srcAccessMask    = VK_ACCESS_TRANSFER_WRITE_BIT,
+      .dstAccessMask    = VK_ACCESS_SHADER_READ_BIT,
+      .oldLayout        = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+      .newLayout        = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+      .image            = img,
+      .subresourceRange = {
+        .aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
+        .levelCount     = 1,
+        .layerCount     = 1,
+      },
+    }},
+  };
+  vkCmdPipelineBarrier2KHR(cb, &di);
+
+  vkEndCommandBuffer(cb);
+
+  VkSubmitInfo submit = {
+    .sType              = VK_STRUCTURE_TYPE_SUBMIT_INFO,
+    .pCommandBuffers    = &cb,
+    .commandBufferCount = 1,
+  };
+  _(vkQueueSubmit(vlk_q, 1, &submit, NULL));
+
+  return cb;
+}
+
 static void vlk_record_cmdbuf(int i) {
   VkCommandBuffer cb = vlk_cb[i];
 
@@ -527,81 +611,7 @@ static void vlk_load_atlas() {
   vlk_atlas_mem = vlk_allocate_image_memory(vlk_atlas_img);
   vlk_atlas_iv  = vlk_create_image_view(vlk_atlas_img, VK_FORMAT_R8_UNORM);
 
-  VkCommandBuffer cb;
-  vlk_allocate_command_buffers(1, &cb);
-
-  VkCommandBufferBeginInfo binfo = {
-    .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
-  };
-  vkBeginCommandBuffer(cb, &binfo);
-
-  VkDependencyInfoKHR di = {
-    .sType                    = VK_STRUCTURE_TYPE_DEPENDENCY_INFO_KHR,
-    .bufferMemoryBarrierCount = 1,
-    .pBufferMemoryBarriers    = (VkBufferMemoryBarrier2KHR[]) {{
-      .sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER_2_KHR,
-      .srcStageMask  = VK_PIPELINE_STAGE_HOST_BIT,
-      .dstStageMask  = VK_PIPELINE_STAGE_TRANSFER_BIT,
-      .srcAccessMask = VK_ACCESS_HOST_WRITE_BIT,
-      .dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT,
-      .buffer        = buf,
-      .size          = VK_WHOLE_SIZE,
-    }},
-    .imageMemoryBarrierCount = 1,
-    .pImageMemoryBarriers    = (VkImageMemoryBarrier2KHR[]) {{
-      .sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2_KHR,
-      .srcStageMask     = VK_PIPELINE_STAGE_HOST_BIT,
-      .dstStageMask     = VK_PIPELINE_STAGE_TRANSFER_BIT,
-      .dstAccessMask    = VK_ACCESS_TRANSFER_WRITE_BIT,
-      .newLayout        = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-      .image            = vlk_atlas_img,
-      .subresourceRange = {
-        .aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
-        .levelCount     = 1,
-        .layerCount     = 1,
-      },
-    }},
-  };
-  vkCmdPipelineBarrier2KHR(cb, &di);
-
-  VkBufferImageCopy bic = {
-    .imageExtent = (VkExtent3D) { 512, 128, 1 },
-    .imageSubresource = {
-      .aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
-      .layerCount     = 1,
-    },
-  };
-  vkCmdCopyBufferToImage(cb, buf, vlk_atlas_img, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &bic);
-
-  di = (VkDependencyInfoKHR) {
-    .sType                   = VK_STRUCTURE_TYPE_DEPENDENCY_INFO_KHR,
-    .imageMemoryBarrierCount = 1,
-    .pImageMemoryBarriers    = (VkImageMemoryBarrier2KHR[]) {{
-      .sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2_KHR,
-      .srcStageMask     = VK_PIPELINE_STAGE_TRANSFER_BIT,
-      .dstStageMask     = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
-      .srcAccessMask    = VK_ACCESS_TRANSFER_WRITE_BIT,
-      .dstAccessMask    = VK_ACCESS_SHADER_READ_BIT,
-      .oldLayout        = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-      .newLayout        = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-      .image            = vlk_atlas_img,
-      .subresourceRange = {
-        .aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
-        .levelCount     = 1,
-        .layerCount     = 1,
-      },
-    }},
-  };
-  vkCmdPipelineBarrier2KHR(cb, &di);
-
-  vkEndCommandBuffer(cb);
-
-  VkSubmitInfo submit = {
-    .sType              = VK_STRUCTURE_TYPE_SUBMIT_INFO,
-    .pCommandBuffers    = &cb,
-    .commandBufferCount = 1,
-  };
-  _(vkQueueSubmit(vlk_q, 1, &submit, NULL));
+  vlk_record_buf2img(buf, vlk_atlas_img, 512, 128);
 
   vkDeviceWaitIdle(vlk_dev);
 
@@ -610,47 +620,15 @@ static void vlk_load_atlas() {
 }
 
 void vlk_create_map() {
-  vlk_map_img = vlk_create_image(32, 32, VK_FORMAT_R8G8B8A8_UINT, 0);
+  vlk_map_h_buf = vlk_create_buffer_for_image(32 * 32 * 4);
+  vlk_map_h_mem = vlk_allocate_memory(32 * 32 * 4, vlk_find_host_memory());
+  _(vkBindBufferMemory(vlk_dev, vlk_map_h_buf, vlk_map_h_mem, 0));
+
+  vlk_map_img = vlk_create_image(32, 32, VK_FORMAT_R8G8B8A8_UINT, VK_IMAGE_USAGE_TRANSFER_DST_BIT);
   vlk_map_mem = vlk_allocate_image_memory(vlk_map_img);
   vlk_map_iv  = vlk_create_image_view(vlk_map_img, VK_FORMAT_R8G8B8A8_UINT);
 
-  VkCommandBuffer cb;
-  vlk_allocate_command_buffers(1, &cb);
-
-  VkCommandBufferBeginInfo binfo = {
-    .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
-    .flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT,
-  };
-  vkBeginCommandBuffer(cb, &binfo);
-
-  VkDependencyInfoKHR di = {
-    .sType                   = VK_STRUCTURE_TYPE_DEPENDENCY_INFO_KHR,
-    .imageMemoryBarrierCount = 1,
-    .pImageMemoryBarriers    = (VkImageMemoryBarrier2[]) {{
-      .sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2_KHR,
-      .dstStageMask     = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
-      .dstAccessMask    = VK_ACCESS_SHADER_READ_BIT,
-      .newLayout        = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-      .image            = vlk_map_img,
-      .subresourceRange = {
-        .aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
-        .levelCount     = 1,
-        .layerCount     = 1,
-      },
-    }},
-  };
-  vkCmdPipelineBarrier2KHR(cb, &di);
-
-  vkEndCommandBuffer(cb);
-
-  VkSubmitInfo submit = {
-    .sType              = VK_STRUCTURE_TYPE_SUBMIT_INFO,
-    .pCommandBuffers    = &cb,
-    .commandBufferCount = 1,
-  };
-  _(vkQueueSubmit(vlk_q, 1, &submit, NULL));
-
-  vlk_map_cb = cb;
+  vlk_map_cb = vlk_record_buf2img(vlk_map_h_buf, vlk_map_img, 32, 32);
 }
 
 void vlk_init() {
@@ -897,6 +875,9 @@ void vlk_deinit() {
   vkDestroyImageView (vlk_dev, vlk_map_iv, NULL);
   vkDestroyImage     (vlk_dev, vlk_map_img, NULL);
   vkFreeMemory       (vlk_dev, vlk_map_mem, NULL);
+
+  vkDestroyBuffer (vlk_dev, vlk_map_h_buf, NULL);
+  vkFreeMemory    (vlk_dev, vlk_map_h_mem, NULL);
 
   vkDestroySampler             (vlk_dev, vlk_smp,   NULL);
   vkDestroyDescriptorSetLayout (vlk_dev, vlk_dsl,   NULL);
