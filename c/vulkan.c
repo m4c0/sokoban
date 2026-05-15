@@ -333,13 +333,13 @@ static void vlk_create_command_pool() {
   _(vkCreateCommandPool(vlk_dev, &info, NULL, &vlk_cpool));
 }
 
-static void vlk_create_command_buffer() {
+static void vlk_allocate_command_buffers(int count, VkCommandBuffer * cbs) {
   VkCommandBufferAllocateInfo info = {
     .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
     .commandPool = vlk_cpool,
-    .commandBufferCount = vlk_swc_count,
+    .commandBufferCount = count,
   };
-  _(vkAllocateCommandBuffers(vlk_dev, &info, vlk_cb));
+  _(vkAllocateCommandBuffers(vlk_dev, &info, cbs));
 }
 
 static void vlk_record_cmdbuf(int i) {
@@ -426,6 +426,17 @@ static VkShaderModule vlk_create_shader_module(const char * name) {
   return mod;
 }
 
+static VkBuffer vlk_create_buffer_for_image(unsigned sz) {
+  VkBufferCreateInfo buf_info = {
+    .sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
+    .size  = sz,
+    .usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+  };
+  VkBuffer buf;
+  _(vkCreateBuffer(vlk_dev, &buf_info, NULL, &buf));
+  return buf;
+}
+
 #define F(x, y) (((x) & (y)) == (y))
 static int vlk_find_memory(VkMemoryPropertyFlags desired) {
   VkPhysicalDeviceMemoryProperties props;
@@ -503,14 +514,7 @@ static void vlk_load_atlas() {
   assert(sz);
   assert(0 == fseek(f, 0, SEEK_SET));
 
-  VkBufferCreateInfo buf_info = {
-    .sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
-    .size  = sz,
-    .usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-  };
-  VkBuffer buf;
-  _(vkCreateBuffer(vlk_dev, &buf_info, NULL, &buf));
-
+  VkBuffer buf = vlk_create_buffer_for_image(sz);
   VkDeviceMemory mem = vlk_allocate_memory(sz, vlk_find_host_memory());
   _(vkBindBufferMemory(vlk_dev, buf, mem, 0));
 
@@ -523,13 +527,8 @@ static void vlk_load_atlas() {
   vlk_atlas_mem = vlk_allocate_image_memory(vlk_atlas_img);
   vlk_atlas_iv  = vlk_create_image_view(vlk_atlas_img, VK_FORMAT_R8_UNORM);
 
-  VkCommandBufferAllocateInfo info = {
-    .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
-    .commandPool = vlk_cpool,
-    .commandBufferCount = 1,
-  };
   VkCommandBuffer cb;
-  _(vkAllocateCommandBuffers(vlk_dev, &info, &cb));
+  vlk_allocate_command_buffers(1, &cb);
 
   VkCommandBufferBeginInfo binfo = {
     .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
@@ -615,13 +614,8 @@ void vlk_create_map() {
   vlk_map_mem = vlk_allocate_image_memory(vlk_map_img);
   vlk_map_iv  = vlk_create_image_view(vlk_map_img, VK_FORMAT_R8G8B8A8_UINT);
 
-  VkCommandBufferAllocateInfo info = {
-    .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
-    .commandPool = vlk_cpool,
-    .commandBufferCount = 1,
-  };
   VkCommandBuffer cb;
-  _(vkAllocateCommandBuffers(vlk_dev, &info, &cb));
+  vlk_allocate_command_buffers(1, &cb);
 
   VkCommandBufferBeginInfo binfo = {
     .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
@@ -669,11 +663,12 @@ void vlk_init() {
   vlk_create_surface();
   vlk_create_device();
   vlk_create_command_pool();
-  vlk_create_command_buffer();
   vlk_create_render_pass();
   vlk_create_swc();
   vlk_create_semaphores();
   vlk_create_fence();
+
+  vlk_allocate_command_buffers(vlk_swc_count, vlk_cb);
 
   vlk_create_swc();
 
