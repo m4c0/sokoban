@@ -450,8 +450,6 @@ static void vlk_load_image() {
   assert(sz);
   assert(0 == fseek(f, 0, SEEK_SET));
 
-  // TODO: take bits out of png - duh
-
   VkBufferCreateInfo buf_info = {
     .sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
     .size  = sz,
@@ -514,15 +512,15 @@ void vlk_init() {
 
   VkDescriptorSetLayoutCreateInfo dsl_info = {
     .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
-    .bindingCount = 1,
+    .bindingCount = 2,
     .pBindings = (VkDescriptorSetLayoutBinding[]) {{
       .binding = 0,
-      .descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+      .descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,
       .descriptorCount = 1,
       .stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
     }, {
       .binding = 1,
-      .descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+      .descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,
       .descriptorCount = 1,
       .stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
     }},
@@ -534,7 +532,7 @@ void vlk_init() {
     .maxSets = 1,
     .poolSizeCount = 1,
     .pPoolSizes = (VkDescriptorPoolSize[]) {{
-      .type = VK_DESCRIPTOR_TYPE_SAMPLER,
+      .type = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,
       .descriptorCount = 2,
     }},
   };
@@ -557,7 +555,7 @@ void vlk_init() {
     .sType           = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
     .dstSet          = vlk_dset,
     .descriptorCount = 1,
-    .descriptorType  = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+    .descriptorType  = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,
     .pImageInfo      = (VkDescriptorImageInfo[]) {{
       .sampler       = vlk_smp,
       .imageView     = NULL,
@@ -568,7 +566,7 @@ void vlk_init() {
     .dstSet          = vlk_dset,
     .dstBinding      = 1,
     .descriptorCount = 1,
-    .descriptorType  = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+    .descriptorType  = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,
     .pImageInfo      = (VkDescriptorImageInfo[]) {{
       .sampler       = vlk_smp,
       .imageView     = NULL,
