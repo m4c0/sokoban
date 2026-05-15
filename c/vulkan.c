@@ -61,9 +61,10 @@ static VkDeviceMemory vlk_atlas_mem;
 static VkImage        vlk_atlas_img;
 static VkImageView    vlk_atlas_iv;
 
-static VkDeviceMemory vlk_map_mem;
-static VkImage        vlk_map_img;
-static VkImageView    vlk_map_iv;
+static VkCommandBuffer vlk_map_cb;
+static VkDeviceMemory  vlk_map_mem;
+static VkImage         vlk_map_img;
+static VkImageView     vlk_map_iv;
 
 static VkDescriptorPool      vlk_dpool;
 static VkDescriptorSetLayout vlk_dsl;
@@ -624,6 +625,7 @@ void vlk_create_map() {
 
   VkCommandBufferBeginInfo binfo = {
     .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
+    .flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT,
   };
   vkBeginCommandBuffer(cb, &binfo);
 
@@ -653,6 +655,8 @@ void vlk_create_map() {
     .commandBufferCount = 1,
   };
   _(vkQueueSubmit(vlk_q, 1, &submit, NULL));
+
+  vlk_map_cb = cb;
 }
 
 void vlk_init() {
