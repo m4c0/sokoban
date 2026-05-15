@@ -690,7 +690,9 @@ void vlk_init() {
   _(vkAllocateDescriptorSets(vlk_dev, &dset_info, &vlk_dset));
 
   VkSamplerCreateInfo smp_info = {
-    .sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
+    .sType     = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
+    .magFilter = VK_FILTER_NEAREST,
+    .minFilter = VK_FILTER_NEAREST,
   };
   _(vkCreateSampler(vlk_dev, &smp_info, NULL, &vlk_smp));
 
