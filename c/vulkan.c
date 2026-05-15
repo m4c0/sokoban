@@ -414,17 +414,32 @@ static VkShaderModule vlk_create_shader_module(const char * name) {
 }
 
 #define F(x, y) (((x) & (y)) == (y))
-static int vlk_find_host_memory() {
+static int vlk_find_memory(VkMemoryPropertyFlags desired) {
   VkPhysicalDeviceMemoryProperties props;
   vkGetPhysicalDeviceMemoryProperties(vlk_pd, &props);
 
-  int host = -1;
   for (int i = 0; i < props.memoryTypeCount; i++) {
     VkMemoryPropertyFlags flags = props.memoryTypes[i].propertyFlags;
-    if (host == -1 && F(flags, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT)) host = i;
+    if (F(flags, desired)) return i;
   }
-  assert(host >= 0);
-  return host;
+  assert(0 && "could not find suitable vulkan memory");
+}
+static int vlk_find_host_memory() {
+  return vlk_find_memory(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+}
+static int vlk_find_local_memory() {
+  return vlk_find_memory(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+}
+
+static VkDeviceMemory vlk_allocate_memory(VkDeviceSize sz, int idx) {
+  VkMemoryAllocateInfo mem_info = {
+    .sType           = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
+    .allocationSize  = sz,
+    .memoryTypeIndex = idx,
+  };
+  VkDeviceMemory mem;
+  _(vkAllocateMemory(vlk_dev, &mem_info, NULL, &mem));
+  return mem;
 }
 
 static void vlk_load_image() {
@@ -443,13 +458,7 @@ static void vlk_load_image() {
   VkBuffer buf;
   _(vkCreateBuffer(vlk_dev, &buf_info, NULL, &buf));
 
-  VkMemoryAllocateInfo mem_info = {
-    .sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
-    .allocationSize = VBUF_SIZE,
-    .memoryTypeIndex = vlk_find_host_memory(),
-  };
-  VkDeviceMemory mem;
-  _(vkAllocateMemory(vlk_dev, &mem_info, NULL, &mem));
+  VkDeviceMemory mem = vlk_allocate_memory(sz, vlk_find_host_memory());
   _(vkBindBufferMemory(vlk_dev, buf, mem, 0));
 
   void * data;
@@ -461,6 +470,12 @@ static void vlk_load_image() {
     .sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
   };
   _(vkCreateImage(vlk_dev, &img_info, NULL, &vlk_atlas_img));
+
+  VkMemoryRequirements req;
+  vkGetImageMemoryRequirements(vlk_dev, vlk_atlas_img, &req);
+
+  vlk_atlas_mem = vlk_allocate_memory(req.size, vlk_find_local_memory());
+  _(vkBindImageMemory(vlk_dev, vlk_atlas_img, vlk_atlas_mem, 0));
 
   vkDeviceWaitIdle(vlk_dev);
 
