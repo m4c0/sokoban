@@ -149,6 +149,11 @@ static void vlk_create_device() {
     "VK_KHR_portability_subset",
   };
 
+  VkPhysicalDeviceSynchronization2FeaturesKHR sync2 = {
+    .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SYNCHRONIZATION_2_FEATURES_KHR,
+    .synchronization2 = VK_TRUE,
+  };
+
   const float pri = 1.0f;
   VkDeviceQueueCreateInfo q = (VkDeviceQueueCreateInfo) {
     .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
@@ -158,6 +163,7 @@ static void vlk_create_device() {
   };
   VkDeviceCreateInfo info = (VkDeviceCreateInfo) {
     .sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
+    .pNext = &sync2,
     .queueCreateInfoCount = 1,
     .pQueueCreateInfos = &q,
     .ppEnabledExtensionNames = ext,
