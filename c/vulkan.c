@@ -145,6 +145,7 @@ static void vlk_find_physical_device() {
 static void vlk_create_device() {
   const char * ext[] = {
     VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+    VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME,
     "VK_KHR_portability_subset",
   };
 
@@ -160,7 +161,7 @@ static void vlk_create_device() {
     .queueCreateInfoCount = 1,
     .pQueueCreateInfos = &q,
     .ppEnabledExtensionNames = ext,
-    .enabledExtensionCount = 1,
+    .enabledExtensionCount = 2,
   };
 
 #ifdef __APPLE__
