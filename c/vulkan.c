@@ -59,6 +59,7 @@ static unsigned           vlk_swc_count;
 
 static VkDeviceMemory vlk_atlas_mem;
 static VkImage        vlk_atlas_img;
+static VkImageView    vlk_atlas_iv;
 
 static VkDescriptorPool      vlk_dpool;
 static VkDescriptorSetLayout vlk_dsl;
@@ -483,6 +484,19 @@ static void vlk_load_image() {
 
   vlk_atlas_mem = vlk_allocate_memory(req.size, vlk_find_local_memory());
   _(vkBindImageMemory(vlk_dev, vlk_atlas_img, vlk_atlas_mem, 0));
+
+  VkImageViewCreateInfo iv_info = {
+    .sType        = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
+    .image        = vlk_atlas_img,
+    .format       = VK_FORMAT_R8_UINT,
+    .viewType     = VK_IMAGE_VIEW_TYPE_2D,
+    .subresourceRange = {
+      .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+      .levelCount = 1,
+      .layerCount = 1,
+    },
+  };
+  _(vkCreateImageView(vlk_dev, &iv_info, NULL, &vlk_atlas_iv));
 
   vkDeviceWaitIdle(vlk_dev);
 
