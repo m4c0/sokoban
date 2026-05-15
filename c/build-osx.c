@@ -1,3 +1,6 @@
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
 #include <sys/stat.h>
 #include <assert.h>
 #include <stdio.h>
@@ -23,6 +26,22 @@ static int run(char ** args) {
 
   fprintf(stderr, "failed to run child process: %s\n", args[0]);
   return 1;
+}
+
+static int atlas() {
+  int w, h, comp;
+  stbi_uc * data = stbi_load("../atlas.png", &w, &h, &comp, 1);
+  assert(data);
+  assert(w == 512);
+  assert(h == 128);
+  assert(comp == 4);
+
+  FILE * out = fopen("sokoban.app/Contents/Resources/atlas.img", "wb");
+  assert(out);
+  for (int i = 0; i < w * h; i++, data += 4) assert(data[3] == fputc(data[3], out));
+  fclose(out);
+
+  return 0;
 }
 
 static int shader(char * name) {
@@ -73,8 +92,8 @@ int main(int argc, char ** argv) {
 
   { char * args[] = { "cp", "libvulkan.dylib", "sokoban.app/Contents/MacOS/", 0 };
     if (run(args)) return 1; }
-  { char * args[] = { "cp", "../atlas.png", "sokoban.app/Contents/Resources/", 0 };
-    if (run(args)) return 1; }
+
+  if (atlas()) return 1;
 
   if (cc("vulkan.c",     "vulkan.o"    )) return 1;
   if (cc("vulkan-osx.m", "vulkan-osx.o")) return 1;

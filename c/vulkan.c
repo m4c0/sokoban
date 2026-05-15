@@ -474,7 +474,7 @@ static void vlk_load_image() {
     .extent      = (VkExtent3D) { 512, 128, 1 },
     .usage       = VK_IMAGE_USAGE_SAMPLED_BIT,
     .samples     = VK_SAMPLE_COUNT_1_BIT,
-    .format      = VK_FORMAT_R8G8B8A8_SRGB,
+    .format      = VK_FORMAT_R8_UINT,
     .mipLevels   = 1,
     .arrayLayers = 1,
   };
