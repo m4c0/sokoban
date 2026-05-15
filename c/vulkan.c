@@ -531,6 +531,26 @@ static void vlk_load_atlas() {
 
   // TODO: enqueue a copy
 
+  VkDependencyInfoKHR di = {
+    .sType                   = VK_STRUCTURE_TYPE_DEPENDENCY_INFO_KHR,
+    .imageMemoryBarrierCount = 1,
+    .pImageMemoryBarriers    = (VkImageMemoryBarrier2[]) {{
+      .sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2_KHR,
+      .srcStageMask     = VK_PIPELINE_STAGE_TRANSFER_BIT,
+      .dstStageMask     = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+      .srcAccessMask    = VK_ACCESS_TRANSFER_WRITE_BIT,
+      .dstAccessMask    = VK_ACCESS_SHADER_READ_BIT,
+      .newLayout        = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+      .image            = vlk_atlas_img,
+      .subresourceRange = {
+        .aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
+        .levelCount     = 1,
+        .layerCount     = 1,
+      },
+    }},
+  };
+  vkCmdPipelineBarrier2KHR(cb, &di);
+
   vkEndCommandBuffer(cb);
 
   VkSubmitInfo submit = {
@@ -550,6 +570,46 @@ void vlk_create_map() {
   vlk_map_img = vlk_create_image(32, 32, VK_FORMAT_R8G8B8A8_UINT);
   vlk_map_mem = vlk_allocate_image_memory(vlk_map_img);
   vlk_map_iv  = vlk_create_image_view(vlk_map_img, VK_FORMAT_R8G8B8A8_UINT);
+
+  VkCommandBufferAllocateInfo info = {
+    .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
+    .commandPool = vlk_cpool,
+    .commandBufferCount = 1,
+  };
+  VkCommandBuffer cb;
+  _(vkAllocateCommandBuffers(vlk_dev, &info, &cb));
+
+  VkCommandBufferBeginInfo binfo = {
+    .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
+  };
+  vkBeginCommandBuffer(cb, &binfo);
+
+  VkDependencyInfoKHR di = {
+    .sType                   = VK_STRUCTURE_TYPE_DEPENDENCY_INFO_KHR,
+    .imageMemoryBarrierCount = 1,
+    .pImageMemoryBarriers    = (VkImageMemoryBarrier2[]) {{
+      .sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2_KHR,
+      .dstStageMask     = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+      .dstAccessMask    = VK_ACCESS_SHADER_READ_BIT,
+      .newLayout        = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+      .image            = vlk_map_img,
+      .subresourceRange = {
+        .aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
+        .levelCount     = 1,
+        .layerCount     = 1,
+      },
+    }},
+  };
+  vkCmdPipelineBarrier2KHR(cb, &di);
+
+  vkEndCommandBuffer(cb);
+
+  VkSubmitInfo submit = {
+    .sType              = VK_STRUCTURE_TYPE_SUBMIT_INFO,
+    .pCommandBuffers    = &cb,
+    .commandBufferCount = 1,
+  };
+  _(vkQueueSubmit(vlk_q, 1, &submit, NULL));
 }
 
 void vlk_init() {
