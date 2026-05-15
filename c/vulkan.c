@@ -388,9 +388,9 @@ static void vlk_create_swc() {
   vlk_create_framebuffer();
 }
 
-FILE * vlk_open(const char * name);
+FILE * vlk_open(const char * name, const char * ext);
 static VkShaderModule vlk_create_shader_module(const char * name) {
-  FILE * f = vlk_open(name);
+  FILE * f = vlk_open(name, "spv");
   assert(f);
   assert(0 == fseek(f, 0, SEEK_END));
   long sz = ftell(f);
@@ -443,7 +443,7 @@ static VkDeviceMemory vlk_allocate_memory(VkDeviceSize sz, int idx) {
 }
 
 static void vlk_load_image() {
-  FILE * f = vlk_open("atlas.png");
+  FILE * f = vlk_open("atlas", "png");
   assert(f);
   assert(0 == fseek(f, 0, SEEK_END));
   long sz = ftell(f);

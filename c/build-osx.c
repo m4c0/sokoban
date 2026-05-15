@@ -73,6 +73,8 @@ int main(int argc, char ** argv) {
 
   { char * args[] = { "cp", "libvulkan.dylib", "sokoban.app/Contents/MacOS/", 0 };
     if (run(args)) return 1; }
+  { char * args[] = { "cp", "../atlas.png", "sokoban.app/Contents/Resources/", 0 };
+    if (run(args)) return 1; }
 
   if (cc("vulkan.c",     "vulkan.o"    )) return 1;
   if (cc("vulkan-osx.m", "vulkan-osx.o")) return 1;
