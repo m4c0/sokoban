@@ -450,6 +450,8 @@ static void vlk_load_image() {
   assert(sz);
   assert(0 == fseek(f, 0, SEEK_SET));
 
+  // TODO: take bits out of png - duh
+
   VkBufferCreateInfo buf_info = {
     .sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
     .size  = sz,
@@ -467,7 +469,14 @@ static void vlk_load_image() {
   fclose(f);
 
   VkImageCreateInfo img_info = {
-    .sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
+    .sType       = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
+    .imageType   = VK_IMAGE_TYPE_2D,
+    .extent      = (VkExtent3D) { 512, 128, 1 },
+    .usage       = VK_IMAGE_USAGE_SAMPLED_BIT,
+    .samples     = VK_SAMPLE_COUNT_1_BIT,
+    .format      = VK_FORMAT_R8G8B8A8_SRGB,
+    .mipLevels   = 1,
+    .arrayLayers = 1,
   };
   _(vkCreateImage(vlk_dev, &img_info, NULL, &vlk_atlas_img));
 
