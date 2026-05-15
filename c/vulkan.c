@@ -454,12 +454,12 @@ static VkDeviceMemory vlk_allocate_memory(VkDeviceSize sz, int idx) {
   return mem;
 }
 
-static VkImage vlk_create_image(unsigned w, unsigned h, VkFormat fmt) {
+static VkImage vlk_create_image(unsigned w, unsigned h, VkFormat fmt, VkImageUsageFlagBits flags) {
   VkImageCreateInfo img_info = {
     .sType       = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
     .imageType   = VK_IMAGE_TYPE_2D,
     .extent      = (VkExtent3D) { w, h, 1 },
-    .usage       = VK_IMAGE_USAGE_SAMPLED_BIT,
+    .usage       = VK_IMAGE_USAGE_SAMPLED_BIT | flags,
     .samples     = VK_SAMPLE_COUNT_1_BIT,
     .format      = fmt,
     .mipLevels   = 1,
@@ -518,7 +518,7 @@ static void vlk_load_atlas() {
   assert(1 == fread(data, sz, 1, f));
   fclose(f);
 
-  vlk_atlas_img = vlk_create_image(512, 128, VK_FORMAT_R8_UNORM);
+  vlk_atlas_img = vlk_create_image(512, 128, VK_FORMAT_R8_UNORM, VK_IMAGE_USAGE_TRANSFER_DST_BIT);
   vlk_atlas_mem = vlk_allocate_image_memory(vlk_atlas_img);
   vlk_atlas_iv  = vlk_create_image_view(vlk_atlas_img, VK_FORMAT_R8_UNORM);
 
@@ -535,17 +535,54 @@ static void vlk_load_atlas() {
   };
   vkBeginCommandBuffer(cb, &binfo);
 
-  // TODO: enqueue a copy
-
   VkDependencyInfoKHR di = {
+    .sType                    = VK_STRUCTURE_TYPE_DEPENDENCY_INFO_KHR,
+    .bufferMemoryBarrierCount = 1,
+    .pBufferMemoryBarriers    = (VkBufferMemoryBarrier2KHR[]) {{
+      .sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER_2_KHR,
+      .srcStageMask  = VK_PIPELINE_STAGE_HOST_BIT,
+      .dstStageMask  = VK_PIPELINE_STAGE_TRANSFER_BIT,
+      .srcAccessMask = VK_ACCESS_HOST_WRITE_BIT,
+      .dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT,
+      .buffer        = buf,
+      .size          = VK_WHOLE_SIZE,
+    }},
+    .imageMemoryBarrierCount = 1,
+    .pImageMemoryBarriers    = (VkImageMemoryBarrier2KHR[]) {{
+      .sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2_KHR,
+      .srcStageMask     = VK_PIPELINE_STAGE_HOST_BIT,
+      .dstStageMask     = VK_PIPELINE_STAGE_TRANSFER_BIT,
+      .dstAccessMask    = VK_ACCESS_TRANSFER_WRITE_BIT,
+      .newLayout        = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+      .image            = vlk_atlas_img,
+      .subresourceRange = {
+        .aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
+        .levelCount     = 1,
+        .layerCount     = 1,
+      },
+    }},
+  };
+  vkCmdPipelineBarrier2KHR(cb, &di);
+
+  VkBufferImageCopy bic = {
+    .imageExtent = (VkExtent3D) { 512, 128, 1 },
+    .imageSubresource = {
+      .aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
+      .layerCount     = 1,
+    },
+  };
+  vkCmdCopyBufferToImage(cb, buf, vlk_atlas_img, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &bic);
+
+  di = (VkDependencyInfoKHR) {
     .sType                   = VK_STRUCTURE_TYPE_DEPENDENCY_INFO_KHR,
     .imageMemoryBarrierCount = 1,
-    .pImageMemoryBarriers    = (VkImageMemoryBarrier2[]) {{
+    .pImageMemoryBarriers    = (VkImageMemoryBarrier2KHR[]) {{
       .sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2_KHR,
       .srcStageMask     = VK_PIPELINE_STAGE_TRANSFER_BIT,
       .dstStageMask     = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
       .srcAccessMask    = VK_ACCESS_TRANSFER_WRITE_BIT,
       .dstAccessMask    = VK_ACCESS_SHADER_READ_BIT,
+      .oldLayout        = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
       .newLayout        = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
       .image            = vlk_atlas_img,
       .subresourceRange = {
@@ -573,7 +610,7 @@ static void vlk_load_atlas() {
 }
 
 void vlk_create_map() {
-  vlk_map_img = vlk_create_image(32, 32, VK_FORMAT_R8G8B8A8_UINT);
+  vlk_map_img = vlk_create_image(32, 32, VK_FORMAT_R8G8B8A8_UINT, 0);
   vlk_map_mem = vlk_allocate_image_memory(vlk_map_img);
   vlk_map_iv  = vlk_create_image_view(vlk_map_img, VK_FORMAT_R8G8B8A8_UINT);
 
