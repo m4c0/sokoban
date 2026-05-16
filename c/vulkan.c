@@ -620,13 +620,13 @@ static void vlk_load_atlas() {
 }
 
 void vlk_create_map() {
-  vlk_map_h_buf = vlk_create_buffer_for_image(32 * 32 * 4);
-  vlk_map_h_mem = vlk_allocate_memory(32 * 32 * 4, vlk_find_host_memory());
+  vlk_map_h_buf = vlk_create_buffer_for_image(32 * 32);
+  vlk_map_h_mem = vlk_allocate_memory(32 * 32, vlk_find_host_memory());
   _(vkBindBufferMemory(vlk_dev, vlk_map_h_buf, vlk_map_h_mem, 0));
 
-  vlk_map_img = vlk_create_image(32, 32, VK_FORMAT_R8G8B8A8_UINT, VK_IMAGE_USAGE_TRANSFER_DST_BIT);
+  vlk_map_img = vlk_create_image(32, 32, VK_FORMAT_R8_UINT, VK_IMAGE_USAGE_TRANSFER_DST_BIT);
   vlk_map_mem = vlk_allocate_image_memory(vlk_map_img);
-  vlk_map_iv  = vlk_create_image_view(vlk_map_img, VK_FORMAT_R8G8B8A8_UINT);
+  vlk_map_iv  = vlk_create_image_view(vlk_map_img, VK_FORMAT_R8_UINT);
 
   vlk_map_cb = vlk_record_buf2img(vlk_map_h_buf, vlk_map_img, 32, 32);
 }
@@ -796,7 +796,7 @@ void vlk_init() {
 
   gettimeofday(&clk, NULL);
 
-  //_(vkMapMemory(vlk_dev, vlk_vmem, 0, VK_WHOLE_SIZE, 0, (void **)&gme_buf));
+  _(vkMapMemory(vlk_dev, vlk_map_mem, 0, VK_WHOLE_SIZE, 0, (void **)&gme_blks));
 }
 
 void vlk_frame() {

@@ -19,11 +19,26 @@ typedef struct gme_upc {
   float menu_btn_dim;
 } gme_upc_t;
 
+enum gme_blocks {
+  gme_b_player        = 'P',
+  gme_b_player_target = 'p',
+  gme_b_wall          = 'X',
+  gme_b_empty         = '.',
+  gme_b_outside       = ' ',
+  gme_b_target        = '*',
+  gme_b_box           = 'O',
+  gme_b_target_box    = '0',
+};
+
 extern gme_upc_t gme_pc;
+extern unsigned char * gme_blks;
 
 #ifdef GME_IMPL
+#define GME_WIDTH  32
+#define GME_HEIGHT 24
 
 gme_upc_t gme_pc;
+unsigned char * gme_blks;
 
 #endif
 #endif
