@@ -64,7 +64,9 @@ static int cc(char * src, char * o) {
 
 static int hdr(char * src, char * o, char * d) {
   char * args[] = {
-    "clang", "-Wall", "-x", "c", "-g", "-D", d, "-o", o, "-c", src, 0
+    "clang", "-Wall", "-x", "c", "-g",
+    "-IVulkan-Headers/include",
+    "-D", d, "-o", o, "-c", src, 0
   };
   return run(args);
 }
@@ -76,8 +78,8 @@ static int link_exe() {
     "-framework", "AudioToolbox",
     "-framework", "MetalKit",
     "-o", "sokoban.app/Contents/MacOS/sokoban", 
-    "gme.o",
-    "vulkan.o", "vulkan-osx.o",
+    "gme.o", "spr.o", "vlk.o",
+    "vulkan-osx.o",
     0 };
   return run(args);
 }
@@ -95,9 +97,10 @@ int main(int argc, char ** argv) {
 
   if (atlas()) return 1;
 
-  if (cc("vulkan.c",     "vulkan.o"    )) return 1;
   if (cc("vulkan-osx.m", "vulkan-osx.o")) return 1;
   if (hdr("gme.h", "gme.o", "GME_IMPL")) return 1;
+  if (hdr("spr.h", "spr.o", "SPR_IMPL")) return 1;
+  if (hdr("vlk.h", "vlk.o", "VLK_IMPL")) return 1;
   if (link_exe()) return 1;
 
   if (shader("sokoban.frag")) return 1;

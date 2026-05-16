@@ -31,14 +31,14 @@ enum gme_blocks {
 };
 
 extern gme_upc_t gme_pc;
-extern unsigned char * gme_blks;
 
 #ifdef GME_IMPL
+#include "spr.h"
+
 #define GME_WIDTH  32
 #define GME_HEIGHT 24
 
 gme_upc_t gme_pc;
-unsigned char * gme_blks;
 
 #endif
 #endif

@@ -1,4 +1,13 @@
+#ifndef VLK_H
+#define VLK_H
+
+void vlk_init();
+void vlk_frame();
+void vlk_deinit();
+
+#ifdef VLK_IMPL
 #include "gme.h"
+#include "spr.h"
 
 #define _CRT_SECURE_NO_WARNINGS
 #include <assert.h>
@@ -796,7 +805,7 @@ void vlk_init() {
 
   gettimeofday(&clk, NULL);
 
-  _(vkMapMemory(vlk_dev, vlk_map_mem, 0, VK_WHOLE_SIZE, 0, (void **)&gme_blks));
+  _(vkMapMemory(vlk_dev, vlk_map_h_mem, 0, VK_WHOLE_SIZE, 0, (void **)&spr_scr));
 }
 
 void vlk_frame() {
@@ -893,3 +902,5 @@ void vlk_deinit() {
   vkDestroySurfaceKHR(vlk_ins, vlk_surf, NULL);
   vkDestroyInstance(vlk_ins, NULL);
 }
+#endif
+#endif
