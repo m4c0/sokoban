@@ -1,3 +1,6 @@
+module;
+#include <stdio.h>
+
 export module save;
 import buoy;
 import silog;
@@ -9,16 +12,27 @@ struct data {
 };
 
 data read() {
-  return buoy::open_for_reading("sokoban", "save.dat")
-      .fmap([](auto &&r) { return r.template read<data>(); })
-      .trace("reading save data")
-      .log_error();
+  auto path = buoy::path("sokoban", "save.dat");
+  
+  data res {};
+
+  FILE * f = fopen(path.begin(), "rb");
+  if (1 != fread(&res, sizeof(data), 1, f)) {
+    silog::error("Error reading save data");
+    res = {};
+  }
+  fclose(f);
+
+  return res;
 }
 
 void write(data d) {
-  buoy::open_for_writing("sokoban", "save.dat")
-      .fmap([d](auto &&w) { return w.write(d); })
-      .trace("writing save data")
-      .log_error();
+  auto path = buoy::path("sokoban", "save.dat");
+
+  FILE * f = fopen(path.begin(), "rb");
+  if (1 != fwrite(&d, sizeof(data), 1, f)) {
+    silog::error("Error writing save data");
+  }
+  fclose(f);
 }
 } // namespace save

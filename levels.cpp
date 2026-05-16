@@ -5,6 +5,7 @@ import hai;
 import jute;
 import silog;
 import sires;
+import yoyo;
 
 namespace sg = sokoban::game;
 namespace sl = sokoban::levels;
@@ -32,7 +33,8 @@ mno::req<void> read_level(yoyo::subreader data) {
 }
 
 void sl::read_levels() {
-  sires::open("levels.dat")
+  auto path = sires::real_path_name("levels.dat");
+  yoyo::file_reader::open(path.begin())
       .fpeek(frk::assert("SKB"))
       .fpeek(frk::take_all("LEVL", read_level))
       .map(frk::end())

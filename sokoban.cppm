@@ -1,11 +1,11 @@
 #pragma leco app
 #pragma leco display_name Warehouse
-#pragma leco landscape
+//#pragma leco landscape
 #pragma leco add_impl audio
 #pragma leco add_impl smenu
 #pragma leco add_impl splay
 #pragma leco add_impl sselect
-#pragma leco add_build_dep "maped.cppm"
+//#pragma leco add_build_dep "maped.cppm"
 export module sokoban;
 import casein;
 import dotz;
