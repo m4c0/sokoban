@@ -7,6 +7,7 @@ import dotz;
 import fff;
 import quack;
 import silog;
+import sires;
 import sprites;
 import stubby;
 import traits;
@@ -119,20 +120,17 @@ struct init {
     handle(KEY_DOWN, K_ENTER, save);
     handle(KEY_DOWN, K_SPACE, flip);
 
-    stbi::load("atlas.png")
-        .assert(sane_image_width, "image is wider than buffer")
-        .assert(sane_image_height, "image is taller than buffer")
-        .assert(sane_num_channels, "image is not RGBA")
-        .map([](auto &&img) {
-          auto *d = reinterpret_cast<uint32_t *>(*img.data);
-          for (auto y = 0; y < img.height; y++) {
-            for (auto x = 0; x < img.width; x++) {
-              g_pixies[y][x] = *d++;
-            }
-          }
-        })
-        .trace("loading atlas")
-        .log_error();
+    auto file = sires::slurp("atlas.png");
+    auto img = stbi::load(file.begin(), file.size());
+    silog::assert(sane_image_width(img), "image is wider than buffer");
+    silog::assert(sane_image_height(img), "image is taller than buffer");
+    silog::assert(sane_num_channels(img), "image is not RGBA");
+    auto *d = reinterpret_cast<uint32_t *>(*img.data);
+    for (auto y = 0; y < img.height; y++) {
+      for (auto x = 0; x < img.width; x++) {
+        g_pixies[y][x] = *d++;
+      }
+    }
 
     quack::upc upc{};
     upc.grid_size = {image_w, image_h};
