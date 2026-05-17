@@ -8,6 +8,7 @@ import silog;
 import sitime;
 import sprites;
 import traits;
+import vapp;
 import vee;
 import voo;
 
@@ -62,10 +63,12 @@ namespace {
     return rpc;
   }
 
-struct main : voo::casein_thread {
+struct main : vapp {
   void run() override {
     voo::device_and_queue dq { "sokoban" };
     sr::g_dq = &dq;
+
+    auto rp = voo::single_att_render_pass(dq);
 
     quack::pipeline_stuff ps { dq, 2 };
     quack::buffer_updater u { &dq, sg::max_quads, &updater };
@@ -78,7 +81,7 @@ struct main : voo::casein_thread {
     map.run_once();
 
     vee::descriptor_set_layout dsl = vee::create_descriptor_set_layout({ vee::dsl_fragment_sampler(), vee::dsl_fragment_sampler() });
-    vee::pipeline_layout pl = vee::create_pipeline_layout({ *dsl }, { vee::vert_frag_push_constant_range<upc>() });
+    vee::pipeline_layout pl = vee::create_pipeline_layout(*dsl, vee::vert_frag_push_constant_range<upc>());
     voo::one_quad_render oqr { "sokoban", &dq, *pl };
 
     auto n_smp = vee::create_sampler(vee::nearest_sampler);
@@ -106,13 +109,14 @@ struct main : voo::casein_thread {
     };
 
     while (!interrupted()) {
-      voo::swapchain_and_stuff sw { dq };
+      voo::swapchain_and_stuff sw { dq, *rp };
 
       extent_loop(dq.queue(), sw, [&] {
-        sw.queue_one_time_submit(dq.queue(), [&](auto pcb) {
-          auto scb = sw.cmd_render_pass(pcb);
+        sw.queue_one_time_submit([&] {
+          auto cb = sw.command_buffer();
+          auto crp = sw.cmd_render_pass();
           auto ext = sw.extent();
-          sr::g_render(*scb, ext, sw.aspect());
+          sr::g_render(cb, ext, sw.aspect());
 
           quack::run(&ps, {
             .sw = &sw,
