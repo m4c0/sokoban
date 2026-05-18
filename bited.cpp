@@ -25,6 +25,11 @@ static unsigned g_cursor_y{};
 static bool g_cursor_hl{};
 static uint32_t g_pixies[image_h][image_w]{};
 
+struct upc {
+  dotz::vec2 grid_pos{};
+  dotz::vec2 grid_size{1, 1};
+} g_pc;
+
 struct rotation {
   float angle;
   float rel_x;
@@ -154,14 +159,12 @@ struct init : vapp {
       }
     }
 
-    quack::upc upc{};
-    upc.grid_size = {image_w, image_h};
-    upc.grid_pos = upc.grid_size * 0.5;
+    g_pc = {
+      .grid_pos { image_w * 0.5, image_h * 0.5 },
+      .grid_size { image_w, image_h },
+    };
 
     using namespace quack::donald;
-    app_name("bited");
-    max_quads(quad_count);
-    push_constants(upc);
     refresh_atlas();
     refresh_batch();
   }
