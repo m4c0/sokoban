@@ -71,6 +71,18 @@ static int hdr(char * src, char * o, char * d) {
   return run(args);
 }
 
+static int bited_exe() {
+  char * args[] = {
+    "clang", "-Wall",
+    "-framework", "AppKit",
+    "-framework", "AudioToolbox",
+    "-framework", "MetalKit",
+    "-o", "bited.app/Contents/MacOS/bited", 
+    "bited.o",
+    0 };
+  return run(args);
+}
+
 static int link_exe() {
   char * args[] = {
     "clang", "-Wall",
@@ -105,10 +117,12 @@ static int app(const char * n) {
 int main(int argc, char ** argv) {
   if (argc != 1) return (usage(), 1);
 
+  if (app("bited"  )) return 1;
   if (app("sokoban")) return 1;
 
   if (atlas()) return 1;
 
+  if (cc("bited.m",      "bited.o"     )) return 1;
   if (cc("vulkan-osx.m", "vulkan-osx.o")) return 1;
   if (hdr("gme.h", "gme.o", "GME_IMPL")) return 1;
   if (hdr("spr.h", "spr.o", "SPR_IMPL")) return 1;
