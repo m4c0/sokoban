@@ -11,6 +11,7 @@ import sires;
 import sprites;
 import stubby;
 import traits;
+import vapp;
 
 using namespace traits::ints;
 using namespace spr;
@@ -24,12 +25,29 @@ static unsigned g_cursor_y{};
 static bool g_cursor_hl{};
 static uint32_t g_pixies[image_h][image_w]{};
 
-static void update_data(quack::instance *& i) {
+struct rotation {
+  float angle;
+  float rel_x;
+  float rel_y;
+  float pad; // Currently unused
+};
+struct instance {
+  dotz::vec2 position;
+  dotz::vec2 size;
+  dotz::vec2 uv0;
+  dotz::vec2 uv1;
+  dotz::vec4 colour;
+  dotz::vec4 multiplier;
+  rotation rotation;
+};
+static_assert(sizeof(instance) == 20 * sizeof(float));
+
+static void update_data(instance *& i) {
   static constexpr const float inv_c = 1.0f / cols;
   static constexpr const float inv_r = 1.0f / rows;
   for (auto y = 0; y < rows; y++) {
     for (auto x = 0; x < cols; x++) {
-      *i++ = quack::instance{
+      *i++ = instance{
           .position{x * 8.0f + 0.1f, y * 8.0f + 0.1f},
           .size{8 - 0.2f, 8 - 0.2f},
           .uv0{x * inv_c, y * inv_r},
@@ -39,7 +57,7 @@ static void update_data(quack::instance *& i) {
     }
   }
 
-  *i++ = quack::instance{
+  *i++ = instance{
       .position{static_cast<float>(g_cursor_x), static_cast<float>(g_cursor_y)},
       .size{1},
       .colour = g_cursor_hl ? dotz::vec4{} : dotz::vec4{1, 0, 0, 1},
@@ -47,8 +65,12 @@ static void update_data(quack::instance *& i) {
   };
 }
 
-void refresh_atlas() { quack::donald::atlas(g_pixies, image_w, image_h); }
-void refresh_batch() { quack::donald::data(update_data); }
+void refresh_atlas() {
+  //quack::donald::atlas(g_pixies, image_w, image_h);
+}
+void refresh_batch() {
+  //quack::donald::data(update_data);
+}
 
 static void flip_cursor() {
   g_cursor_hl = !g_cursor_hl;
@@ -107,7 +129,7 @@ static constexpr bool sane_num_channels(const stbi::image &img) {
   return img.num_channels == 4;
 }
 
-struct init {
+struct init : vapp {
   fff::timer m_timer { 300, flip_cursor };
 
   init() {
@@ -142,5 +164,8 @@ struct init {
     push_constants(upc);
     refresh_atlas();
     refresh_batch();
+  }
+
+  void run() override {
   }
 } i;
