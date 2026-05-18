@@ -69,11 +69,6 @@ void vlk_log(int r, const char * msg) {
 }
 
 static void run() {
-  NSDictionary * info = [[NSBundle mainBundle] infoDictionary];
-  NSString * name = info[@"CFBundleDisplayName"];
-  if (!name) name = info[@"CFBundleName"];
-  if (!name) name = @"App";
-
   MTKView * v = [POCView new];
   v.delegate = [POCViewDelegate new];
 
@@ -81,7 +76,7 @@ static void run() {
   w.contentView = v;
   w.styleMask = NSWindowStyleMaskTitled | NSWindowStyleMaskClosable | NSWindowStyleMaskMiniaturizable;
 
-  NSRect crect = NSMakeRect(0, 0, 600, 800);
+  NSRect crect = NSMakeRect(0, 0, 800, 600);
   NSRect frect = [w frameRectForContentRect:crect];
   [w setFrame:frect display:YES];
   [w center];
@@ -90,7 +85,7 @@ static void run() {
   // Apple menu
   NSMenu * menu = [NSMenu new];
   [menu       addItem:[[NSMenuItem alloc]
-        initWithTitle:[@"Quit " stringByAppendingString:name]
+        initWithTitle:@"Quit Bited"
                action:@selector(terminate:)
         keyEquivalent:@"q"]];
 
