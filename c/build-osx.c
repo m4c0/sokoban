@@ -84,16 +84,28 @@ static int link_exe() {
   return run(args);
 }
 
+static void mkd(const char * n, const char * p) {
+  char buf[1024];
+  snprintf(buf, 1024, "%s.app/%s", n, p);
+  mkdir(buf, 0777);
+}
+static int app(const char * n) {
+  mkd(n, "");
+  mkd(n, "Contents");
+  mkd(n, "Contents/MacOS");
+  mkd(n, "Contents/Resources");
+
+  char buf[1024];
+  snprintf(buf, 1024, "%s.app/Contents/MacOS/", n);
+
+  char * args[] = { "cp", "libvulkan.dylib", buf, 0 };
+  return run(args);
+}
+
 int main(int argc, char ** argv) {
   if (argc != 1) return (usage(), 1);
 
-  mkdir("sokoban.app", 0777);
-  mkdir("sokoban.app/Contents", 0777);
-  mkdir("sokoban.app/Contents/MacOS", 0777);
-  mkdir("sokoban.app/Contents/Resources", 0777);
-
-  { char * args[] = { "cp", "libvulkan.dylib", "sokoban.app/Contents/MacOS/", 0 };
-    if (run(args)) return 1; }
+  if (app("sokoban")) return 1;
 
   if (atlas()) return 1;
 
