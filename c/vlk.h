@@ -6,9 +6,6 @@ void vlk_frame();
 void vlk_deinit();
 
 #ifdef VLK_IMPL
-#include "gme.h"
-#include "spr.h"
-
 #define _CRT_SECURE_NO_WARNINGS
 #include <assert.h>
 #include <stdio.h>
@@ -42,8 +39,28 @@ typedef struct vlk_swc {
   VkSwapchainKHR  swc;
 } vlk_swc_t;
 
+typedef struct vlk_vec2 {
+  float x, y;
+} vlk_vec2_t;
+typedef struct vlk_vec4 {
+  float x, y, z, w;
+} vlk_vec4_t;
+typedef struct vlk_upc {
+  vlk_vec4_t sel_rect;
+  vlk_vec2_t player_pos;
+  vlk_vec2_t label_pos;
+  vlk_vec2_t menu_size;
+  float level;
+  float aspect;
+  float time;
+  float back_btn_dim;
+  float menu_btn_dim;
+} vlk_upc_t;
+
 static vlk_swc_t vlk_swc     = {0};
 static vlk_swc_t vlk_swc_old = {0};
+
+static vlk_upc_t vlk_pc;
 
 static VkCommandBuffer vlk_cb      [MAX_SWAPCHAIN_IMAGES];
 static VkImage         vlk_swc_img [MAX_SWAPCHAIN_IMAGES];
@@ -74,6 +91,7 @@ static VkCommandBuffer vlk_map_cb;
 static VkDeviceMemory  vlk_map_mem;
 static VkImage         vlk_map_img;
 static VkImageView     vlk_map_iv;
+static uint8_t *       vlk_map_ptr;
 
 static VkBuffer        vlk_map_h_buf;
 static VkDeviceMemory  vlk_map_h_mem;
@@ -467,7 +485,7 @@ static void vlk_record_cmdbuf(int i) {
   };
   vkCmdSetScissor(cb, 0, 1, &sci);
 
-  vkCmdPushConstants(cb, vlk_pl, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(gme_upc_t), &gme_pc);
+  vkCmdPushConstants(cb, vlk_pl, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(vlk_upc_t), &vlk_pc);
   vkCmdBindPipeline(cb, VK_PIPELINE_BIND_POINT_GRAPHICS, vlk_ppl);
   vkCmdBindDescriptorSets(cb, VK_PIPELINE_BIND_POINT_GRAPHICS, vlk_pl, 0, 1, &vlk_dset, 0, NULL);
   vkCmdDraw(cb, 3, 1, 0, 0);
@@ -736,7 +754,7 @@ void vlk_init() {
     .pushConstantRangeCount = 1,
     .pPushConstantRanges    = (VkPushConstantRange[]) {{
       .stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
-      .size       = sizeof(gme_upc_t),
+      .size       = sizeof(vlk_upc_t),
     }},
   };
   _(vkCreatePipelineLayout(vlk_dev, &pl_info, NULL, &vlk_pl));
@@ -805,7 +823,7 @@ void vlk_init() {
 
   gettimeofday(&clk, NULL);
 
-  _(vkMapMemory(vlk_dev, vlk_map_h_mem, 0, VK_WHOLE_SIZE, 0, (void **)&spr_scr));
+  _(vkMapMemory(vlk_dev, vlk_map_h_mem, 0, VK_WHOLE_SIZE, 0, (void **)&vlk_map_ptr));
 }
 
 void vlk_frame() {

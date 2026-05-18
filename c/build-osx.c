@@ -78,7 +78,7 @@ static int bited_exe() {
     "-framework", "AudioToolbox",
     "-framework", "MetalKit",
     "-o", "bited.app/Contents/MacOS/bited", 
-    "bited.o",
+    "bited.o", "vlk.o",
     0 };
   return run(args);
 }
@@ -128,6 +128,7 @@ int main(int argc, char ** argv) {
   if (hdr("spr.h", "spr.o", "SPR_IMPL")) return 1;
   if (hdr("vlk.h", "vlk.o", "VLK_IMPL")) return 1;
   if (link_exe()) return 1;
+  if (bited_exe()) return 1;
 
   if (shader("sokoban.frag")) return 1;
   if (shader("sokoban.vert")) return 1;
