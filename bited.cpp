@@ -1,6 +1,8 @@
 #ifndef LECO_TARGET_IOS
 #pragma leco app
 #endif
+#pragma leco add_shader "quack.vert"
+#pragma leco add_shader "quack.frag"
 
 import casein;
 import dotz;
@@ -54,6 +56,8 @@ static VkDeviceMemory g_mem;
 static unsigned g_inst_count;
 
 static void refresh_batch() {
+  if (!g_mem) return;
+
   voo::memiter<inst> m { g_mem, &g_inst_count };
 
   static constexpr const float inv_c = 1.0f / cols;
@@ -171,6 +175,32 @@ struct init : vapp {
     };
 
     main_loop("bited", [&](auto & dq, auto & sw) {
+      voo::one_quad oq {};
+
+      vee::descriptor_set_layout dsl = vee::create_descriptor_set_layout({ vee::dsl_fragment_sampler() });
+      vee::pipeline_layout pl = vee::create_pipeline_layout(*dsl, vee::vert_frag_push_constant_range<upc>());
+      vee::render_pass rp = voo::single_att_render_pass(dq);
+      vee::gr_pipeline gp = vee::create_graphics_pipeline({
+        .pipeline_layout = *pl,
+        .render_pass = *rp,
+        .shaders {
+          *voo::vert_shader("quack.vert.spv"),
+          *voo::frag_shader("quack.frag.spv"),
+        },
+        .bindings {
+          oq.vertex_input_bind(),
+          vee::vertex_input_bind_per_instance(sizeof(inst)),
+        },
+        .attributes {
+          oq.vertex_attribute(0),
+          vee::vertex_attribute_vec4(1, 0),
+          vee::vertex_attribute_vec4(1, 8 * sizeof(float)),
+          vee::vertex_attribute_vec4(1, 4 * sizeof(float)),
+          vee::vertex_attribute_vec4(1, 12 * sizeof(float)),
+          vee::vertex_attribute_vec4(1, 16 * sizeof(float)),
+        },
+      });
+
       auto buf = voo::bound_buffer::create_from_host(buf_size, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
       g_mem = *buf.memory;
       refresh_batch();
@@ -178,9 +208,14 @@ struct init : vapp {
 
       extent_loop(dq.queue(), sw, [&] {
         sw.queue_one_time_submit([&] {
-          //auto crp = sw.cmd_render_pass();
-          //auto cb = sw.command_buffer();
-          //p.run(cb, sw.extent());
+          auto crp = sw.cmd_render_pass();
+          auto cb = sw.command_buffer();
+          vee::cmd_bind_gr_pipeline(cb, *gp);
+          vee::cmd_push_vert_frag_constants(cb, *pl, &g_pc);
+          vee::cmd_set_viewport(cb, sw.extent());
+          vee::cmd_set_scissor(cb, sw.extent());
+          vee::cmd_bind_vertex_buffers(cb, 1, *buf.buffer);
+          oq.run(cb, 0, g_inst_count);
         });
       });
     });
