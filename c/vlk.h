@@ -838,8 +838,8 @@ void vlk_frame() {
   struct timeval now;
   gettimeofday(&now, NULL);
 
-  //gme_pc.time   = (now.tv_sec - clk.tv_sec) + (now.tv_usec - clk.tv_usec) / 1.0e6; 
-  //gme_pc.aspect = (float)vlk_ext.width / (float)vlk_ext.height;
+  vlk_pc.time   = (now.tv_sec - clk.tv_sec) + (now.tv_usec - clk.tv_usec) / 1.0e6; 
+  vlk_pc.aspect = (float)vlk_ext.width / (float)vlk_ext.height;
 
   vlk_record_cmdbuf(idx);
 
