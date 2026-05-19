@@ -5,17 +5,19 @@
 import casein;
 import dotz;
 import fff;
+import jojo;
 import quack;
 import silog;
 import sires;
-import sprites;
 import stubby;
 import traits;
 import vapp;
+import voo;
 
 using namespace traits::ints;
-using namespace spr;
 
+static constexpr const unsigned cols = 1 << 6;
+static constexpr const unsigned rows = 1 << 4;
 static constexpr const unsigned image_w = 8 * cols;
 static constexpr const unsigned image_h = 8 * rows;
 static constexpr const unsigned quad_count = 1 + (rows * cols);
@@ -36,7 +38,7 @@ struct rotation {
   float rel_y;
   float pad; // Currently unused
 };
-struct instance {
+struct inst {
   dotz::vec2 position;
   dotz::vec2 size;
   dotz::vec2 uv0;
@@ -45,14 +47,15 @@ struct instance {
   dotz::vec4 multiplier;
   rotation rotation;
 };
-static_assert(sizeof(instance) == 20 * sizeof(float));
+static_assert(sizeof(inst) == 20 * sizeof(float));
+static constexpr const unsigned buf_size = sizeof(inst) * quad_count;
 
-static void update_data(instance *& i) {
+void update_data(inst *& i) {
   static constexpr const float inv_c = 1.0f / cols;
   static constexpr const float inv_r = 1.0f / rows;
   for (auto y = 0; y < rows; y++) {
     for (auto x = 0; x < cols; x++) {
-      *i++ = instance{
+      *i++ = inst {
           .position{x * 8.0f + 0.1f, y * 8.0f + 0.1f},
           .size{8 - 0.2f, 8 - 0.2f},
           .uv0{x * inv_c, y * inv_r},
@@ -62,7 +65,7 @@ static void update_data(instance *& i) {
     }
   }
 
-  *i++ = instance{
+  *i++ = inst {
       .position{static_cast<float>(g_cursor_x), static_cast<float>(g_cursor_y)},
       .size{1},
       .colour = g_cursor_hl ? dotz::vec4{} : dotz::vec4{1, 0, 0, 1},
@@ -146,10 +149,12 @@ struct init : vapp {
     handle(KEY_DOWN, K_RIGHT, right);
     handle(KEY_DOWN, K_ENTER, save);
     handle(KEY_DOWN, K_SPACE, flip);
+  }
 
-    auto file = sires::slurp("atlas.png");
+  void run() override {
+    auto file = jojo::slurp("atlas.png");
     auto img = stbi::load(file.begin(), file.size());
-    silog::assert(sane_image_width(img), "image is wider than buffer");
+    silog::assert(sane_image_width(img),  "image is wider than buffer");
     silog::assert(sane_image_height(img), "image is taller than buffer");
     silog::assert(sane_num_channels(img), "image is not RGBA");
     auto *d = reinterpret_cast<uint32_t *>(*img.data);
@@ -164,11 +169,19 @@ struct init : vapp {
       .grid_size { image_w, image_h },
     };
 
-    using namespace quack::donald;
-    refresh_atlas();
-    refresh_batch();
-  }
+    //using namespace quack::donald;
+    //refresh_atlas();
+    //refresh_batch();
 
-  void run() override {
+    main_loop("bited", [&](auto & dq, auto & sw) {
+      auto buf = voo::bound_buffer::create_from_host(buf_size, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
+      extent_loop(dq.queue(), sw, [&] {
+        sw.queue_one_time_submit([&] {
+          //auto crp = sw.cmd_render_pass();
+          //auto cb = sw.command_buffer();
+          //p.run(cb, sw.extent());
+        });
+      });
+    });
   }
 } i;
