@@ -50,12 +50,17 @@ struct inst {
 static_assert(sizeof(inst) == 20 * sizeof(float));
 static constexpr const unsigned buf_size = sizeof(inst) * quad_count;
 
-void update_data(inst *& i) {
+static VkDeviceMemory g_mem;
+static unsigned g_inst_count;
+
+static void refresh_batch() {
+  voo::memiter<inst> m { g_mem, &g_inst_count };
+
   static constexpr const float inv_c = 1.0f / cols;
   static constexpr const float inv_r = 1.0f / rows;
   for (auto y = 0; y < rows; y++) {
     for (auto x = 0; x < cols; x++) {
-      *i++ = inst {
+      m += inst {
           .position{x * 8.0f + 0.1f, y * 8.0f + 0.1f},
           .size{8 - 0.2f, 8 - 0.2f},
           .uv0{x * inv_c, y * inv_r},
@@ -65,7 +70,7 @@ void update_data(inst *& i) {
     }
   }
 
-  *i++ = inst {
+  m += inst {
       .position{static_cast<float>(g_cursor_x), static_cast<float>(g_cursor_y)},
       .size{1},
       .colour = g_cursor_hl ? dotz::vec4{} : dotz::vec4{1, 0, 0, 1},
@@ -73,11 +78,7 @@ void update_data(inst *& i) {
   };
 }
 
-void refresh_atlas() {
-  //quack::donald::atlas(g_pixies, image_w, image_h);
-}
-void refresh_batch() {
-  //quack::donald::data(update_data);
+static void refresh_atlas() {
 }
 
 static void flip_cursor() {
@@ -169,12 +170,12 @@ struct init : vapp {
       .grid_size { image_w, image_h },
     };
 
-    //using namespace quack::donald;
-    //refresh_atlas();
-    //refresh_batch();
-
     main_loop("bited", [&](auto & dq, auto & sw) {
       auto buf = voo::bound_buffer::create_from_host(buf_size, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
+      g_mem = *buf.memory;
+      refresh_batch();
+      //refresh_atlas();
+
       extent_loop(dq.queue(), sw, [&] {
         sw.queue_one_time_submit([&] {
           //auto crp = sw.cmd_render_pass();
