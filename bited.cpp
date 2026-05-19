@@ -236,6 +236,7 @@ struct init : vapp {
           vee::cmd_push_vert_frag_constants(cb, *pl, &g_pc);
           vee::cmd_set_viewport(cb, sw.extent());
           vee::cmd_set_scissor(cb, sw.extent());
+          vee::cmd_bind_descriptor_set(cb, *pl, 0, dset);
           vee::cmd_bind_vertex_buffers(cb, 1, *buf.buffer);
           oq.run(cb, 0, g_inst_count);
         });
