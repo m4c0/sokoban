@@ -230,7 +230,9 @@ struct init : vapp {
 
       extent_loop(dq.queue(), sw, [&] {
         sw.queue_one_time_submit([&] {
-          auto crp = sw.cmd_render_pass();
+          auto crp = sw.cmd_render_pass({
+              .clear_colours { vee::clear_colour({}) },
+          });
           auto cb = sw.command_buffer();
           vee::cmd_bind_gr_pipeline(cb, *gp);
           vee::cmd_push_vert_frag_constants(cb, *pl, &g_pc);
