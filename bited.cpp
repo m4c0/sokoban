@@ -184,7 +184,7 @@ struct init : vapp {
 
     g_pc = {
       .grid_pos { image_w * 0.5, image_h * 0.5 },
-      .grid_size { image_w, image_h },
+      .grid_size { image_w * 0.5, image_h * 0.5 },
     };
 
     main_loop("bited", [&](auto & dq, auto & sw) {
