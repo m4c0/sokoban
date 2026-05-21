@@ -5,12 +5,13 @@ void vlk_init();
 void vlk_frame();
 void vlk_deinit();
 
+void vlk_cursor(int dx, int dy);
+
 #ifdef VLK_IMPL
 #define _CRT_SECURE_NO_WARNINGS
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/time.h>
 
 #ifdef __APPLE__
 #  include <TargetConditionals.h>
@@ -79,8 +80,6 @@ static VkDescriptorSet       vlk_dset;
 static VkPipelineLayout      vlk_pl;
 static VkPipeline            vlk_ppl;
 static VkSampler             vlk_smp;
-
-struct timeval clk;
 
 #ifdef __APPLE__
 CAMetalLayer * vlk_metal_layer();
@@ -769,8 +768,6 @@ void vlk_init() {
 
   vkDestroyShaderModule(vlk_dev, vert, NULL);
   vkDestroyShaderModule(vlk_dev, frag, NULL);
-
-  gettimeofday(&clk, NULL);
 }
 
 void vlk_frame() {
@@ -781,9 +778,6 @@ void vlk_frame() {
 
   unsigned idx;
   vkAcquireNextImageKHR(vlk_dev, vlk_swc.swc, ~0UL, vlk_sema_img[inf], VK_NULL_HANDLE, &idx);
-
-  struct timeval now;
-  gettimeofday(&now, NULL);
 
   vlk_record_cmdbuf(idx);
 
@@ -825,7 +819,6 @@ void vlk_frame() {
     vlk_ext = cap.currentExtent;
 
     vlk_create_swc();
-    //gme_resize(vlk_ext.width, vlk_ext.height);
   }
 }
 
@@ -857,5 +850,14 @@ void vlk_deinit() {
   vkDestroySurfaceKHR(vlk_ins, vlk_surf, NULL);
   vkDestroyInstance(vlk_ins, NULL);
 }
+
+void vlk_cursor(int dx, int dy) {
+  int x = vlk_pc.x + dx;
+  if (x >= 0 && x < 128) vlk_pc.x = x;
+
+  int y = vlk_pc.y + dy;
+  if (y >= 0 && y < 128) vlk_pc.y = y;
+}
+
 #endif
 #endif

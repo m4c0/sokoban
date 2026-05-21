@@ -29,15 +29,15 @@
   NSString * chrs = event.charactersIgnoringModifiers;
   if (chrs.length != 1) return;
 
-  //unichar c = [chrs characterAtIndex:0];
-  //switch (c) {
-  //  case NSLeftArrowFunctionKey:  return gme_left();
-  //  case NSRightArrowFunctionKey: return gme_right();
-  //  case NSUpArrowFunctionKey:    return gme_up();
-  //  case NSDownArrowFunctionKey:  return gme_down();
+  unichar c = [chrs characterAtIndex:0];
+  switch (c) {
+    case NSLeftArrowFunctionKey:  return vlk_cursor(-1,  0);
+    case NSRightArrowFunctionKey: return vlk_cursor( 1,  0);
+    case NSUpArrowFunctionKey:    return vlk_cursor( 0, -1);
+    case NSDownArrowFunctionKey:  return vlk_cursor( 0,  1);
 
-  //  case ' ': return gme_new_game();
-  //}
+    //case ' ': return gme_new_game();
+  }
 }
 @end
 
