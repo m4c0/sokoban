@@ -6,6 +6,7 @@ void vlk_frame();
 void vlk_deinit();
 
 void vlk_cursor(int dx, int dy);
+void vlk_toggle();
 
 #ifdef VLK_IMPL
 #define _CRT_SECURE_NO_WARNINGS
@@ -69,6 +70,9 @@ static VkSurfaceFormatKHR vlk_surf_fmt;
 static VkSurfaceKHR       vlk_surf;
 static unsigned           vlk_qf;
 static unsigned           vlk_swc_count;
+
+static VkBuffer       vlk_atlas_h_buf;
+static VkDeviceMemory vlk_atlas_h_mem;
 
 static VkDeviceMemory vlk_atlas_mem;
 static VkImage        vlk_atlas_img;
@@ -601,25 +605,21 @@ static void vlk_load_atlas() {
   assert(sz);
   assert(0 == fseek(f, 0, SEEK_SET));
 
-  VkBuffer buf = vlk_create_buffer_for_image(sz);
-  VkDeviceMemory mem = vlk_allocate_memory(sz, vlk_find_host_memory());
-  _(vkBindBufferMemory(vlk_dev, buf, mem, 0));
+  vlk_atlas_h_buf = vlk_create_buffer_for_image(sz);
+  vlk_atlas_h_mem = vlk_allocate_memory(sz, vlk_find_host_memory());
+  _(vkBindBufferMemory(vlk_dev, vlk_atlas_h_buf, vlk_atlas_h_mem, 0));
 
   void * data;
-  _(vkMapMemory(vlk_dev, mem, 0, VK_WHOLE_SIZE, 0, &data));
+  _(vkMapMemory(vlk_dev, vlk_atlas_h_mem, 0, VK_WHOLE_SIZE, 0, &data));
   assert(1 == fread(data, sz, 1, f));
+  vkUnmapMemory(vlk_dev, vlk_atlas_h_mem);
   fclose(f);
 
   vlk_atlas_img = vlk_create_image(128, 32, VK_FORMAT_R8_UNORM, VK_IMAGE_USAGE_TRANSFER_DST_BIT);
   vlk_atlas_mem = vlk_allocate_image_memory(vlk_atlas_img);
   vlk_atlas_iv  = vlk_create_image_view(vlk_atlas_img, VK_FORMAT_R8_UNORM);
 
-  vlk_record_buf2img(buf, vlk_atlas_img, 128, 32);
-
-  vkDeviceWaitIdle(vlk_dev);
-
-  vkDestroyBuffer(vlk_dev, buf, NULL);
-  vkFreeMemory(vlk_dev, mem, NULL);
+  vlk_record_buf2img(vlk_atlas_h_buf, vlk_atlas_img, 128, 32);
 }
 
 void vlk_init() {
@@ -834,6 +834,9 @@ void vlk_deinit() {
     vkDestroySemaphore(vlk_dev, vlk_sema_present[i], NULL);
   }
 
+  vkDestroyBuffer(vlk_dev, vlk_atlas_h_buf, NULL);
+  vkFreeMemory   (vlk_dev, vlk_atlas_h_mem, NULL);
+
   vkDestroyImageView (vlk_dev, vlk_atlas_iv, NULL);
   vkDestroyImage     (vlk_dev, vlk_atlas_img, NULL);
   vkFreeMemory       (vlk_dev, vlk_atlas_mem, NULL);
@@ -857,6 +860,17 @@ void vlk_cursor(int dx, int dy) {
 
   int y = vlk_pc.y + dy;
   if (y >= 0 && y < 128) vlk_pc.y = y;
+}
+
+void vlk_toggle() {
+  unsigned char * data;
+  _(vkMapMemory(vlk_dev, vlk_atlas_h_mem, 0, VK_WHOLE_SIZE, 0, (void **)&data));
+
+  int i = vlk_pc.y * 128 + vlk_pc.x;
+  data[i] = data[i] ? 0 : 255;
+
+  vkUnmapMemory(vlk_dev, vlk_atlas_h_mem);
+  vlk_record_buf2img(vlk_atlas_h_buf, vlk_atlas_img, 128, 32);
 }
 
 #endif

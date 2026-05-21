@@ -36,7 +36,7 @@
     case NSUpArrowFunctionKey:    return vlk_cursor( 0, -1);
     case NSDownArrowFunctionKey:  return vlk_cursor( 0,  1);
 
-    //case ' ': return gme_new_game();
+    case ' ': return vlk_toggle();
   }
 }
 @end
