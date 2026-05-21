@@ -28,14 +28,6 @@ static int run(char ** args) {
   return 1;
 }
 
-static int cp(const char * b) {
-  char skb[1024]; snprintf(skb, 1024, "sokoban.app/Contents/Resources/%s", b);
-  char bit[1024]; snprintf(bit, 1024, "bited.app/Contents/Resources/%s", b);
-
-  char * args[] = { "cp", skb, bit, 0 };
-  return run(args);
-}
-
 static int atlas() {
   int w, h, comp;
   stbi_uc * data = stbi_load("../atlas.png", &w, &h, &comp, 1);
@@ -49,18 +41,15 @@ static int atlas() {
   for (int i = 0; i < w * h; i++, data += 4) assert(data[3] == fputc(data[3], out));
   fclose(out);
 
-  return cp("atlas.img");
+  return 0;
 }
 
-static int shader(char * name) {
-  char spv[1024]; snprintf(spv, 1024, "sokoban.app/Contents/Resources/%s.spv", name);
+static int shader(const char * app, char * name) {
+  char spv[1024]; snprintf(spv, 1024, "%s.app/Contents/Resources/%s.spv", app, name);
   char src[1024]; snprintf(src, 1024, "../%s", name);
 
-  { char * args[] = { "glslang", "-V", src, "-o", spv, 0 };
-    if (run(args)) return 1; }
-
-  snprintf(spv, 1024, "%s.spv", name);
-  return cp(spv);
+  char * args[] = { "glslang", "-V", src, "-o", spv, 0 };
+  return run(args);
 }
 
 static int cc(char * src, char * o) {
@@ -135,7 +124,7 @@ int main(int argc, char ** argv) {
   if (shader("sokoban", "sokoban.frag")) return 1;
   if (shader("sokoban", "sokoban.vert")) return 1;
 
-  if (app("bited"  )) return 1;
+  if (app("bited")) return 1;
   if (cc("bited.m", "bited.o")) return 1;
   if (hdr("vlk-bited.h", "vlk-bited.o", "VLK_IMPL")) return 1;
   if (bited_exe()) return 1;
