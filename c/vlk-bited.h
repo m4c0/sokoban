@@ -8,6 +8,9 @@ void vlk_deinit();
 void vlk_cursor(int dx, int dy);
 void vlk_toggle();
 
+void vlk_load();
+void vlk_save();
+
 #ifdef VLK_IMPL
 #define _CRT_SECURE_NO_WARNINGS
 #include <assert.h>
@@ -871,6 +874,28 @@ void vlk_toggle() {
 
   vkUnmapMemory(vlk_dev, vlk_atlas_h_mem);
   vlk_record_buf2img(vlk_atlas_h_buf, vlk_atlas_img, 128, 32);
+}
+
+void vlk_load() {
+  FILE * f = fopen("atlas.img", "rb");
+
+  unsigned char * data;
+  _(vkMapMemory(vlk_dev, vlk_atlas_h_mem, 0, VK_WHOLE_SIZE, 0, (void **)&data));
+  fread(data, 128 * 32, 1, f);
+  vkUnmapMemory(vlk_dev, vlk_atlas_h_mem);
+
+  fclose(f);
+  vlk_record_buf2img(vlk_atlas_h_buf, vlk_atlas_img, 128, 32);
+}
+void vlk_save() {
+  FILE * f = fopen("atlas.img", "wb");
+
+  unsigned char * data;
+  _(vkMapMemory(vlk_dev, vlk_atlas_h_mem, 0, VK_WHOLE_SIZE, 0, (void **)&data));
+  fwrite(data, 128 * 32, 1, f);
+  vkUnmapMemory(vlk_dev, vlk_atlas_h_mem);
+
+  fclose(f);
 }
 
 #endif

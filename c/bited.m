@@ -37,6 +37,9 @@
     case NSDownArrowFunctionKey:  return vlk_cursor( 0,  1);
 
     case ' ': return vlk_toggle();
+
+    case 'e': return vlk_load();
+    case 'w': return vlk_save();
   }
 }
 @end
