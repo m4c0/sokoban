@@ -39,22 +39,8 @@ typedef struct vlk_swc {
   VkSwapchainKHR  swc;
 } vlk_swc_t;
 
-typedef struct vlk_vec2 {
-  float x, y;
-} vlk_vec2_t;
-typedef struct vlk_vec4 {
-  float x, y, z, w;
-} vlk_vec4_t;
 typedef struct vlk_upc {
-  vlk_vec4_t sel_rect;
-  vlk_vec2_t player_pos;
-  vlk_vec2_t label_pos;
-  vlk_vec2_t menu_size;
-  float level;
-  float aspect;
-  float time;
-  float back_btn_dim;
-  float menu_btn_dim;
+  int x, y;
 } vlk_upc_t;
 
 static vlk_swc_t vlk_swc     = {0};
@@ -798,9 +784,6 @@ void vlk_frame() {
 
   struct timeval now;
   gettimeofday(&now, NULL);
-
-  vlk_pc.time   = (now.tv_sec - clk.tv_sec) + (now.tv_usec - clk.tv_usec) / 1.0e6; 
-  vlk_pc.aspect = (float)vlk_ext.width / (float)vlk_ext.height;
 
   vlk_record_cmdbuf(idx);
 
