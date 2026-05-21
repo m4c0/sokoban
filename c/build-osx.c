@@ -36,9 +36,15 @@ static int atlas() {
   assert(h == 128);
   assert(comp == 4);
 
-  FILE * out = fopen("sokoban.app/Contents/Resources/atlas.img", "wb");
+  FILE * out = fopen("atlas.img", "wb");
   assert(out);
-  for (int i = 0; i < w * h; i++) assert(data[i] == fputc(data[i], out));
+  for (int y = 0; y < h; y += 4) {
+    for (int x = 0; x < w; x += 4) {
+      int i = (y+1) * w + (x+1);
+      assert(data[i] == fputc(data[i], out));
+    }
+  }
+  //for (int i = 0; i < w * h; i++) assert(data[i] == fputc(data[i], out));
   fclose(out);
 
   return 0;

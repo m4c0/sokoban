@@ -625,11 +625,11 @@ static void vlk_load_atlas() {
   assert(1 == fread(data, sz, 1, f));
   fclose(f);
 
-  vlk_atlas_img = vlk_create_image(512, 128, VK_FORMAT_R8_UNORM, VK_IMAGE_USAGE_TRANSFER_DST_BIT);
+  vlk_atlas_img = vlk_create_image(128, 32, VK_FORMAT_R8_UNORM, VK_IMAGE_USAGE_TRANSFER_DST_BIT);
   vlk_atlas_mem = vlk_allocate_image_memory(vlk_atlas_img);
   vlk_atlas_iv  = vlk_create_image_view(vlk_atlas_img, VK_FORMAT_R8_UNORM);
 
-  vlk_record_buf2img(buf, vlk_atlas_img, 512, 128);
+  vlk_record_buf2img(buf, vlk_atlas_img, 128, 32);
 
   vkDeviceWaitIdle(vlk_dev);
 
