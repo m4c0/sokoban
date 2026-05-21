@@ -87,15 +87,6 @@ static VkDeviceMemory vlk_atlas_mem;
 static VkImage        vlk_atlas_img;
 static VkImageView    vlk_atlas_iv;
 
-static VkCommandBuffer vlk_map_cb;
-static VkDeviceMemory  vlk_map_mem;
-static VkImage         vlk_map_img;
-static VkImageView     vlk_map_iv;
-static uint8_t *       vlk_map_ptr;
-
-static VkBuffer        vlk_map_h_buf;
-static VkDeviceMemory  vlk_map_h_mem;
-
 static VkDescriptorPool      vlk_dpool;
 static VkDescriptorSetLayout vlk_dsl;
 static VkDescriptorSet       vlk_dset;
@@ -646,18 +637,6 @@ static void vlk_load_atlas() {
   vkFreeMemory(vlk_dev, mem, NULL);
 }
 
-void vlk_create_map() {
-  vlk_map_h_buf = vlk_create_buffer_for_image(32 * 32);
-  vlk_map_h_mem = vlk_allocate_memory(32 * 32, vlk_find_host_memory());
-  _(vkBindBufferMemory(vlk_dev, vlk_map_h_buf, vlk_map_h_mem, 0));
-
-  vlk_map_img = vlk_create_image(32, 32, VK_FORMAT_R8_UINT, VK_IMAGE_USAGE_TRANSFER_DST_BIT);
-  vlk_map_mem = vlk_allocate_image_memory(vlk_map_img);
-  vlk_map_iv  = vlk_create_image_view(vlk_map_img, VK_FORMAT_R8_UINT);
-
-  vlk_map_cb = vlk_record_buf2img(vlk_map_h_buf, vlk_map_img, 32, 32);
-}
-
 void vlk_init() {
 #if !TARGET_OS_IPHONE
   _(volkInitialize());
@@ -678,18 +657,12 @@ void vlk_init() {
   vlk_create_swc();
 
   vlk_load_atlas();
-  vlk_create_map();
 
   VkDescriptorSetLayoutCreateInfo dsl_info = {
     .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
-    .bindingCount = 2,
+    .bindingCount = 1,
     .pBindings = (VkDescriptorSetLayoutBinding[]) {{
       .binding = 0,
-      .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-      .descriptorCount = 1,
-      .stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
-    }, {
-      .binding = 1,
       .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
       .descriptorCount = 1,
       .stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
@@ -703,7 +676,7 @@ void vlk_init() {
     .poolSizeCount = 1,
     .pPoolSizes = (VkDescriptorPoolSize[]) {{
       .type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-      .descriptorCount = 2,
+      .descriptorCount = 1,
     }},
   };
   _(vkCreateDescriptorPool(vlk_dev, &dpool_info, NULL, &vlk_dpool));
@@ -723,20 +696,10 @@ void vlk_init() {
   };
   _(vkCreateSampler(vlk_dev, &smp_info, NULL, &vlk_smp));
 
-  VkWriteDescriptorSet wds[2] = {{
+  VkWriteDescriptorSet wds = {
     .sType           = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
     .dstSet          = vlk_dset,
-    .descriptorCount = 1,
-    .descriptorType  = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-    .pImageInfo      = (VkDescriptorImageInfo[]) {{
-      .sampler       = vlk_smp,
-      .imageView     = vlk_map_iv,
-      .imageLayout   = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-    }},
-  }, {
-    .sType           = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-    .dstSet          = vlk_dset,
-    .dstBinding      = 1,
+    .dstBinding      = 0,
     .descriptorCount = 1,
     .descriptorType  = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
     .pImageInfo      = (VkDescriptorImageInfo[]) {{
@@ -744,8 +707,8 @@ void vlk_init() {
       .imageView     = vlk_atlas_iv,
       .imageLayout   = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
     }},
-  }};
-  vkUpdateDescriptorSets(vlk_dev, 2, wds, 0, NULL);
+  };
+  vkUpdateDescriptorSets(vlk_dev, 1, &wds, 0, NULL);
 
   VkPipelineLayoutCreateInfo pl_info = {
     .sType                  = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
@@ -822,8 +785,6 @@ void vlk_init() {
   vkDestroyShaderModule(vlk_dev, frag, NULL);
 
   gettimeofday(&clk, NULL);
-
-  _(vkMapMemory(vlk_dev, vlk_map_h_mem, 0, VK_WHOLE_SIZE, 0, (void **)&vlk_map_ptr));
 }
 
 void vlk_frame() {
@@ -900,13 +861,6 @@ void vlk_deinit() {
   vkDestroyImageView (vlk_dev, vlk_atlas_iv, NULL);
   vkDestroyImage     (vlk_dev, vlk_atlas_img, NULL);
   vkFreeMemory       (vlk_dev, vlk_atlas_mem, NULL);
-
-  vkDestroyImageView (vlk_dev, vlk_map_iv, NULL);
-  vkDestroyImage     (vlk_dev, vlk_map_img, NULL);
-  vkFreeMemory       (vlk_dev, vlk_map_mem, NULL);
-
-  vkDestroyBuffer (vlk_dev, vlk_map_h_buf, NULL);
-  vkFreeMemory    (vlk_dev, vlk_map_h_mem, NULL);
 
   vkDestroySampler             (vlk_dev, vlk_smp,   NULL);
   vkDestroyDescriptorSetLayout (vlk_dev, vlk_dsl,   NULL);
