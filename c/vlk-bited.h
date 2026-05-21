@@ -609,7 +609,7 @@ static VkImageView vlk_create_image_view(VkImage img, VkFormat fmt) {
 }
 
 static void vlk_load_atlas() {
-  FILE * f = vlk_open("atlas", "img");
+  FILE * f = fopen("atlas.img", "rb");;
   assert(f);
   assert(0 == fseek(f, 0, SEEK_END));
   long sz = ftell(f);
