@@ -38,7 +38,7 @@ static int atlas() {
 
   FILE * out = fopen("sokoban.app/Contents/Resources/atlas.img", "wb");
   assert(out);
-  for (int i = 0; i < w * h; i++, data += 4) assert(data[3] == fputc(data[3], out));
+  for (int i = 0; i < w * h; i++) assert(data[i] == fputc(data[i], out));
   fclose(out);
 
   return 0;
