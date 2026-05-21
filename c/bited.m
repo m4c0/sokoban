@@ -2,7 +2,7 @@
 #import <CoreFoundation/CoreFoundation.h>
 #import <MetalKit/MetalKit.h>
 
-#include "vlk.h"
+#include "vlk-bited.h"
 
 @interface POCViewDelegate : NSObject<MTKViewDelegate>
 @property (nonatomic) BOOL ready;
@@ -76,7 +76,7 @@ static void run() {
   w.contentView = v;
   w.styleMask = NSWindowStyleMaskTitled | NSWindowStyleMaskClosable | NSWindowStyleMaskMiniaturizable;
 
-  NSRect crect = NSMakeRect(0, 0, 800, 600);
+  NSRect crect = NSMakeRect(0, 0, 1024, 256);
   NSRect frect = [w frameRectForContentRect:crect];
   [w setFrame:frect display:YES];
   [w center];
