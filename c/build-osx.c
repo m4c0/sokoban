@@ -58,10 +58,19 @@ static int shader(const char * app, char * name) {
   return run(args);
 }
 
+static int pch() {
+  char * args[] = {
+    "clang", "-Wall", "-g", "-x", "c-header",
+    "-IVulkan-Headers/include",
+    "-D", "VK_USE_PLATFORM_METAL_EXT",
+    "-D", "VLK_USE_VOLK",
+    "-o", "pch.pch", "pch.h", 0 };
+  return run(args);
+}
+
 static int cc(char * src, char * o) {
   char * args[] = {
-    "clang", "-Wall", "-g",
-    "-IVulkan-Headers/include",
+    "clang", "-Wall", "-g", "-include-pch", "pch.pch",
     "-o", o, "-c", src, 0 };
   return run(args);
 }
@@ -71,17 +80,13 @@ static int cm(char * src, char * o) {
   // The compilation speed without it is abismal.
   char * args[] = {
     "clang", "-Wall", "-g", "-fmodules",
-    "-IVulkan-Headers/include",
     "-o", o, "-c", src, 0 };
   return run(args);
 }
 
 static int hdr(char * src, char * o, char * d) {
   char * args[] = {
-    "clang", "-Wall", "-x", "c", "-g",
-    "-IVulkan-Headers/include",
-    "-D", "VK_USE_PLATFORM_METAL_EXT",
-    "-D", "VLK_USE_VOLK",
+    "clang", "-Wall", "-x", "c", "-g", "-include-pch", "pch.pch",
     "-D", d, "-o", o, "-c", src, 0
   };
   return run(args);
@@ -132,6 +137,8 @@ static int app(const char * n) {
 
 int main(int argc, char ** argv) {
   if (argc != 1) return (usage(), 1);
+
+  if (pch()) return 1;
 
   if (hdr("volk.h", "volk.o", "VOLK_IMPLEMENTATION")) return 1;
 
