@@ -82,6 +82,18 @@ static int bited_exe() {
   return run(args);
 }
 
+static int maped_exe() {
+  char * args[] = {
+    "clang", "-Wall",
+    "-framework", "AppKit",
+    "-framework", "AudioToolbox",
+    "-framework", "MetalKit",
+    "-o", "maped.app/Contents/MacOS/maped", 
+    "maped.o", "vlk-maped.o", "volk.o",
+    0 };
+  return run(args);
+}
+
 static int link_exe() {
   char * args[] = {
     "clang", "-Wall",
@@ -113,6 +125,21 @@ static int app(const char * n) {
   return run(args);
 }
 
+static int cp_frag() {
+  char * args[] = { "cp",
+    "sokoban.app/Contents/Resources/sokoban.frag.spv",
+    "maped.app/Contents/Resources/",
+    0 };
+  return run(args);
+}
+static int cp_vert() {
+  char * args[] = { "cp",
+    "sokoban.app/Contents/Resources/sokoban.vert.spv",
+    "maped.app/Contents/Resources/",
+    0 };
+  return run(args);
+}
+
 int main(int argc, char ** argv) {
   if (argc != 1) return (usage(), 1);
 
@@ -126,15 +153,23 @@ int main(int argc, char ** argv) {
   if (hdr("spr.h", "spr.o", "SPR_IMPL")) return 1;
   if (hdr("vlk.h", "vlk.o", "VLK_IMPL")) return 1;
   if (link_exe()) return 1;
-  if (shader("sokoban", "sokoban.frag")) return 1;
-  if (shader("sokoban", "sokoban.vert")) return 1;
 
   if (app("bited")) return 1;
   if (cm("bited.m", "bited.o")) return 1;
   if (hdr("vlk-bited.h", "vlk-bited.o", "VLK_IMPL")) return 1;
   if (bited_exe()) return 1;
+
+  if (app("maped")) return 1;
+  if (cm("maped.m", "maped.o")) return 1;
+  if (hdr("vlk-maped.h", "vlk-maped.o", "VLK_IMPL")) return 1;
+  if (maped_exe()) return 1;
+
   if (shader("bited", "bited.frag")) return 1;
   if (shader("bited", "bited.vert")) return 1;
+  if (shader("sokoban", "sokoban.frag")) return 1;
+  if (shader("sokoban", "sokoban.vert")) return 1;
+  if (cp_frag()) return 1;
+  if (cp_vert()) return 1;
 
   return 0;
 }
