@@ -66,6 +66,16 @@ static int cc(char * src, char * o) {
   return run(args);
 }
 
+static int cm(char * src, char * o) {
+  // It's nearly mandatory to use "modules" with ObjC.
+  // The compilation speed without it is abismal.
+  char * args[] = {
+    "clang", "-Wall", "-g", "-fmodules",
+    "-IVulkan-Headers/include",
+    "-o", o, "-c", src, 0 };
+  return run(args);
+}
+
 static int hdr(char * src, char * o, char * d) {
   char * args[] = {
     "clang", "-Wall", "-x", "c", "-g",
@@ -122,7 +132,7 @@ int main(int argc, char ** argv) {
   if (argc != 1) return (usage(), 1);
 
   if (app("sokoban")) return 1;
-  if (cc("vulkan-osx.m", "vulkan-osx.o")) return 1;
+  if (cm("vulkan-osx.m", "vulkan-osx.o")) return 1;
   if (hdr("gme.h", "gme.o", "GME_IMPL")) return 1;
   if (hdr("spr.h", "spr.o", "SPR_IMPL")) return 1;
   if (hdr("vlk.h", "vlk.o", "VLK_IMPL")) return 1;
@@ -131,7 +141,7 @@ int main(int argc, char ** argv) {
   if (shader("sokoban", "sokoban.vert")) return 1;
 
   if (app("bited")) return 1;
-  if (cc("bited.m", "bited.o")) return 1;
+  if (cm("bited.m", "bited.o")) return 1;
   if (hdr("vlk-bited.h", "vlk-bited.o", "VLK_IMPL")) return 1;
   if (bited_exe()) return 1;
   if (shader("bited", "bited.frag")) return 1;
