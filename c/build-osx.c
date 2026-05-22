@@ -28,28 +28,6 @@ static int run(char ** args) {
   return 1;
 }
 
-static int atlas() {
-  int w, h, comp;
-  stbi_uc * data = stbi_load("../atlas.png", &w, &h, &comp, 1);
-  assert(data);
-  assert(w == 512);
-  assert(h == 128);
-  assert(comp == 4);
-
-  FILE * out = fopen("atlas.img", "wb");
-  assert(out);
-  for (int y = 0; y < h; y += 4) {
-    for (int x = 0; x < w; x += 4) {
-      int i = (y+1) * w + (x+1);
-      assert(data[i] == fputc(data[i], out));
-    }
-  }
-  //for (int i = 0; i < w * h; i++) assert(data[i] == fputc(data[i], out));
-  fclose(out);
-
-  return 0;
-}
-
 static int shader(const char * app, char * name) {
   char spv[1024]; snprintf(spv, 1024, "%s.app/Contents/Resources/%s.spv", app, name);
   char src[1024]; snprintf(src, 1024, "../%s", name);
@@ -157,8 +135,6 @@ int main(int argc, char ** argv) {
   if (bited_exe()) return 1;
   if (shader("bited", "bited.frag")) return 1;
   if (shader("bited", "bited.vert")) return 1;
-
-  if (atlas()) return 1;
 
   return 0;
 }
