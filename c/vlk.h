@@ -12,21 +12,13 @@ void vlk_deinit();
 #include <stdlib.h>
 #include <sys/time.h>
 
-#ifdef __APPLE__
-#  include <TargetConditionals.h>
-#  define VK_USE_PLATFORM_METAL_EXT
-#endif
-
-#if !TARGET_OS_IPHONE
-#  define VOLK_IMPLEMENTATION
+#ifdef VLK_USE_VOLK
 #  include "volk.h"
-#endif
-
-// not really needed. I'm using because it enables Vim's ctrl-n
-#include "Vulkan-Headers/include/vulkan/vulkan_core.h"
-
-#ifdef __APPLE__
-#  include "Vulkan-Headers/include/vulkan/vulkan_metal.h"
+#else
+#  include "Vulkan-Headers/include/vulkan/vulkan_core.h"
+#  ifdef __APPLE__
+#    include "Vulkan-Headers/include/vulkan/vulkan_metal.h"
+#  endif
 #endif
 
 #define VBUF_SIZE 16

@@ -80,6 +80,8 @@ static int hdr(char * src, char * o, char * d) {
   char * args[] = {
     "clang", "-Wall", "-x", "c", "-g",
     "-IVulkan-Headers/include",
+    "-D", "VK_USE_PLATFORM_METAL_EXT",
+    "-D", "VLK_USE_VOLK",
     "-D", d, "-o", o, "-c", src, 0
   };
   return run(args);
@@ -92,7 +94,7 @@ static int bited_exe() {
     "-framework", "AudioToolbox",
     "-framework", "MetalKit",
     "-o", "bited.app/Contents/MacOS/bited", 
-    "bited.o", "vlk-bited.o",
+    "bited.o", "vlk-bited.o", "volk.o",
     0 };
   return run(args);
 }
@@ -104,7 +106,7 @@ static int link_exe() {
     "-framework", "AudioToolbox",
     "-framework", "MetalKit",
     "-o", "sokoban.app/Contents/MacOS/sokoban", 
-    "gme.o", "spr.o", "vlk.o",
+    "gme.o", "spr.o", "vlk.o", "volk.o",
     "vulkan-osx.o",
     0 };
   return run(args);
@@ -130,6 +132,8 @@ static int app(const char * n) {
 
 int main(int argc, char ** argv) {
   if (argc != 1) return (usage(), 1);
+
+  if (hdr("volk.h", "volk.o", "VOLK_IMPLEMENTATION")) return 1;
 
   if (app("sokoban")) return 1;
   if (cm("vulkan-osx.m", "vulkan-osx.o")) return 1;
