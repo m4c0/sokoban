@@ -42,11 +42,14 @@ static LRESULT window_proc(HWND hwnd, UINT msg, WPARAM w_param, LPARAM l_param) 
       if (HIWORD(l_param) & KF_REPEAT) return 0;
 
       switch (LOWORD(w_param)) {
-        // case VK_LEFT:  gme_left();     break;
-        // case VK_RIGHT: gme_right();    break;
-        // case VK_UP:    gme_up();       break;
-        // case VK_DOWN:  gme_down();     break;
-        // case VK_SPACE: gme_new_game(); break;
+        case VK_LEFT:  vlk_cursor(-1,  0); break;
+        case VK_RIGHT: vlk_cursor( 1,  0); break;
+        case VK_UP:    vlk_cursor( 0, -1); break;
+        case VK_DOWN:  vlk_cursor( 0,  1); break;
+        case VK_SPACE: vlk_toggle(); break;
+
+        case 'W': vlk_save(); break;
+        case 'E': vlk_load(); break;
       }
 
       return 0;
