@@ -27,6 +27,7 @@ typedef struct vlk_upc {
 } vlk_upc_t;
 
 static vlk_upc_t vlk_pc;
+static vlk_img_t vlk_map;
 
 static VkDescriptorPool      vlk_dpool;
 static VkDescriptorSetLayout vlk_dsl;
@@ -46,6 +47,9 @@ void vlk_init() {
   vlk_create();
 
   vlk_load_atlas(vlk_open("atlas", "img"));
+
+  vlk_create_img(&vlk_map, 128, 128, VK_FORMAT_R8_UINT);
+  vlk_record_buf2img(vlk_map.h_buf, vlk_map.img, 128, 128);
 
   VkDescriptorSetLayoutCreateInfo dsl_info = {
     .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
@@ -98,7 +102,7 @@ void vlk_init() {
     .descriptorType  = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
     .pImageInfo      = (VkDescriptorImageInfo[]) {{
       .sampler       = vlk_smp,
-      .imageView     = vlk_atlas.iv,
+      .imageView     = vlk_map.iv,
       .imageLayout   = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
     }},
   }, {
@@ -199,6 +203,7 @@ void vlk_deinit() {
   vkDestroyPipeline            (vlk_dev, vlk_ppl,   NULL);
   vkDestroyPipelineLayout      (vlk_dev, vlk_pl,    NULL);
 
+  vlk_destroy_img(&vlk_map);
   vlk_destroy();
 }
 

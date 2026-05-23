@@ -413,16 +413,16 @@ static VkImageView vlk_create_image_view(VkImage img, VkFormat fmt) {
   return iv;
 }
 
-static void vlk_create_img(vlk_img_t * img, unsigned w, unsigned h) {
+static void vlk_create_img(vlk_img_t * img, unsigned w, unsigned h, VkFormat fmt) {
   unsigned sz = w * h;
 
   img->h_buf = vlk_create_buffer_for_image(sz);
   img->h_mem = vlk_allocate_memory(sz, vlk_find_host_memory());
   _(vkBindBufferMemory(vlk_dev, img->h_buf, img->h_mem, 0));
 
-  img->img = vlk_create_image(w, h, VK_FORMAT_R8_UNORM, VK_IMAGE_USAGE_TRANSFER_DST_BIT);
+  img->img = vlk_create_image(w, h, fmt, VK_IMAGE_USAGE_TRANSFER_DST_BIT);
   img->mem = vlk_allocate_image_memory(img->img);
-  img->iv  = vlk_create_image_view(img->img, VK_FORMAT_R8_UNORM);
+  img->iv  = vlk_create_image_view(img->img, fmt);
 }
 static void vlk_destroy_img(vlk_img_t * img) {
   vkDestroyBuffer    (vlk_dev, img->h_buf, NULL);
@@ -677,7 +677,7 @@ static VkCommandBuffer vlk_record_buf2img(VkBuffer buf, VkImage img, int w, int 
 }
 
 static void vlk_load_atlas(FILE * f) {
-  vlk_create_img(&vlk_atlas, 128, 32);
+  vlk_create_img(&vlk_atlas, 128, 32, VK_FORMAT_R8_UNORM);
 
   assert(f);
   assert(0 == fseek(f, 0, SEEK_END));
