@@ -1,15 +1,6 @@
-#include "gme.h"
-
-#define _CRT_SECURE_NO_WARNINGS
-#define WIN32_MEAN_AND_LEAN
-#include <stdio.h>
-#include <windows.h>
+#include "vlk-bited.h"
 
 HWND vlk_hwnd;
-
-void vlk_init();
-void vlk_frame();
-void vlk_deinit();
 
 FILE * vlk_open(const char * name) {
   char buf[128]; snprintf(buf, 128, "%s.spv", name);
@@ -71,7 +62,7 @@ int WinMain(HINSTANCE h_instance, HINSTANCE h_prev, LPSTR cmd_line, int cmd_show
     .hIcon         = h_icon,
     .hCursor       = LoadCursor(NULL, IDC_ARROW),
     .hbrBackground = (HBRUSH)(COLOR_WINDOW + 1),
-    .lpszClassName = "m4c0-snake-window",
+    .lpszClassName = "m4c0-sokoban-bited-window",
     .hIconSm       = h_icon,
   };
   if (!RegisterClassEx(&wcex)) {
@@ -82,10 +73,10 @@ int WinMain(HINSTANCE h_instance, HINSTANCE h_prev, LPSTR cmd_line, int cmd_show
   DWORD style = WS_OVERLAPPEDWINDOW ^ WS_SIZEBOX ^ WS_MAXIMIZEBOX;
 
   HWND hwnd = CreateWindow(
-      "m4c0-snake-window",
-      "Casually Casual Snake Game",
+      "m4c0-sokoban-bited-window",
+      "BITmap EDitor",
       style, CW_USEDEFAULT, CW_USEDEFAULT,
-      600, 800, 
+      1024, 256, 
       NULL, NULL, h_instance, NULL);
   if (!hwnd) {
     MessageBox(NULL, "Failed to create window", "Unhandled error", 0);
