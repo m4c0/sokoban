@@ -20,8 +20,6 @@ typedef struct vlk_upc {
 
 static vlk_upc_t vlk_pc;
 
-static VkRenderPass       vlk_rp;
-
 static VkBuffer       vlk_atlas_h_buf;
 static VkDeviceMemory vlk_atlas_h_mem;
 
@@ -35,60 +33,6 @@ static VkDescriptorSet       vlk_dset;
 static VkPipelineLayout      vlk_pl;
 static VkPipeline            vlk_ppl;
 static VkSampler             vlk_smp;
-
-static void vlk_create_render_pass() {
-  VkAttachmentDescription att = {
-    .format      = vlk_surf_fmt.format,
-    .samples     = VK_SAMPLE_COUNT_1_BIT,
-    .loadOp      = VK_ATTACHMENT_LOAD_OP_CLEAR,
-    .storeOp     = VK_ATTACHMENT_STORE_OP_STORE,
-    .finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
-  };
-
-  VkAttachmentReference ref = {
-    .attachment = 0,
-    .layout     = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-  };
-
-  // Without this, we might face WRITE_AFTER_READ access hazards
-  VkSubpassDependency dep = {
-    .srcSubpass    = VK_SUBPASS_EXTERNAL,
-    .srcStageMask  = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
-    .dstStageMask  = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
-    .dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
-  };
-
-  VkSubpassDescription subpass = {
-    .colorAttachmentCount = 1,
-    .pColorAttachments    = &ref,
-  };
-
-  VkRenderPassCreateInfo info = {
-    .sType           = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
-    .attachmentCount = 1,
-    .pAttachments    = &att,
-    .subpassCount    = 1,
-    .pSubpasses      = &subpass,
-    .dependencyCount = 1,
-    .pDependencies   = &dep,
-  };
-  _(vkCreateRenderPass(vlk_dev, &info, NULL, &vlk_rp));
-}
-
-static void vlk_create_framebuffer() {
-  for (int i = 0; i < vlk_swc_count; i++) {
-    VkFramebufferCreateInfo info = {
-      .sType           = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
-      .renderPass      = vlk_rp,
-      .attachmentCount = 1,
-      .pAttachments    = vlk_swc.iv + i,
-      .width           = vlk_ext.width,
-      .height          = vlk_ext.height,
-      .layers          = 1,
-    };
-    _(vkCreateFramebuffer(vlk_dev, &info, NULL, vlk_swc.fb + i));
-  }
-}
 
 static VkCommandBuffer vlk_record_buf2img(VkBuffer buf, VkImage img, int w, int h) {
   VkCommandBuffer cb;
@@ -240,7 +184,6 @@ static void vlk_load_atlas() {
 void vlk_init() {
   vlk_create();
 
-  vlk_create_render_pass();
   vlk_load_atlas();
 
   VkDescriptorSetLayoutCreateInfo dsl_info = {
@@ -435,8 +378,6 @@ void vlk_deinit() {
   vkDestroyDescriptorPool      (vlk_dev, vlk_dpool, NULL);
   vkDestroyPipeline            (vlk_dev, vlk_ppl,   NULL);
   vkDestroyPipelineLayout      (vlk_dev, vlk_pl,    NULL);
-
-  vkDestroyRenderPass(vlk_dev, vlk_rp, NULL);
 
   vlk_destroy();
 }

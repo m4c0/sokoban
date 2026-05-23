@@ -15,6 +15,7 @@ static VkExtent2D         vlk_ext;
 static VkInstance         vlk_ins;
 static VkPhysicalDevice   vlk_pd;
 static VkQueue            vlk_q;
+static VkRenderPass       vlk_rp;
 static VkSurfaceFormatKHR vlk_surf_fmt;
 static VkSurfaceKHR       vlk_surf;
 static unsigned           vlk_qf;
@@ -223,7 +224,60 @@ static void vlk_create_swapchain() {
   }
 }
 
-static void vlk_create_framebuffer();
+static void vlk_create_render_pass() {
+  VkAttachmentDescription att = {
+    .format      = vlk_surf_fmt.format,
+    .samples     = VK_SAMPLE_COUNT_1_BIT,
+    .loadOp      = VK_ATTACHMENT_LOAD_OP_CLEAR,
+    .storeOp     = VK_ATTACHMENT_STORE_OP_STORE,
+    .finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+  };
+
+  VkAttachmentReference ref = {
+    .attachment = 0,
+    .layout     = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+  };
+
+  // Without this, we might face WRITE_AFTER_READ access hazards
+  VkSubpassDependency dep = {
+    .srcSubpass    = VK_SUBPASS_EXTERNAL,
+    .srcStageMask  = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+    .dstStageMask  = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+    .dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
+  };
+
+  VkSubpassDescription subpass = {
+    .colorAttachmentCount = 1,
+    .pColorAttachments    = &ref,
+  };
+
+  VkRenderPassCreateInfo info = {
+    .sType           = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
+    .attachmentCount = 1,
+    .pAttachments    = &att,
+    .subpassCount    = 1,
+    .pSubpasses      = &subpass,
+    .dependencyCount = 1,
+    .pDependencies   = &dep,
+  };
+  _(vkCreateRenderPass(vlk_dev, &info, NULL, &vlk_rp));
+}
+
+static void vlk_create_framebuffer() {
+  for (int i = 0; i < vlk_swc_count; i++) {
+    VkFramebufferCreateInfo info = {
+      .sType           = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
+      .renderPass      = vlk_rp,
+      .attachmentCount = 1,
+      .pAttachments    = vlk_swc.iv + i,
+      .width           = vlk_ext.width,
+      .height          = vlk_ext.height,
+      .layers          = 1,
+    };
+    _(vkCreateFramebuffer(vlk_dev, &info, NULL, vlk_swc.fb + i));
+  }
+}
+
 static void vlk_destroy_swc(vlk_swc_t * swc) {
   for (int i = 0; i < vlk_swc_count; i++) {
     vkDestroyFramebuffer(vlk_dev, swc->fb[i], NULL);
@@ -402,6 +456,8 @@ static void vlk_create() {
 
   vlk_create_command_pool();
   vlk_allocate_command_buffers(vlk_swc_count, vlk_cb);
+
+  vlk_create_render_pass();
 }
 
 static void vlk_destroy() {
@@ -415,6 +471,7 @@ static void vlk_destroy() {
   }
 
   vkDestroyCommandPool(vlk_dev, vlk_cpool, NULL);
+  vkDestroyRenderPass(vlk_dev, vlk_rp, NULL);
 
   vkDestroyDevice(vlk_dev, NULL);
   vkDestroySurfaceKHR(vlk_ins, vlk_surf, NULL);
