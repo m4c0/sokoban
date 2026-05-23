@@ -34,126 +34,11 @@ static VkPipelineLayout      vlk_pl;
 static VkPipeline            vlk_ppl;
 static VkSampler             vlk_smp;
 
-static VkCommandBuffer vlk_record_buf2img(VkBuffer buf, VkImage img, int w, int h) {
-  VkCommandBuffer cb;
-  vlk_allocate_command_buffers(1, &cb);
-
-  VkCommandBufferBeginInfo binfo = {
-    .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
-    .flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT,
-  };
-  vkBeginCommandBuffer(cb, &binfo);
-
-  VkDependencyInfoKHR di = {
-    .sType                    = VK_STRUCTURE_TYPE_DEPENDENCY_INFO_KHR,
-    .bufferMemoryBarrierCount = 1,
-    .pBufferMemoryBarriers    = (VkBufferMemoryBarrier2KHR[]) {{
-      .sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER_2_KHR,
-      .srcStageMask  = VK_PIPELINE_STAGE_HOST_BIT,
-      .dstStageMask  = VK_PIPELINE_STAGE_TRANSFER_BIT,
-      .srcAccessMask = VK_ACCESS_HOST_WRITE_BIT,
-      .dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT,
-      .buffer        = buf,
-      .size          = VK_WHOLE_SIZE,
-    }},
-    .imageMemoryBarrierCount = 1,
-    .pImageMemoryBarriers    = (VkImageMemoryBarrier2KHR[]) {{
-      .sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2_KHR,
-      .srcStageMask     = VK_PIPELINE_STAGE_HOST_BIT,
-      .dstStageMask     = VK_PIPELINE_STAGE_TRANSFER_BIT,
-      .dstAccessMask    = VK_ACCESS_TRANSFER_WRITE_BIT,
-      .newLayout        = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-      .image            = img,
-      .subresourceRange = {
-        .aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
-        .levelCount     = 1,
-        .layerCount     = 1,
-      },
-    }},
-  };
-  vkCmdPipelineBarrier2KHR(cb, &di);
-
-  VkBufferImageCopy bic = {
-    .imageExtent = (VkExtent3D) { w, h, 1 },
-    .imageSubresource = {
-      .aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
-      .layerCount     = 1,
-    },
-  };
-  vkCmdCopyBufferToImage(cb, buf, img, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &bic);
-
-  di = (VkDependencyInfoKHR) {
-    .sType                   = VK_STRUCTURE_TYPE_DEPENDENCY_INFO_KHR,
-    .imageMemoryBarrierCount = 1,
-    .pImageMemoryBarriers    = (VkImageMemoryBarrier2KHR[]) {{
-      .sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2_KHR,
-      .srcStageMask     = VK_PIPELINE_STAGE_TRANSFER_BIT,
-      .dstStageMask     = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
-      .srcAccessMask    = VK_ACCESS_TRANSFER_WRITE_BIT,
-      .dstAccessMask    = VK_ACCESS_SHADER_READ_BIT,
-      .oldLayout        = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-      .newLayout        = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-      .image            = img,
-      .subresourceRange = {
-        .aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
-        .levelCount     = 1,
-        .layerCount     = 1,
-      },
-    }},
-  };
-  vkCmdPipelineBarrier2KHR(cb, &di);
-
-  vkEndCommandBuffer(cb);
-
-  VkSubmitInfo submit = {
-    .sType              = VK_STRUCTURE_TYPE_SUBMIT_INFO,
-    .pCommandBuffers    = &cb,
-    .commandBufferCount = 1,
-  };
-  _(vkQueueSubmit(vlk_q, 1, &submit, NULL));
-
-  return cb;
-}
-
-static void vlk_record_cmdbuf(int i) {
-  VkCommandBuffer cb = vlk_cb[i];
-
-  VkCommandBufferBeginInfo binfo = {
-    .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
-  };
-  vkBeginCommandBuffer(cb, &binfo);
-
-  VkClearValue clear = {
-    .color = {{ 0.1, 0.2, 0.3, 1 }},
-  };
-  VkRenderPassBeginInfo rp = {
-    .sType           = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
-    .renderPass      = vlk_rp,
-    .framebuffer     = vlk_swc.fb[i],
-    .renderArea      = (VkRect2D) { .extent = vlk_ext },
-    .clearValueCount = 1,
-    .pClearValues    = &clear,
-  };
-  vkCmdBeginRenderPass(cb, &rp, VK_SUBPASS_CONTENTS_INLINE);
-
-  VkViewport vp = {
-    .width  = vlk_ext.width,
-    .height = vlk_ext.height,
-  };
-  vkCmdSetViewport(cb, 0, 1, &vp);
-
-  VkRect2D sci = {
-    .extent = vlk_ext,
-  };
-  vkCmdSetScissor(cb, 0, 1, &sci);
-
+static void vlk_record(VkCommandBuffer cb) {
   vkCmdPushConstants(cb, vlk_pl, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(vlk_upc_t), &vlk_pc);
   vkCmdBindPipeline(cb, VK_PIPELINE_BIND_POINT_GRAPHICS, vlk_ppl);
   vkCmdBindDescriptorSets(cb, VK_PIPELINE_BIND_POINT_GRAPHICS, vlk_pl, 0, 1, &vlk_dset, 0, NULL);
   vkCmdDraw(cb, 3, 1, 0, 0);
-
-  vkCmdEndRenderPass(cb);
-  vkEndCommandBuffer(cb);
 }
 
 static void vlk_load_atlas() {
@@ -311,56 +196,6 @@ void vlk_init() {
 
   vkDestroyShaderModule(vlk_dev, vert, NULL);
   vkDestroyShaderModule(vlk_dev, frag, NULL);
-}
-
-void vlk_frame() {
-  if (!vlk_swc.swc) vlk_create_swc();
-
-  unsigned inf = vlk_cur_inflight;
-
-  _(vkWaitForFences(vlk_dev, 1, vlk_fence + inf, VK_TRUE, ~0UL));
-  _(vkResetFences  (vlk_dev, 1, vlk_fence + inf));
-
-  unsigned idx;
-  vkAcquireNextImageKHR(vlk_dev, vlk_swc.swc, ~0UL, vlk_sema_img[inf], VK_NULL_HANDLE, &idx);
-
-  vlk_record_cmdbuf(idx);
-
-  // TODO: confirm if this is the best and document why
-  VkPipelineStageFlags stage = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
-  // The idea of the wait semaphore is to wait until the swapchain _actually_
-  // made the image available
-  VkSubmitInfo submit = {
-    .sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
-    .pCommandBuffers = vlk_cb + idx,
-    .commandBufferCount = 1,
-    .pWaitSemaphores = vlk_sema_img + inf,
-    .pWaitDstStageMask = &stage,
-    .waitSemaphoreCount = 1,
-    .pSignalSemaphores = vlk_sema_present + inf,
-    .signalSemaphoreCount = 1,
-  };
-  // The fence signals we can reuse the current in-flight
-  _(vkQueueSubmit(vlk_q, 1, &submit, vlk_fence[inf]));
-
-  // Present is entirely async. We don't have control when it finishes. We then
-  // use a semaphore to force it to wait until we finished processing the
-  // image.
-  VkPresentInfoKHR pres = {
-    .sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
-    .pWaitSemaphores = vlk_sema_present + inf,
-    .waitSemaphoreCount = 1,
-    .swapchainCount = 1,
-    .pSwapchains = &vlk_swc.swc,
-    .pImageIndices = &idx,
-  };
-  VkResult res = vkQueuePresentKHR(vlk_q, &pres);
-  // TODO: deal with suboptimal
-  if (res != VK_SUBOPTIMAL_KHR) {
-    vlk_check(res, "vkQueuePresentKHR");
-  } else {
-    vlk_create_swc();
-  }
 }
 
 void vlk_deinit() {
