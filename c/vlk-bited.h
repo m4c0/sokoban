@@ -20,7 +20,6 @@ typedef struct vlk_upc {
 
 static vlk_upc_t vlk_pc;
 
-static VkCommandPool      vlk_cpool;
 static VkRenderPass       vlk_rp;
 
 static VkBuffer       vlk_atlas_h_buf;
@@ -89,23 +88,6 @@ static void vlk_create_framebuffer() {
     };
     _(vkCreateFramebuffer(vlk_dev, &info, NULL, vlk_swc.fb + i));
   }
-}
-
-static void vlk_create_command_pool() {
-  VkCommandPoolCreateInfo info = {
-    .sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
-    .flags = VK_COMMAND_POOL_CREATE_TRANSIENT_BIT | VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT,
-  };
-  _(vkCreateCommandPool(vlk_dev, &info, NULL, &vlk_cpool));
-}
-
-static void vlk_allocate_command_buffers(int count, VkCommandBuffer * cbs) {
-  VkCommandBufferAllocateInfo info = {
-    .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
-    .commandPool = vlk_cpool,
-    .commandBufferCount = count,
-  };
-  _(vkAllocateCommandBuffers(vlk_dev, &info, cbs));
 }
 
 static VkCommandBuffer vlk_record_buf2img(VkBuffer buf, VkImage img, int w, int h) {
@@ -256,21 +238,9 @@ static void vlk_load_atlas() {
 }
 
 void vlk_init() {
-#if !TARGET_OS_IPHONE
-  _(volkInitialize());
-#endif
+  vlk_create();
 
-  vlk_create_instance();
-  vlk_find_physical_device();
-  vlk_create_surface();
-  vlk_create_device();
-  vlk_create_command_pool();
   vlk_create_render_pass();
-  vlk_create_semaphores();
-  vlk_create_fences();
-
-  vlk_allocate_command_buffers(vlk_swc_count, vlk_cb);
-
   vlk_load_atlas();
 
   VkDescriptorSetLayoutCreateInfo dsl_info = {
@@ -453,15 +423,6 @@ void vlk_frame() {
 void vlk_deinit() {
   vkDeviceWaitIdle(vlk_dev);
 
-  vlk_destroy_swc(&vlk_swc);
-  vlk_destroy_swc(&vlk_swc_old);
-
-  for (int i = 0; i < MAX_INFLIGHTS; i++) {
-    vkDestroyFence    (vlk_dev, vlk_fence       [i], NULL);
-    vkDestroySemaphore(vlk_dev, vlk_sema_img    [i], NULL);
-    vkDestroySemaphore(vlk_dev, vlk_sema_present[i], NULL);
-  }
-
   vkDestroyBuffer(vlk_dev, vlk_atlas_h_buf, NULL);
   vkFreeMemory   (vlk_dev, vlk_atlas_h_mem, NULL);
 
@@ -475,11 +436,9 @@ void vlk_deinit() {
   vkDestroyPipeline            (vlk_dev, vlk_ppl,   NULL);
   vkDestroyPipelineLayout      (vlk_dev, vlk_pl,    NULL);
 
-  vkDestroyCommandPool(vlk_dev, vlk_cpool, NULL);
   vkDestroyRenderPass(vlk_dev, vlk_rp, NULL);
-  vkDestroyDevice(vlk_dev, NULL);
-  vkDestroySurfaceKHR(vlk_ins, vlk_surf, NULL);
-  vkDestroyInstance(vlk_ins, NULL);
+
+  vlk_destroy();
 }
 
 void vlk_cursor(int dx, int dy) {

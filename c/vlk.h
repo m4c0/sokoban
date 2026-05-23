@@ -9,6 +9,7 @@ CAMetalLayer * vlk_metal_layer();
 extern HWND vlk_hwnd;
 #endif
 
+static VkCommandPool      vlk_cpool;
 static VkDevice           vlk_dev;
 static VkExtent2D         vlk_ext;
 static VkInstance         vlk_ins;
@@ -349,6 +350,23 @@ static VkImageView vlk_create_image_view(VkImage img, VkFormat fmt) {
   return iv;
 }
 
+static void vlk_create_command_pool() {
+  VkCommandPoolCreateInfo info = {
+    .sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
+    .flags = VK_COMMAND_POOL_CREATE_TRANSIENT_BIT | VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT,
+  };
+  _(vkCreateCommandPool(vlk_dev, &info, NULL, &vlk_cpool));
+}
+
+static void vlk_allocate_command_buffers(int count, VkCommandBuffer * cbs) {
+  VkCommandBufferAllocateInfo info = {
+    .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
+    .commandPool = vlk_cpool,
+    .commandBufferCount = count,
+  };
+  _(vkAllocateCommandBuffers(vlk_dev, &info, cbs));
+}
+
 static void vlk_create_semaphores() {
   VkSemaphoreCreateInfo info = {
     .sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO,
@@ -367,6 +385,40 @@ static void vlk_create_fences() {
   for (int i = 0; i < MAX_INFLIGHTS; i++) {
     _(vkCreateFence(vlk_dev, &info, NULL, vlk_fence + i));
   }
+}
+
+static void vlk_create() {
+#if !TARGET_OS_IPHONE
+  _(volkInitialize());
+#endif
+
+  vlk_create_instance();
+  vlk_find_physical_device();
+  vlk_create_surface();
+  vlk_create_device();
+
+  vlk_create_semaphores();
+  vlk_create_fences();
+
+  vlk_create_command_pool();
+  vlk_allocate_command_buffers(vlk_swc_count, vlk_cb);
+}
+
+static void vlk_destroy() {
+  vlk_destroy_swc(&vlk_swc);
+  vlk_destroy_swc(&vlk_swc_old);
+
+  for (int i = 0; i < MAX_INFLIGHTS; i++) {
+    vkDestroyFence    (vlk_dev, vlk_fence       [i], NULL);
+    vkDestroySemaphore(vlk_dev, vlk_sema_img    [i], NULL);
+    vkDestroySemaphore(vlk_dev, vlk_sema_present[i], NULL);
+  }
+
+  vkDestroyCommandPool(vlk_dev, vlk_cpool, NULL);
+
+  vkDestroyDevice(vlk_dev, NULL);
+  vkDestroySurfaceKHR(vlk_ins, vlk_surf, NULL);
+  vkDestroyInstance(vlk_ins, NULL);
 }
 
 #endif
