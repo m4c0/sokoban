@@ -27,8 +27,22 @@ typedef struct vlk_swc {
   VkSwapchainKHR  swc;
 } vlk_swc_t;
 
+typedef struct vlk_vec2 {
+  float x, y;
+} vlk_vec2_t;
+typedef struct vlk_vec4 {
+  float x, y, z, w;
+} vlk_vec4_t;
 typedef struct vlk_upc {
-  int x, y;
+  vlk_vec4_t sel_rect;
+  vlk_vec2_t player_pos;
+  vlk_vec2_t label_pos;
+  vlk_vec2_t menu_size;
+  float level;
+  float aspect;
+  float time;
+  float back_btn_dim;
+  float menu_btn_dim;
 } vlk_upc_t;
 
 static vlk_swc_t vlk_swc     = {0};
@@ -646,9 +660,14 @@ void vlk_init() {
 
   VkDescriptorSetLayoutCreateInfo dsl_info = {
     .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
-    .bindingCount = 1,
+    .bindingCount = 2,
     .pBindings = (VkDescriptorSetLayoutBinding[]) {{
       .binding = 0,
+      .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+      .descriptorCount = 1,
+      .stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
+    }, {
+      .binding = 1,
       .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
       .descriptorCount = 1,
       .stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
@@ -662,7 +681,7 @@ void vlk_init() {
     .poolSizeCount = 1,
     .pPoolSizes = (VkDescriptorPoolSize[]) {{
       .type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-      .descriptorCount = 1,
+      .descriptorCount = 2,
     }},
   };
   _(vkCreateDescriptorPool(vlk_dev, &dpool_info, NULL, &vlk_dpool));
@@ -853,47 +872,6 @@ void vlk_deinit() {
   vkDestroyDevice(vlk_dev, NULL);
   vkDestroySurfaceKHR(vlk_ins, vlk_surf, NULL);
   vkDestroyInstance(vlk_ins, NULL);
-}
-
-void vlk_cursor(int dx, int dy) {
-  int x = vlk_pc.x + dx;
-  if (x >= 0 && x < 128) vlk_pc.x = x;
-
-  int y = vlk_pc.y + dy;
-  if (y >= 0 && y < 128) vlk_pc.y = y;
-}
-
-void vlk_toggle() {
-  unsigned char * data;
-  _(vkMapMemory(vlk_dev, vlk_atlas_h_mem, 0, VK_WHOLE_SIZE, 0, (void **)&data));
-
-  int i = vlk_pc.y * 128 + vlk_pc.x;
-  data[i] = data[i] ? 0 : 255;
-
-  vkUnmapMemory(vlk_dev, vlk_atlas_h_mem);
-  vlk_record_buf2img(vlk_atlas_h_buf, vlk_atlas_img, 128, 32);
-}
-
-void vlk_load() {
-  FILE * f = fopen("atlas.img", "rb");
-
-  unsigned char * data;
-  _(vkMapMemory(vlk_dev, vlk_atlas_h_mem, 0, VK_WHOLE_SIZE, 0, (void **)&data));
-  fread(data, 128 * 32, 1, f);
-  vkUnmapMemory(vlk_dev, vlk_atlas_h_mem);
-
-  fclose(f);
-  vlk_record_buf2img(vlk_atlas_h_buf, vlk_atlas_img, 128, 32);
-}
-void vlk_save() {
-  FILE * f = fopen("atlas.img", "wb");
-
-  unsigned char * data;
-  _(vkMapMemory(vlk_dev, vlk_atlas_h_mem, 0, VK_WHOLE_SIZE, 0, (void **)&data));
-  fwrite(data, 128 * 32, 1, f);
-  vkUnmapMemory(vlk_dev, vlk_atlas_h_mem);
-
-  fclose(f);
 }
 
 #endif
