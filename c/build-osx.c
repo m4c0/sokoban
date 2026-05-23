@@ -101,8 +101,8 @@ static int link_exe() {
     "-framework", "AudioToolbox",
     "-framework", "MetalKit",
     "-o", "sokoban.app/Contents/MacOS/sokoban", 
-    "gme.o", "spr.o", "vlk.o", "volk.o",
-    "vulkan-osx.o",
+    "gme.o", "spr.o", "volk.o",
+    "vlk-sokoban.o", "vulkan-osx.o",
     0 };
   return run(args);
 }
@@ -151,7 +151,7 @@ int main(int argc, char ** argv) {
   if (cm("vulkan-osx.m", "vulkan-osx.o")) return 1;
   if (hdr("gme.h", "gme.o", "GME_IMPL")) return 1;
   if (hdr("spr.h", "spr.o", "SPR_IMPL")) return 1;
-  if (hdr("vlk.h", "vlk.o", "VLK_IMPL")) return 1;
+  if (hdr("vlk-sokoban.h", "vlk-sokoban.o", "VLK_IMPL")) return 1;
   if (link_exe()) return 1;
 
   if (app("bited")) return 1;

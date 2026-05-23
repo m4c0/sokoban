@@ -2,7 +2,7 @@
 #import <CoreFoundation/CoreFoundation.h>
 #import <MetalKit/MetalKit.h>
 
-#include "vlk.h"
+#include "vlk-sokoban.h"
 
 @interface POCViewDelegate : NSObject<MTKViewDelegate>
 @property (nonatomic) BOOL ready;

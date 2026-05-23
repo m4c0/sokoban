@@ -208,7 +208,7 @@ static int link_exe() {
     "-framework", "UIKit",
     "-o", "export.xcarchive/Products/Applications/boas.app/boas", 
     "gme.o", "sfx.o", "snd.o", "snk.o", "tmr.o",
-    "vulkan.o", "vulkan-ios.o",
+    "vlk-sokoban.o", "vulkan-ios.o",
     "MoltenVK.xcframework/ios-arm64/libMoltenVK.a",
     "-lc++",
     0 };

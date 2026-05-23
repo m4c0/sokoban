@@ -83,7 +83,7 @@ static int link_exe() {
   char * args[] = {
     "clang", "-Wall", OPT,
     "-o", "app/sokoban.exe", 
-    "gme.o", "spr.o", "vlk.o", "volk.o",
+    "gme.o", "spr.o", "vlk-sokoban.o", "volk.o",
     "vulkan-win.o",
     "-luser32",
     0 };
