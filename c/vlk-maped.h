@@ -90,7 +90,7 @@ void vlk_init() {
   };
   _(vkCreateSampler(vlk_dev, &smp_info, NULL, &vlk_smp));
 
-  VkWriteDescriptorSet wds = {
+  VkWriteDescriptorSet wds[] = {{
     .sType           = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
     .dstSet          = vlk_dset,
     .dstBinding      = 0,
@@ -101,8 +101,19 @@ void vlk_init() {
       .imageView     = vlk_atlas_iv,
       .imageLayout   = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
     }},
-  };
-  vkUpdateDescriptorSets(vlk_dev, 1, &wds, 0, NULL);
+  }, {
+    .sType           = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+    .dstSet          = vlk_dset,
+    .dstBinding      = 1,
+    .descriptorCount = 1,
+    .descriptorType  = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+    .pImageInfo      = (VkDescriptorImageInfo[]) {{
+      .sampler       = vlk_smp,
+      .imageView     = vlk_atlas_iv,
+      .imageLayout   = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+    }},
+  }};
+  vkUpdateDescriptorSets(vlk_dev, 2, wds, 0, NULL);
 
   VkPipelineLayoutCreateInfo pl_info = {
     .sType                  = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
