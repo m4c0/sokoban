@@ -71,7 +71,7 @@ int WinMain(HINSTANCE h_instance, HINSTANCE h_prev, LPSTR cmd_line, int cmd_show
     .hIcon         = h_icon,
     .hCursor       = LoadCursor(NULL, IDC_ARROW),
     .hbrBackground = (HBRUSH)(COLOR_WINDOW + 1),
-    .lpszClassName = "m4c0-snake-window",
+    .lpszClassName = "m4c0-maped-window",
     .hIconSm       = h_icon,
   };
   if (!RegisterClassEx(&wcex)) {
@@ -82,8 +82,8 @@ int WinMain(HINSTANCE h_instance, HINSTANCE h_prev, LPSTR cmd_line, int cmd_show
   DWORD style = WS_OVERLAPPEDWINDOW ^ WS_SIZEBOX ^ WS_MAXIMIZEBOX;
 
   HWND hwnd = CreateWindow(
-      "m4c0-snake-window",
-      "Casually Casual Snake Game",
+      "m4c0-maped-window",
+      "MAP Editor",
       style, CW_USEDEFAULT, CW_USEDEFAULT,
       600, 800, 
       NULL, NULL, h_instance, NULL);
