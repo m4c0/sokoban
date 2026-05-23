@@ -85,7 +85,7 @@ void vlk_init() {
     .descriptorType  = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
     .pImageInfo      = (VkDescriptorImageInfo[]) {{
       .sampler       = vlk_smp,
-      .imageView     = vlk_atlas_iv,
+      .imageView     = vlk_atlas.iv,
       .imageLayout   = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
     }},
   };
@@ -169,13 +169,6 @@ void vlk_init() {
 void vlk_deinit() {
   vkDeviceWaitIdle(vlk_dev);
 
-  vkDestroyBuffer(vlk_dev, vlk_atlas_h_buf, NULL);
-  vkFreeMemory   (vlk_dev, vlk_atlas_h_mem, NULL);
-
-  vkDestroyImageView (vlk_dev, vlk_atlas_iv, NULL);
-  vkDestroyImage     (vlk_dev, vlk_atlas_img, NULL);
-  vkFreeMemory       (vlk_dev, vlk_atlas_mem, NULL);
-
   vkDestroySampler             (vlk_dev, vlk_smp,   NULL);
   vkDestroyDescriptorSetLayout (vlk_dev, vlk_dsl,   NULL);
   vkDestroyDescriptorPool      (vlk_dev, vlk_dpool, NULL);
@@ -195,33 +188,33 @@ void vlk_cursor(int dx, int dy) {
 
 void vlk_toggle() {
   unsigned char * data;
-  _(vkMapMemory(vlk_dev, vlk_atlas_h_mem, 0, VK_WHOLE_SIZE, 0, (void **)&data));
+  _(vkMapMemory(vlk_dev, vlk_atlas.h_mem, 0, VK_WHOLE_SIZE, 0, (void **)&data));
 
   int i = vlk_pc.y * 128 + vlk_pc.x;
   data[i] = data[i] ? 0 : 255;
 
-  vkUnmapMemory(vlk_dev, vlk_atlas_h_mem);
-  vlk_record_buf2img(vlk_atlas_h_buf, vlk_atlas_img, 128, 32);
+  vkUnmapMemory(vlk_dev, vlk_atlas.h_mem);
+  vlk_record_buf2img(vlk_atlas.h_buf, vlk_atlas.img, 128, 32);
 }
 
 void vlk_load() {
   FILE * f = fopen("atlas.img", "rb");
 
   unsigned char * data;
-  _(vkMapMemory(vlk_dev, vlk_atlas_h_mem, 0, VK_WHOLE_SIZE, 0, (void **)&data));
+  _(vkMapMemory(vlk_dev, vlk_atlas.h_mem, 0, VK_WHOLE_SIZE, 0, (void **)&data));
   fread(data, 128 * 32, 1, f);
-  vkUnmapMemory(vlk_dev, vlk_atlas_h_mem);
+  vkUnmapMemory(vlk_dev, vlk_atlas.h_mem);
 
   fclose(f);
-  vlk_record_buf2img(vlk_atlas_h_buf, vlk_atlas_img, 128, 32);
+  vlk_record_buf2img(vlk_atlas.h_buf, vlk_atlas.img, 128, 32);
 }
 void vlk_save() {
   FILE * f = fopen("atlas.img", "wb");
 
   unsigned char * data;
-  _(vkMapMemory(vlk_dev, vlk_atlas_h_mem, 0, VK_WHOLE_SIZE, 0, (void **)&data));
+  _(vkMapMemory(vlk_dev, vlk_atlas.h_mem, 0, VK_WHOLE_SIZE, 0, (void **)&data));
   fwrite(data, 128 * 32, 1, f);
-  vkUnmapMemory(vlk_dev, vlk_atlas_h_mem);
+  vkUnmapMemory(vlk_dev, vlk_atlas.h_mem);
 
   fclose(f);
 }

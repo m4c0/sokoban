@@ -98,7 +98,7 @@ void vlk_init() {
     .descriptorType  = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
     .pImageInfo      = (VkDescriptorImageInfo[]) {{
       .sampler       = vlk_smp,
-      .imageView     = vlk_atlas_iv,
+      .imageView     = vlk_atlas.iv,
       .imageLayout   = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
     }},
   }, {
@@ -109,7 +109,7 @@ void vlk_init() {
     .descriptorType  = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
     .pImageInfo      = (VkDescriptorImageInfo[]) {{
       .sampler       = vlk_smp,
-      .imageView     = vlk_atlas_iv,
+      .imageView     = vlk_atlas.iv,
       .imageLayout   = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
     }},
   }};
@@ -192,13 +192,6 @@ void vlk_init() {
 
 void vlk_deinit() {
   vkDeviceWaitIdle(vlk_dev);
-
-  vkDestroyBuffer(vlk_dev, vlk_atlas_h_buf, NULL);
-  vkFreeMemory   (vlk_dev, vlk_atlas_h_mem, NULL);
-
-  vkDestroyImageView (vlk_dev, vlk_atlas_iv, NULL);
-  vkDestroyImage     (vlk_dev, vlk_atlas_img, NULL);
-  vkFreeMemory       (vlk_dev, vlk_atlas_mem, NULL);
 
   vkDestroySampler             (vlk_dev, vlk_smp,   NULL);
   vkDestroyDescriptorSetLayout (vlk_dev, vlk_dsl,   NULL);
