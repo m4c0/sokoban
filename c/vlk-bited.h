@@ -11,6 +11,10 @@ void vlk_toggle();
 void vlk_load();
 void vlk_save();
 
+#ifdef _WIN32
+extern HWND vlk_hwnd;
+#endif
+
 #ifdef VLK_IMPL
 
 #define VBUF_SIZE 16
@@ -108,6 +112,10 @@ static void vlk_create_instance() {
   info.flags = VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
   info.enabledExtensionCount += 2;
 #endif
+#elif _WIN32
+  ext[0] = VK_KHR_WIN32_SURFACE_EXTENSION_NAME;
+#else
+#  error Unsupported platform
 #endif
 
   _(vkCreateInstance(&info, NULL, &vlk_ins));
@@ -224,6 +232,16 @@ static void vlk_create_surface() {
     .pLayer = vlk_metal_layer(),
   };
   _(vkCreateMetalSurfaceEXT(vlk_ins, &info, NULL, &vlk_surf));
+#elif _WIN32
+  assert(vlk_hwnd);
+  VkWin32SurfaceCreateInfoKHR info = {
+    .sType     = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR,
+    .hinstance = GetModuleHandle(NULL),
+    .hwnd      = vlk_hwnd,
+  };
+  _(vkCreateWin32SurfaceKHR(vlk_ins, &info, NULL, &vlk_surf));
+#else
+#error Unsupported platform
 #endif
 
   VkSurfaceCapabilitiesKHR cap;
