@@ -171,5 +171,8 @@ int main(int argc, char ** argv) {
   if (cp_frag()) return 1;
   if (cp_vert()) return 1;
 
+  { char * argv[] = { "cp", "atlas.img", "maped.app/Contents/Resources/", 0 };
+    if (run(argv)) return 1; }
+
   return 0;
 }
