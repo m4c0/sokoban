@@ -236,6 +236,10 @@ static void vlk_create_swc() {
   if (vlk_swc_old.swc) vlk_destroy_swc(&vlk_swc_old);
   vlk_swc_old = vlk_swc;
 
+  VkSurfaceCapabilitiesKHR cap;
+  _(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(vlk_pd, vlk_surf, &cap));
+  vlk_ext = cap.currentExtent;
+
   vlk_create_swapchain();
   vlk_create_framebuffer();
 }

@@ -266,13 +266,10 @@ void vlk_init() {
   vlk_create_device();
   vlk_create_command_pool();
   vlk_create_render_pass();
-  vlk_create_swc();
   vlk_create_semaphores();
   vlk_create_fences();
 
   vlk_allocate_command_buffers(vlk_swc_count, vlk_cb);
-
-  vlk_create_swc();
 
   vlk_load_atlas();
 
@@ -404,6 +401,8 @@ void vlk_init() {
 }
 
 void vlk_frame() {
+  if (!vlk_swc.swc) vlk_create_swc();
+
   unsigned inf = vlk_cur_inflight;
 
   _(vkWaitForFences(vlk_dev, 1, vlk_fence + inf, VK_TRUE, ~0UL));
@@ -447,10 +446,6 @@ void vlk_frame() {
   if (res != VK_SUBOPTIMAL_KHR) {
     vlk_check(res, "vkQueuePresentKHR");
   } else {
-    VkSurfaceCapabilitiesKHR cap;
-    _(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(vlk_pd, vlk_surf, &cap));
-    vlk_ext = cap.currentExtent;
-
     vlk_create_swc();
   }
 }
