@@ -20,13 +20,6 @@ typedef struct vlk_upc {
 
 static vlk_upc_t vlk_pc;
 
-static VkBuffer       vlk_atlas_h_buf;
-static VkDeviceMemory vlk_atlas_h_mem;
-
-static VkDeviceMemory vlk_atlas_mem;
-static VkImage        vlk_atlas_img;
-static VkImageView    vlk_atlas_iv;
-
 static VkDescriptorPool      vlk_dpool;
 static VkDescriptorSetLayout vlk_dsl;
 static VkDescriptorSet       vlk_dset;
@@ -41,35 +34,10 @@ static void vlk_record(VkCommandBuffer cb) {
   vkCmdDraw(cb, 3, 1, 0, 0);
 }
 
-static void vlk_load_atlas() {
-  FILE * f = fopen("atlas.img", "rb");;
-  assert(f);
-  assert(0 == fseek(f, 0, SEEK_END));
-  long sz = ftell(f);
-  assert(sz);
-  assert(0 == fseek(f, 0, SEEK_SET));
-
-  vlk_atlas_h_buf = vlk_create_buffer_for_image(sz);
-  vlk_atlas_h_mem = vlk_allocate_memory(sz, vlk_find_host_memory());
-  _(vkBindBufferMemory(vlk_dev, vlk_atlas_h_buf, vlk_atlas_h_mem, 0));
-
-  void * data;
-  _(vkMapMemory(vlk_dev, vlk_atlas_h_mem, 0, VK_WHOLE_SIZE, 0, &data));
-  assert(1 == fread(data, sz, 1, f));
-  vkUnmapMemory(vlk_dev, vlk_atlas_h_mem);
-  fclose(f);
-
-  vlk_atlas_img = vlk_create_image(128, 32, VK_FORMAT_R8_UNORM, VK_IMAGE_USAGE_TRANSFER_DST_BIT);
-  vlk_atlas_mem = vlk_allocate_image_memory(vlk_atlas_img);
-  vlk_atlas_iv  = vlk_create_image_view(vlk_atlas_img, VK_FORMAT_R8_UNORM);
-
-  vlk_record_buf2img(vlk_atlas_h_buf, vlk_atlas_img, 128, 32);
-}
-
 void vlk_init() {
   vlk_create();
 
-  vlk_load_atlas();
+  vlk_load_atlas(fopen("atlas.img", "rb"));
 
   VkDescriptorSetLayoutCreateInfo dsl_info = {
     .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
