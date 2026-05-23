@@ -8,6 +8,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define OPT "-gdwarf"
+//#define OPT "-O3"
+
 static void usage() {
   fprintf(stderr, "just call 'build' without arguments\n");
 }
@@ -33,7 +36,7 @@ static int shader(char * name) {
 
 static int pch() {
   char * args[] = {
-    "clang", "-Wall", "-g", "-x", "c-header",
+    "clang", "-Wall", OPT, "-x", "c-header",
     "-IVulkan-Headers/include",
     "-D", "VK_USE_PLATFORM_WIN32_KHR",
     "-D", "VLK_USE_VOLK",
@@ -43,14 +46,14 @@ static int pch() {
 
 static int cc(char * src, char * o) {
   char * args[] = {
-    "clang", "-Wall", "-g", "-include-pch", "pch.pch",
+    "clang", "-Wall", OPT, "-include-pch", "pch.pch",
     "-o", o, "-c", src, 0 };
   return run(args);
 }
 
 static int hdr(char * src, char * o, char * d) {
   char * args[] = {
-    "clang", "-Wall", "-x", "c", "-g", "-include-pch", "pch.pch",
+    "clang", "-Wall", "-x", "c", OPT, "-include-pch", "pch.pch",
     "-D", d, "-o", o, "-c", src, 0
   };
   return run(args);
@@ -58,7 +61,7 @@ static int hdr(char * src, char * o, char * d) {
 
 static int bited_exe() {
   char * args[] = {
-    "clang", "-Wall",
+    "clang", "-Wall", OPT,
     "-o", "app/bited.exe", 
     "bited.o", "vlk-bited.o", "volk.o",
     "-luser32",
@@ -68,7 +71,7 @@ static int bited_exe() {
 
 static int maped_exe() {
   char * args[] = {
-    "clang", "-Wall",
+    "clang", "-Wall", OPT,
     "-o", "app/maped.exe", 
     "maped.o", "vlk-maped.o", "volk.o",
     "-luser32",
@@ -78,7 +81,7 @@ static int maped_exe() {
 
 static int link_exe() {
   char * args[] = {
-    "clang", "-Wall",
+    "clang", "-Wall", OPT,
     "-o", "app/sokoban.exe", 
     "gme.o", "spr.o", "vlk.o", "volk.o",
     "vulkan-win.o",
