@@ -6,7 +6,6 @@ void vlk_frame();
 void vlk_deinit();
 
 #ifdef VLK_IMPL
-#include <sys/time.h>
 
 #define VBUF_SIZE 16
 //SNK_MAX_CELLS * sizeof(gme_storage_t)
@@ -537,6 +536,7 @@ static int vlk_find_memory(VkMemoryPropertyFlags desired) {
     if (F(flags, desired)) return i;
   }
   assert(0 && "could not find suitable vulkan memory");
+  return -1; // unreachable
 }
 static int vlk_find_host_memory() {
   return vlk_find_memory(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
@@ -800,7 +800,7 @@ void vlk_init() {
   vkDestroyShaderModule(vlk_dev, vert, NULL);
   vkDestroyShaderModule(vlk_dev, frag, NULL);
 
-  gettimeofday(&clk, NULL);
+  //gettimeofday(&clk, NULL);
 
   _(vkMapMemory(vlk_dev, vlk_map_h_mem, 0, VK_WHOLE_SIZE, 0, (void **)&vlk_map_ptr));
 }
@@ -814,11 +814,11 @@ void vlk_frame() {
   unsigned idx;
   vkAcquireNextImageKHR(vlk_dev, vlk_swc.swc, ~0UL, vlk_sema_img[inf], VK_NULL_HANDLE, &idx);
 
-  struct timeval now;
-  gettimeofday(&now, NULL);
+  //struct timeval now;
+  //gettimeofday(&now, NULL);
 
-  vlk_pc.time   = (now.tv_sec - clk.tv_sec) + (now.tv_usec - clk.tv_usec) / 1.0e6; 
-  vlk_pc.aspect = (float)vlk_ext.width / (float)vlk_ext.height;
+  //vlk_pc.time   = (now.tv_sec - clk.tv_sec) + (now.tv_usec - clk.tv_usec) / 1.0e6; 
+  //vlk_pc.aspect = (float)vlk_ext.width / (float)vlk_ext.height;
 
   vlk_record_cmdbuf(idx);
 

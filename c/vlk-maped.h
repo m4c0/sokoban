@@ -520,6 +520,7 @@ static int vlk_find_memory(VkMemoryPropertyFlags desired) {
     if (F(flags, desired)) return i;
   }
   assert(0 && "could not find suitable vulkan memory");
+  return -1; // unreachable
 }
 static int vlk_find_host_memory() {
   return vlk_find_memory(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
