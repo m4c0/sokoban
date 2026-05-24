@@ -8,25 +8,31 @@ extern int lvl_current;
 extern int lvl_px, lvl_py;
 extern int lvl_min_x, lvl_min_y;
 
-void lvl_load(FILE * f, int n, char * buffer);
+void lvl_init(FILE * f);
+void lvl_load(int n, char * buffer);
 
 #ifdef LVL_IMPL
 #define LVL_SZ (32 * 24)
 
+FILE * lvl_f;
 int lvl_current;
 int lvl_px, lvl_py;
 int lvl_min_x, lvl_min_y;
 
-void lvl_load(FILE * f, int n, char * buffer) {
+void lvl_init(FILE * f) {
+  lvl_f = f;
+}
+void lvl_load(int n, char * buffer) {
+  assert(0 == fseek(lvl_f, 0, SEEK_SET));
+
   for (int i = 0; i <= n; i++) {
-    assert('|' == fgetc(f));
-    assert(1 == fread(buffer, LVL_SZ, 1, f));
-    assert('|' == fgetc(f));
+    assert('|' == fgetc(lvl_f));
+    assert(1 == fread(buffer, LVL_SZ, 1, lvl_f));
+    assert('|' == fgetc(lvl_f));
 
     char nl[2];
-    assert(fgets(nl, 2, f));
+    assert(fgets(nl, 2, lvl_f));
   }
-  fclose(f);
 
   lvl_current = n;
   lvl_min_x = lvl_min_y = 0;

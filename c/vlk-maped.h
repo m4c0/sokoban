@@ -56,10 +56,10 @@ static void vlk_record(VkCommandBuffer cb) {
   vkCmdDraw(cb, 3, 1, 0, 0);
 }
 
-static void vlk_load_map(FILE * f, int lvl) {
+static void vlk_load_map(int lvl) {
   char * map;
   _(vkMapMemory(vlk_dev, vlk_map.h_mem, 0, VK_WHOLE_SIZE, 0, (void **)&map));
-  lvl_load(f, lvl, map);
+  lvl_load(lvl, map);
   vkUnmapMemory(vlk_dev, vlk_map.h_mem);
 
   vlk_record_buf2img(vlk_map.h_buf, vlk_map.img, LVL_WIDTH, LVL_WIDTH);
@@ -69,8 +69,10 @@ void vlk_init() {
   vlk_create();
   vlk_create_img(&vlk_map, LVL_WIDTH, LVL_WIDTH, VK_FORMAT_R8_UINT);
 
+  lvl_init(fopen("levels.txt", "r"));
+
   vlk_load_atlas(vlk_open("atlas", "img"));
-  vlk_load_map(fopen("levels.txt", "r"), 0);
+  vlk_load_map(0);
 
   VkDescriptorSetLayoutCreateInfo dsl_info = {
     .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
@@ -231,12 +233,12 @@ void vlk_deinit() {
 void vlk_load_next_level() {
   int lvl = lvl_current + 1;
   if (lvl > 59) lvl = 59;
-  vlk_load_map(fopen("levels.txt", "r"), lvl);
+  vlk_load_map(lvl);
 }
 void vlk_load_prev_level() {
   int lvl = lvl_current - 1;
   if (lvl < 0) lvl = 0;
-  vlk_load_map(fopen("levels.txt", "r"), lvl);
+  vlk_load_map(lvl);
 }
 
 #endif
