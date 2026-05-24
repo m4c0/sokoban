@@ -31,8 +31,8 @@
 
   unichar c = [chrs characterAtIndex:0];
   switch (c) {
-    //case NSLeftArrowFunctionKey:  return vlk_cursor(-1,  0);
-    //case NSRightArrowFunctionKey: return vlk_cursor( 1,  0);
+    case NSLeftArrowFunctionKey:  return vlk_load_prev_level();
+    case NSRightArrowFunctionKey: return vlk_load_next_level();
     //case NSUpArrowFunctionKey:    return vlk_cursor( 0, -1);
     //case NSDownArrowFunctionKey:  return vlk_cursor( 0,  1);
 

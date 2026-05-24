@@ -5,6 +5,9 @@ void vlk_init();
 void vlk_frame();
 void vlk_deinit();
 
+void vlk_load_next_level();
+void vlk_load_prev_level();
+
 #ifdef VLK_IMPL
 #include "lvl.h"
 #include "vlk.h"
@@ -217,6 +220,17 @@ void vlk_deinit() {
 
   vlk_destroy_img(&vlk_map);
   vlk_destroy();
+}
+
+void vlk_load_next_level() {
+  int lvl = lvl_current + 1;
+  if (lvl > 59) lvl = 59;
+  vlk_load_map(fopen("levels.txt", "r"), lvl);
+}
+void vlk_load_prev_level() {
+  int lvl = lvl_current - 1;
+  if (lvl < 0) lvl = 0;
+  vlk_load_map(fopen("levels.txt", "r"), lvl);
 }
 
 #endif
