@@ -49,9 +49,9 @@ static void vlk_record(VkCommandBuffer cb) {
 
 static void vlk_load_map(FILE * f, int lvl) {
   char * map;
-  _(vkMapMemory(vlk_dev, vlk_atlas.h_mem, 0, VK_WHOLE_SIZE, 0, (void **)&map));
+  _(vkMapMemory(vlk_dev, vlk_map.h_mem, 0, VK_WHOLE_SIZE, 0, (void **)&map));
   lvl_load(f, lvl, map);
-  vkUnmapMemory(vlk_dev, vlk_atlas.h_mem);
+  vkUnmapMemory(vlk_dev, vlk_map.h_mem);
 
   vlk_record_buf2img(vlk_map.h_buf, vlk_map.img, LVL_WIDTH, LVL_HEIGHT);
 }
