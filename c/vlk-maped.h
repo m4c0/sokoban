@@ -6,6 +6,7 @@ void vlk_frame();
 void vlk_deinit();
 
 #ifdef VLK_IMPL
+#include "lvl.h"
 #include "vlk.h"
 
 typedef struct vlk_vec2 {
@@ -43,13 +44,21 @@ static void vlk_record(VkCommandBuffer cb) {
   vkCmdDraw(cb, 3, 1, 0, 0);
 }
 
+static void vlk_load_map(FILE * f, int lvl) {
+  char * map;
+  _(vkMapMemory(vlk_dev, vlk_atlas.h_mem, 0, VK_WHOLE_SIZE, 0, (void **)&map));
+  lvl_load(f, lvl, map);
+  vkUnmapMemory(vlk_dev, vlk_atlas.h_mem);
+
+  vlk_record_buf2img(vlk_map.h_buf, vlk_map.img, LVL_WIDTH, LVL_HEIGHT);
+}
+
 void vlk_init() {
   vlk_create();
+  vlk_create_img(&vlk_map, LVL_WIDTH, LVL_HEIGHT, VK_FORMAT_R8_UINT);
 
   vlk_load_atlas(vlk_open("atlas", "img"));
-
-  vlk_create_img(&vlk_map, 128, 128, VK_FORMAT_R8_UINT);
-  vlk_record_buf2img(vlk_map.h_buf, vlk_map.img, 128, 128);
+  vlk_load_map(fopen("levels.txt", "r"), 3);
 
   VkDescriptorSetLayoutCreateInfo dsl_info = {
     .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,

@@ -89,7 +89,7 @@ static int maped_exe() {
     "-framework", "AudioToolbox",
     "-framework", "MetalKit",
     "-o", "maped.app/Contents/MacOS/maped", 
-    "maped.o", "vlk-maped.o", "volk.o",
+    "lvl.o", "maped.o", "vlk-maped.o", "volk.o",
     0 };
   return run(args);
 }
@@ -150,6 +150,7 @@ int main(int argc, char ** argv) {
   if (app("sokoban")) return 1;
   if (cm("vulkan-osx.m", "vulkan-osx.o")) return 1;
   if (hdr("gme.h", "gme.o", "GME_IMPL")) return 1;
+  if (hdr("lvl.h", "lvl.o", "LVL_IMPL")) return 1;
   if (hdr("spr.h", "spr.o", "SPR_IMPL")) return 1;
   if (hdr("vlk-sokoban.h", "vlk-sokoban.o", "VLK_IMPL")) return 1;
   if (link_exe()) return 1;
