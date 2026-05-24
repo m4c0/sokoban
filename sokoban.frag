@@ -312,5 +312,7 @@ void main() {
   f = back_btn(f);
   f = menu_btn(f);
 
+  f = pow(f, 1.0 / vec3(2.2));
+
   frag_color = vec4(f, 1);
 }
