@@ -232,7 +232,7 @@ void vlk_deinit() {
 
 void vlk_load_next_level() {
   int lvl = lvl_current + 1;
-  if (lvl > 59) lvl = 59;
+  if (lvl > lvl_max_level) lvl = lvl_max_level;
   vlk_load_map(lvl);
 }
 void vlk_load_prev_level() {
