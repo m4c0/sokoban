@@ -53,15 +53,15 @@ static void vlk_load_map(FILE * f, int lvl) {
   lvl_load(f, lvl, map);
   vkUnmapMemory(vlk_dev, vlk_map.h_mem);
 
-  vlk_record_buf2img(vlk_map.h_buf, vlk_map.img, LVL_WIDTH, LVL_HEIGHT);
+  vlk_record_buf2img(vlk_map.h_buf, vlk_map.img, LVL_WIDTH, LVL_WIDTH);
 }
 
 void vlk_init() {
   vlk_create();
-  vlk_create_img(&vlk_map, LVL_WIDTH, LVL_HEIGHT, VK_FORMAT_R8_UINT);
+  vlk_create_img(&vlk_map, LVL_WIDTH, LVL_WIDTH, VK_FORMAT_R8_UINT);
 
   vlk_load_atlas(vlk_open("atlas", "img"));
-  vlk_load_map(fopen("levels.txt", "r"), 3);
+  vlk_load_map(fopen("levels.txt", "r"), 0);
 
   VkDescriptorSetLayoutCreateInfo dsl_info = {
     .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
