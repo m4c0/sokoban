@@ -38,6 +38,8 @@ static VkPipeline            vlk_ppl;
 static VkSampler             vlk_smp;
 
 static void vlk_record(VkCommandBuffer cb) {
+  vlk_pc.aspect = (float)vlk_ext.width / (float)vlk_ext.height;
+
   vkCmdPushConstants(cb, vlk_pl, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(vlk_upc_t), &vlk_pc);
   vkCmdBindPipeline(cb, VK_PIPELINE_BIND_POINT_GRAPHICS, vlk_ppl);
   vkCmdBindDescriptorSets(cb, VK_PIPELINE_BIND_POINT_GRAPHICS, vlk_pl, 0, 1, &vlk_dset, 0, NULL);
