@@ -11,8 +11,14 @@ void vlk_init();
 void vlk_frame();
 void vlk_deinit();
 
-FILE * vlk_open(const char * name) {
-  char buf[128]; snprintf(buf, 128, "%s.spv", name);
+FILE * vlk_open(const char * name, const char * ext) {
+  char exe[MAX_PATH];
+  GetModuleFileName(NULL, exe, MAX_PATH);
+
+  char * p = strrchr(exe, '\\');
+  if (p) *p = 0;
+
+  char buf[MAX_PATH]; snprintf(buf, MAX_PATH, "%s\\%s.%s", exe, name, ext);
   return fopen(buf, "rb");
 }
 
@@ -85,7 +91,7 @@ int WinMain(HINSTANCE h_instance, HINSTANCE h_prev, LPSTR cmd_line, int cmd_show
       "m4c0-maped-window",
       "MAP Editor",
       style, CW_USEDEFAULT, CW_USEDEFAULT,
-      600, 800, 
+      800, 600, 
       NULL, NULL, h_instance, NULL);
   if (!hwnd) {
     MessageBox(NULL, "Failed to create window", "Unhandled error", 0);
