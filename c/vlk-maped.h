@@ -20,7 +20,8 @@ typedef struct vlk_vec4 {
 } vlk_vec4_t;
 typedef struct vlk_upc {
   vlk_vec4_t sel_rect;
-  vlk_vec2_t player_pos;
+  float player_pos_x;
+  float player_pos_y;
   vlk_vec2_t label_pos;
   vlk_vec2_t menu_size;
   float level;
@@ -41,6 +42,8 @@ static VkPipeline            vlk_ppl;
 static VkSampler             vlk_smp;
 
 static void vlk_record(VkCommandBuffer cb) {
+  vlk_pc.player_pos_x = lvl_px;
+  vlk_pc.player_pos_y = lvl_py;
   vlk_pc.level = lvl_current + 1;
   vlk_pc.aspect = (float)vlk_ext.width / (float)vlk_ext.height;
 

@@ -5,6 +5,8 @@
 #define LVL_HEIGHT 24
 
 extern int lvl_current;
+extern int lvl_px;
+extern int lvl_py;
 
 void lvl_load(FILE * f, int n, char * buffer);
 
@@ -12,6 +14,8 @@ void lvl_load(FILE * f, int n, char * buffer);
 #define LVL_SZ (32 * 24)
 
 int lvl_current;
+int lvl_px;
+int lvl_py;
 
 void lvl_load(FILE * f, int n, char * buffer) {
   for (int i = 0; i <= n; i++) {
@@ -24,6 +28,18 @@ void lvl_load(FILE * f, int n, char * buffer) {
   }
   fclose(f);
   lvl_current = n;
+
+  for (int y = 0; y < LVL_HEIGHT; y++) {
+    for (int x = 0; x < LVL_WIDTH; x++) {
+      int p = y * LVL_WIDTH + x;
+      switch (buffer[p]) {
+        case 'P':
+          lvl_px = x;
+          lvl_py = y;
+          break;
+      }
+    }
+  }
 }
 
 #endif
