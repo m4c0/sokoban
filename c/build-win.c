@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
@@ -24,6 +25,26 @@ static int run(char ** args) {
 
   fprintf(stderr, "failed to run child process: %s\n", args[0]);
   return 1;
+}
+
+static int cp_atlas() {
+  FILE * f = fopen("atlas.img", "rb");
+  assert(f);
+
+  assert(0 == fseek(f, 0, SEEK_END));
+  long sz = ftell(f);
+  assert(sz);
+  assert(0 == fseek(f, 0, SEEK_SET));
+
+  char * data = malloc(sz + 1);
+  assert(1 == fread(data, sz, 1, f));
+  fclose(f);
+
+  FILE * o = fopen("app/atlas.img", "wb");
+  assert(o);
+  assert(1 == fwrite(data, sz, 1, o));
+  fclose(o);
+  return 0;
 }
 
 static int shader(char * name) {
@@ -118,6 +139,8 @@ int main(int argc, char ** argv) {
   if (shader("bited.vert")) return 1;
   if (shader("sokoban.frag")) return 1;
   if (shader("sokoban.vert")) return 1;
+
+  if (cp_atlas()) return 1;
 
   return 0;
 }

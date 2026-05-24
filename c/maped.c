@@ -1,15 +1,6 @@
-#include "gme.h"
-
-#define _CRT_SECURE_NO_WARNINGS
-#define WIN32_MEAN_AND_LEAN
-#include <stdio.h>
-#include <windows.h>
+#include "vlk-bited.h"
 
 HWND vlk_hwnd;
-
-void vlk_init();
-void vlk_frame();
-void vlk_deinit();
 
 FILE * vlk_open(const char * name, const char * ext) {
   char exe[MAX_PATH];
