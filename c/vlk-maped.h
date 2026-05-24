@@ -7,6 +7,7 @@ void vlk_deinit();
 
 void vlk_load_next_level();
 void vlk_load_prev_level();
+void vlk_cursor(int dx, int dy);
 
 #ifdef VLK_IMPL
 #include "lvl.h"
@@ -16,13 +17,11 @@ void vlk_load_prev_level();
 typedef struct vlk_vec2 {
   float x, y;
 } vlk_vec2_t;
-typedef struct vlk_vec4 {
-  float x, y, z, w;
-} vlk_vec4_t;
 typedef struct vlk_upc {
-  vlk_vec4_t sel_rect;
+  float sel_rect_x, sel_rect_y, sel_rect_w, sel_rect_h;
   float player_pos_x, player_pos_y;
   float label_pos_x, label_pos_y;
+  float cursor_x, cursor_y;
   vlk_vec2_t menu_size;
   float level;
   float aspect;
@@ -41,7 +40,11 @@ static VkPipelineLayout      vlk_pl;
 static VkPipeline            vlk_ppl;
 static VkSampler             vlk_smp;
 
+static int vlk_cur_x = LVL_WIDTH / 2;
+static int vlk_cur_y = LVL_HEIGHT / 2;
 static void vlk_record(VkCommandBuffer cb) {
+  vlk_pc.cursor_x = vlk_cur_x;
+  vlk_pc.cursor_y = vlk_cur_y;
   vlk_pc.label_pos_x = lvl_min_x;
   vlk_pc.label_pos_y = lvl_min_y - 1;
   vlk_pc.player_pos_x = lvl_px;
@@ -239,6 +242,16 @@ void vlk_load_prev_level() {
   int lvl = lvl_current - 1;
   if (lvl < 0) lvl = lvl_max_level;
   vlk_load_map(lvl);
+}
+
+void vlk_cursor(int dx, int dy) {
+  vlk_cur_x += dx;
+  if (vlk_cur_x < 0) vlk_cur_x = 0;
+  if (vlk_cur_x >= LVL_WIDTH) vlk_cur_x = LVL_WIDTH;
+
+  vlk_cur_y += dy;
+  if (vlk_cur_y < 0) vlk_cur_y = 0;
+  if (vlk_cur_y >= LVL_HEIGHT) vlk_cur_x = LVL_HEIGHT;
 }
 
 #endif

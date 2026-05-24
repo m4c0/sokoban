@@ -6,6 +6,7 @@ layout(push_constant) uniform upc {
   vec4 sel_rect;
   vec2 player_pos;
   vec2 label_pos;
+  vec2 cursor;
   vec2 menu_size;
   float level;
   float aspect;
@@ -192,6 +193,14 @@ vec3 player(vec3 c) {
   return c;
 }
 
+vec3 cursor(vec3 c) {
+  vec2 b = g2l(pc.cursor);
+  float d = length(b) - 0.6;
+  d = abs(d);
+  d = smoothstep(0.0, 0.1, d);
+  return mix(vec3(1), c, d);
+}
+
 vec4 atlas(vec2 p, vec2 sz, vec2 uv0, vec2 uv1) {
   const vec2 uv_sz = vec2(16, 4);
 
@@ -311,6 +320,7 @@ void main() {
   f = selection(f);
   f = back_btn(f);
   f = menu_btn(f);
+  f = cursor(f);
 
   f = pow(f, 1.0 / vec3(2.2));
 
