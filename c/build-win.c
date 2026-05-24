@@ -73,7 +73,7 @@ static int maped_exe() {
   char * args[] = {
     "clang", "-Wall", OPT,
     "-o", "app/maped.exe", 
-    "maped.o", "vlk-maped.o", "volk.o",
+    "lvl.o", "maped.o", "vlk-maped.o", "volk.o",
     "-luser32",
     0 };
   return run(args);
@@ -83,8 +83,8 @@ static int link_exe() {
   char * args[] = {
     "clang", "-Wall", OPT,
     "-o", "app/sokoban.exe", 
-    "gme.o", "spr.o", "vlk-sokoban.o", "volk.o",
-    "vulkan-win.o",
+    "gme.o", "spr.o", "volk.o",
+    "vlk-sokoban.o", "vulkan-win.o",
     "-luser32",
     0 };
   return run(args);
@@ -100,8 +100,9 @@ int main(int argc, char ** argv) {
   if (hdr("volk.h", "volk.o", "VOLK_IMPLEMENTATION")) return 1;
 
   if (hdr("gme.h", "gme.o", "GME_IMPL")) return 1;
+  if (hdr("lvl.h", "lvl.o", "LVL_IMPL")) return 1;
   if (hdr("spr.h", "spr.o", "SPR_IMPL")) return 1;
-  if (hdr("vlk.h", "vlk.o", "VLK_IMPL")) return 1;
+  if (hdr("vlk-sokoban.h", "vlk-sokoban.o", "VLK_IMPL")) return 1;
   if (cc("vulkan-win.c", "vulkan-win.o")) return 1;
   if (link_exe()) return 1;
 
