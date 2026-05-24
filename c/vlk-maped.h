@@ -10,6 +10,7 @@ void vlk_load_prev_level();
 
 #ifdef VLK_IMPL
 #include "lvl.h"
+#include "tim.h"
 #include "vlk.h"
 
 typedef struct vlk_vec2 {
@@ -47,6 +48,7 @@ static void vlk_record(VkCommandBuffer cb) {
   vlk_pc.player_pos_y = lvl_py;
   vlk_pc.level = lvl_current + 1;
   vlk_pc.aspect = (float)vlk_ext.width / (float)vlk_ext.height;
+  vlk_pc.time = tim_now();
 
   vkCmdPushConstants(cb, vlk_pl, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(vlk_upc_t), &vlk_pc);
   vkCmdBindPipeline(cb, VK_PIPELINE_BIND_POINT_GRAPHICS, vlk_ppl);
