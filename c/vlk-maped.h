@@ -15,6 +15,8 @@ void vlk_player();
 void vlk_target();
 void vlk_wall();
 
+void vlk_save();
+
 #ifdef VLK_IMPL
 #include "gme.h"
 #include "lvl.h"
@@ -266,7 +268,7 @@ void vlk_cursor(int dx, int dy) {
 
 static void vlk_clear_player() {
   char * p = vlk_ptr + lvl_py * LVL_WIDTH + lvl_px;
-  if (p < vlk_ptr || p >= vlk_ptr + LVL_WIDTH * LVL_HEIGHT) return;
+  if (p < vlk_ptr || p >= vlk_ptr + LVL_SZ) return;
   switch (*p) {
     case gme_b_player:        *p = gme_b_empty;  break;
     case gme_b_player_target: *p = gme_b_target; break;
@@ -281,7 +283,7 @@ static void vlk_update_player(char * p, char c) {
 }
 void vlk_player() {
   char * p = vlk_ptr + vlk_cur_y * LVL_WIDTH + vlk_cur_x;
-  if (p < vlk_ptr || p >= vlk_ptr + LVL_WIDTH * LVL_HEIGHT) return;
+  if (p < vlk_ptr || p >= vlk_ptr + LVL_SZ) return;
   switch (*p) {
     case gme_b_empty:  vlk_update_player(p, gme_b_player);        break;
     case gme_b_target: vlk_update_player(p, gme_b_player_target); break;
@@ -291,7 +293,7 @@ void vlk_player() {
 
 void vlk_empty() {
   char * p = vlk_ptr + vlk_cur_y * LVL_WIDTH + vlk_cur_x;
-  if (p < vlk_ptr || p >= vlk_ptr + LVL_WIDTH * LVL_HEIGHT) return;
+  if (p < vlk_ptr || p >= vlk_ptr + LVL_SZ) return;
   switch (*p) {
     case gme_b_outside: *p = gme_b_empty;   break;
     case gme_b_empty:   *p = gme_b_outside; break;
@@ -302,7 +304,7 @@ void vlk_empty() {
 
 void vlk_wall() {
   char * p = vlk_ptr + vlk_cur_y * LVL_WIDTH + vlk_cur_x;
-  if (p < vlk_ptr || p >= vlk_ptr + LVL_WIDTH * LVL_HEIGHT) return;
+  if (p < vlk_ptr || p >= vlk_ptr + LVL_SZ) return;
   switch (*p) {
     case gme_b_empty:
     case gme_b_outside: *p = gme_b_wall;    break;
@@ -313,7 +315,7 @@ void vlk_wall() {
 
 void vlk_box() {
   char * p = vlk_ptr + vlk_cur_y * LVL_WIDTH + vlk_cur_x;
-  if (p < vlk_ptr || p >= vlk_ptr + LVL_WIDTH * LVL_HEIGHT) return;
+  if (p < vlk_ptr || p >= vlk_ptr + LVL_SZ) return;
   switch (*p) {
     case gme_b_outside:
     case gme_b_empty:      *p = gme_b_box;        break;
@@ -325,7 +327,7 @@ void vlk_box() {
 }
 void vlk_target() {
   char * p = vlk_ptr + vlk_cur_y * LVL_WIDTH + vlk_cur_x;
-  if (p < vlk_ptr || p >= vlk_ptr + LVL_WIDTH * LVL_HEIGHT) return;
+  if (p < vlk_ptr || p >= vlk_ptr + LVL_SZ) return;
   switch (*p) {
     case gme_b_outside:
     case gme_b_empty:         *p = gme_b_target;        break;

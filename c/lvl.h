@@ -3,6 +3,7 @@
 
 #define LVL_WIDTH  32
 #define LVL_HEIGHT 24
+#define LVL_SZ (32 * 24)
 
 extern int lvl_current;
 extern int lvl_px, lvl_py;
@@ -13,7 +14,6 @@ void lvl_init(FILE * f);
 void lvl_load(int n, char * buffer);
 
 #ifdef LVL_IMPL
-#define LVL_SZ (32 * 24)
 
 FILE * lvl_f;
 int lvl_current;
