@@ -38,9 +38,11 @@
 
     //case ' ': return vlk_toggle();
 
+    case 'b': return vlk_box();
     case 'p': return vlk_player();
-    //case 'e': return vlk_load();
-    //case 'w': return vlk_save();
+    case 't': return vlk_target();
+    case 'w': return vlk_wall();
+    case ' ': return vlk_empty();
 
     case '[': return vlk_load_prev_level();
     case ']': return vlk_load_next_level();

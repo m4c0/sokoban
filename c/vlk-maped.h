@@ -9,7 +9,11 @@ void vlk_load_next_level();
 void vlk_load_prev_level();
 void vlk_cursor(int dx, int dy);
 
+void vlk_box();
+void vlk_empty();
 void vlk_player();
+void vlk_target();
+void vlk_wall();
 
 #ifdef VLK_IMPL
 #include "gme.h"
@@ -64,9 +68,12 @@ static void vlk_record(VkCommandBuffer cb) {
   vkCmdDraw(cb, 3, 1, 0, 0);
 }
 
+static void vlk_update_map() {
+  vlk_record_buf2img(vlk_map.h_buf, vlk_map.img, LVL_WIDTH, LVL_WIDTH);
+}
 static void vlk_load_map(int lvl) {
   lvl_load(lvl, vlk_ptr);
-  vlk_record_buf2img(vlk_map.h_buf, vlk_map.img, LVL_WIDTH, LVL_WIDTH);
+  vlk_update_map();
 }
 
 void vlk_init() {
@@ -279,6 +286,56 @@ void vlk_player() {
     case gme_b_empty:  vlk_update_player(p, gme_b_player);        break;
     case gme_b_target: vlk_update_player(p, gme_b_player_target); break;
   }
+  vlk_update_map();
+}
+
+void vlk_empty() {
+  char * p = vlk_ptr + vlk_cur_y * LVL_WIDTH + vlk_cur_x;
+  if (p < vlk_ptr || p >= vlk_ptr + LVL_WIDTH * LVL_HEIGHT) return;
+  switch (*p) {
+    case gme_b_outside: *p = gme_b_empty;   break;
+    case gme_b_empty:   *p = gme_b_outside; break;
+    case gme_b_wall:    *p = gme_b_empty;   break;
+  }
+  vlk_update_map();
+}
+
+void vlk_wall() {
+  char * p = vlk_ptr + vlk_cur_y * LVL_WIDTH + vlk_cur_x;
+  if (p < vlk_ptr || p >= vlk_ptr + LVL_WIDTH * LVL_HEIGHT) return;
+  switch (*p) {
+    case gme_b_empty:
+    case gme_b_outside: *p = gme_b_wall;    break;
+    case gme_b_wall:    *p = gme_b_outside; break;
+  }
+  vlk_update_map();
+}
+
+void vlk_box() {
+  char * p = vlk_ptr + vlk_cur_y * LVL_WIDTH + vlk_cur_x;
+  if (p < vlk_ptr || p >= vlk_ptr + LVL_WIDTH * LVL_HEIGHT) return;
+  switch (*p) {
+    case gme_b_outside:
+    case gme_b_empty:      *p = gme_b_box;        break;
+    case gme_b_box:        *p = gme_b_empty;      break;
+    case gme_b_target:     *p = gme_b_target_box; break;
+    case gme_b_target_box: *p = gme_b_target;     break;
+  }
+  vlk_update_map();
+}
+void vlk_target() {
+  char * p = vlk_ptr + vlk_cur_y * LVL_WIDTH + vlk_cur_x;
+  if (p < vlk_ptr || p >= vlk_ptr + LVL_WIDTH * LVL_HEIGHT) return;
+  switch (*p) {
+    case gme_b_outside:
+    case gme_b_empty:         *p = gme_b_target;        break;
+    case gme_b_box:           *p = gme_b_target_box;    break;
+    case gme_b_target:        *p = gme_b_empty;         break;
+    case gme_b_target_box:    *p = gme_b_box;           break;
+    case gme_b_player:        *p = gme_b_player_target; break;
+    case gme_b_player_target: *p = gme_b_player;        break;
+  }
+  vlk_update_map();
 }
 
 #endif
