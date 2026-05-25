@@ -9,7 +9,10 @@ void vlk_load_next_level();
 void vlk_load_prev_level();
 void vlk_cursor(int dx, int dy);
 
+void vlk_player();
+
 #ifdef VLK_IMPL
+#include "gme.h"
 #include "lvl.h"
 #include "tim.h"
 #include "vlk.h"
@@ -32,6 +35,8 @@ typedef struct vlk_upc {
 
 static vlk_upc_t vlk_pc;
 static vlk_img_t vlk_map;
+
+static char * vlk_ptr;
 
 static VkDescriptorPool      vlk_dpool;
 static VkDescriptorSetLayout vlk_dsl;
@@ -60,17 +65,15 @@ static void vlk_record(VkCommandBuffer cb) {
 }
 
 static void vlk_load_map(int lvl) {
-  char * map;
-  _(vkMapMemory(vlk_dev, vlk_map.h_mem, 0, VK_WHOLE_SIZE, 0, (void **)&map));
-  lvl_load(lvl, map);
-  vkUnmapMemory(vlk_dev, vlk_map.h_mem);
-
+  lvl_load(lvl, vlk_ptr);
   vlk_record_buf2img(vlk_map.h_buf, vlk_map.img, LVL_WIDTH, LVL_WIDTH);
 }
 
 void vlk_init() {
   vlk_create();
+
   vlk_create_img(&vlk_map, LVL_WIDTH, LVL_WIDTH, VK_FORMAT_R8_UINT);
+  _(vkMapMemory(vlk_dev, vlk_map.h_mem, 0, VK_WHOLE_SIZE, 0, (void **)&vlk_ptr));
 
   lvl_init(fopen("levels.txt", "r"));
 
@@ -252,6 +255,30 @@ void vlk_cursor(int dx, int dy) {
   vlk_cur_y += dy;
   if (vlk_cur_y < 0) vlk_cur_y = 0;
   if (vlk_cur_y >= LVL_HEIGHT) vlk_cur_x = LVL_HEIGHT;
+}
+
+static void vlk_clear_player() {
+  char * p = vlk_ptr + lvl_py * LVL_WIDTH + lvl_px;
+  if (p < vlk_ptr || p >= vlk_ptr + LVL_WIDTH * LVL_HEIGHT) return;
+  switch (*p) {
+    case gme_b_player:        *p = gme_b_empty;  break;
+    case gme_b_player_target: *p = gme_b_target; break;
+    default: assert(0 && "invalid map state in old player pos"); // unreachable
+  }
+}
+static void vlk_update_player(char * p, char c) {
+  vlk_clear_player();
+  *p = c;        
+  lvl_px = vlk_cur_x;
+  lvl_py = vlk_cur_y;
+}
+void vlk_player() {
+  char * p = vlk_ptr + vlk_cur_y * LVL_WIDTH + vlk_cur_x;
+  if (p < vlk_ptr || p >= vlk_ptr + LVL_WIDTH * LVL_HEIGHT) return;
+  switch (*p) {
+    case gme_b_empty:  vlk_update_player(p, gme_b_player);        break;
+    case gme_b_target: vlk_update_player(p, gme_b_player_target); break;
+  }
 }
 
 #endif

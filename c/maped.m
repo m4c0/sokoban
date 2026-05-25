@@ -38,6 +38,7 @@
 
     //case ' ': return vlk_toggle();
 
+    case 'p': return vlk_player();
     //case 'e': return vlk_load();
     //case 'w': return vlk_save();
 
