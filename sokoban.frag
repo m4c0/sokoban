@@ -194,8 +194,8 @@ vec3 player(vec3 c) {
 }
 
 vec3 cursor(vec3 c) {
-  vec2 b = g2l(pc.cursor);
-  float d = length(b) - 0.6;
+  vec2 p = g2l(pc.cursor);
+  float d = sd_box(p, vec2(0.6));
   d = abs(d);
   d = smoothstep(0.0, 0.1, d);
   return mix(vec3(1), c, d);
