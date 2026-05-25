@@ -30,8 +30,6 @@ typedef struct vlk_upc {
 static vlk_upc_t vlk_pc;
 static vlk_img_t vlk_map;
 
-static char * vlk_ptr;
-
 static VkDescriptorPool      vlk_dpool;
 static VkDescriptorSetLayout vlk_dsl;
 static VkDescriptorSet       vlk_dset;
@@ -39,11 +37,8 @@ static VkPipelineLayout      vlk_pl;
 static VkPipeline            vlk_ppl;
 static VkSampler             vlk_smp;
 
-static int vlk_cur_x = LVL_WIDTH / 2;
-static int vlk_cur_y = LVL_HEIGHT / 2;
 static void vlk_record(VkCommandBuffer cb) {
-  vlk_pc.cursor_x = vlk_cur_x;
-  vlk_pc.cursor_y = vlk_cur_y;
+  vlk_pc.cursor_x = vlk_pc.cursor_y = 10000;
   vlk_pc.label_pos_x = lvl_min_x;
   vlk_pc.label_pos_y = lvl_min_y - 1;
   vlk_pc.player_pos_x = lvl_px;
@@ -62,7 +57,7 @@ static void vlk_update_map() {
   vlk_record_buf2img(vlk_map.h_buf, vlk_map.img, LVL_WIDTH, LVL_WIDTH);
 }
 static void vlk_load_map(int lvl) {
-  lvl_load(lvl, vlk_ptr);
+  lvl_load(lvl, gme_map);
   vlk_update_map();
 }
 
@@ -70,7 +65,7 @@ void vlk_init() {
   vlk_create();
 
   vlk_create_img(&vlk_map, LVL_WIDTH, LVL_WIDTH, VK_FORMAT_R8_UINT);
-  _(vkMapMemory(vlk_dev, vlk_map.h_mem, 0, VK_WHOLE_SIZE, 0, (void **)&vlk_ptr));
+  _(vkMapMemory(vlk_dev, vlk_map.h_mem, 0, VK_WHOLE_SIZE, 0, (void **)&gme_map));
 
   lvl_init(fopen("levels.txt", "r+"));
 

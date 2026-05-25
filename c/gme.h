@@ -12,11 +12,11 @@ enum gme_blocks {
   gme_b_target_box    = '0',
 };
 
-#ifdef GME_IMPL
-#include "spr.h"
+extern char * gme_map;
 
-#define GME_WIDTH  32
-#define GME_HEIGHT 24
+#ifdef GME_IMPL
+
+char * gme_map;
 
 #endif
 #endif
