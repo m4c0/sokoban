@@ -84,7 +84,7 @@ void vlk_init() {
   vlk_create_img(&vlk_map, LVL_WIDTH, LVL_WIDTH, VK_FORMAT_R8_UINT);
   _(vkMapMemory(vlk_dev, vlk_map.h_mem, 0, VK_WHOLE_SIZE, 0, (void **)&vlk_ptr));
 
-  lvl_init(fopen("levels.txt", "r"));
+  lvl_init(fopen("levels.txt", "r+"));
 
   vlk_load_atlas(vlk_open("atlas", "img"));
   vlk_load_map(0);
@@ -338,6 +338,11 @@ void vlk_target() {
     case gme_b_player_target: *p = gme_b_player;        break;
   }
   vlk_update_map();
+}
+
+void vlk_save() {
+  assert(0 == fseek(lvl_f, (LVL_SZ + 3) * lvl_current + 1, SEEK_SET));
+  assert(1 == fwrite(vlk_ptr, LVL_SZ, 1, lvl_f));
 }
 
 #endif

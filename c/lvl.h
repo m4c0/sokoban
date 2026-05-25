@@ -10,6 +10,8 @@ extern int lvl_px, lvl_py;
 extern int lvl_min_x, lvl_min_y;
 extern int lvl_max_level;
 
+extern FILE * lvl_f;
+
 void lvl_init(FILE * f);
 void lvl_load(int n, char * buffer);
 
@@ -24,6 +26,8 @@ int lvl_max_level;
 void lvl_init(FILE * f) {
   lvl_f = f;
   lvl_max_level = -1;
+
+  assert(0 == fseek(lvl_f, 0, SEEK_SET));
 
   char buf[LVL_SZ * 2];
   while (!feof(f)) {

@@ -59,6 +59,9 @@
 - (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)app {
   return YES;
 }
+- (void)save {
+  vlk_save();
+}
 @end
 
 CAMetalLayer * vlk_metal_layer() {
@@ -93,6 +96,10 @@ static void run() {
 
   // Apple menu
   NSMenu * menu = [NSMenu new];
+  [menu       addItem:[[NSMenuItem alloc]
+        initWithTitle:@"Save"
+               action:@selector(save)
+        keyEquivalent:@"s"]];
   [menu       addItem:[[NSMenuItem alloc]
         initWithTitle:@"Quit Bited"
                action:@selector(terminate:)
