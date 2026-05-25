@@ -101,7 +101,7 @@ static int link_exe() {
     "-framework", "AudioToolbox",
     "-framework", "MetalKit",
     "-o", "sokoban.app/Contents/MacOS/sokoban", 
-    "gme.o", "spr.o", "volk.o",
+    "gme.o", "lvl.o", "spr.o", "volk.o",
     "vlk-sokoban.o", "vulkan-osx.o",
     0 };
   return run(args);

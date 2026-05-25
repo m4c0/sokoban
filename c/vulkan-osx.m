@@ -29,15 +29,15 @@
   NSString * chrs = event.charactersIgnoringModifiers;
   if (chrs.length != 1) return;
 
-  //unichar c = [chrs characterAtIndex:0];
-  //switch (c) {
-  //  case NSLeftArrowFunctionKey:  return gme_left();
-  //  case NSRightArrowFunctionKey: return gme_right();
-  //  case NSUpArrowFunctionKey:    return gme_up();
-  //  case NSDownArrowFunctionKey:  return gme_down();
+  unichar c = [chrs characterAtIndex:0];
+  switch (c) {
+    //case NSLeftArrowFunctionKey:  return vlk_cursor(-1,  0);
+    //case NSRightArrowFunctionKey: return vlk_cursor( 1,  0);
+    //case NSUpArrowFunctionKey:    return vlk_cursor( 0, -1);
+    //case NSDownArrowFunctionKey:  return vlk_cursor( 0,  1);
 
-  //  case ' ': return gme_new_game();
-  //}
+    //case ' ': return vlk_toggle();
+  }
 }
 @end
 
@@ -69,11 +69,6 @@ void vlk_log(int r, const char * msg) {
 }
 
 static void run() {
-  NSDictionary * info = [[NSBundle mainBundle] infoDictionary];
-  NSString * name = info[@"CFBundleDisplayName"];
-  if (!name) name = info[@"CFBundleName"];
-  if (!name) name = @"App";
-
   MTKView * v = [POCView new];
   v.delegate = [POCViewDelegate new];
 
@@ -81,7 +76,7 @@ static void run() {
   w.contentView = v;
   w.styleMask = NSWindowStyleMaskTitled | NSWindowStyleMaskClosable | NSWindowStyleMaskMiniaturizable;
 
-  NSRect crect = NSMakeRect(0, 0, 600, 800);
+  NSRect crect = NSMakeRect(0, 0, 800, 600);
   NSRect frect = [w frameRectForContentRect:crect];
   [w setFrame:frect display:YES];
   [w center];
@@ -90,7 +85,7 @@ static void run() {
   // Apple menu
   NSMenu * menu = [NSMenu new];
   [menu       addItem:[[NSMenuItem alloc]
-        initWithTitle:[@"Quit " stringByAppendingString:name]
+        initWithTitle:@"Quit Sokoban"
                action:@selector(terminate:)
         keyEquivalent:@"q"]];
 
