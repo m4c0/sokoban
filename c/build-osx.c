@@ -174,6 +174,10 @@ int main(int argc, char ** argv) {
 
   { char * argv[] = { "cp", "atlas.img", "maped.app/Contents/Resources/", 0 };
     if (run(argv)) return 1; }
+  { char * argv[] = { "cp", "atlas.img", "sokoban.app/Contents/Resources/", 0 };
+    if (run(argv)) return 1; }
+  { char * argv[] = { "cp", "levels.txt", "sokoban.app/Contents/Resources/", 0 };
+    if (run(argv)) return 1; }
 
   return 0;
 }
