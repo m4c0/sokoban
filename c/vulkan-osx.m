@@ -36,7 +36,7 @@
     case NSUpArrowFunctionKey:    return vlk_move( 0, -1);
     case NSDownArrowFunctionKey:  return vlk_move( 0,  1);
 
-    //case ' ': return vlk_toggle();
+    case 27: return vlk_reset();
   }
 }
 @end

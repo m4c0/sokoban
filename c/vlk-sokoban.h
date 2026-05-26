@@ -5,6 +5,7 @@ void vlk_init();
 void vlk_frame();
 void vlk_deinit();
 
+void vlk_reset();
 void vlk_move(int dx, int dy);
 
 #ifdef VLK_IMPL
@@ -230,6 +231,10 @@ void vlk_deinit() {
   vlk_destroy();
 }
 
+void vlk_reset() {
+  lvl_load(lvl_current, gme_map);
+  vlk_record_buf2img(vlk_map.h_buf, vlk_map.img, LVL_WIDTH, LVL_WIDTH);
+}
 void vlk_move(int dx, int dy) {
   gme_move(dx, dy);
   vlk_record_buf2img(vlk_map.h_buf, vlk_map.img, LVL_WIDTH, LVL_WIDTH);
