@@ -45,6 +45,9 @@ void gme_move(int dx, int dy) {
     case gme_b_target_box:
       switch (gme_map[b]) {
         int open_tgts;
+        case gme_b_player:
+        case gme_b_player_target:
+          gme_map[b] = (gme_map[b] == gme_b_player) ? gme_b_empty : gme_b_target;
         case gme_b_empty:
         case gme_b_target:
           lvl_px = px; lvl_py = py;

@@ -31,10 +31,10 @@
 
   unichar c = [chrs characterAtIndex:0];
   switch (c) {
-    //case NSLeftArrowFunctionKey:  return vlk_cursor(-1,  0);
-    //case NSRightArrowFunctionKey: return vlk_cursor( 1,  0);
-    //case NSUpArrowFunctionKey:    return vlk_cursor( 0, -1);
-    //case NSDownArrowFunctionKey:  return vlk_cursor( 0,  1);
+    case NSLeftArrowFunctionKey:  return vlk_move(-1,  0);
+    case NSRightArrowFunctionKey: return vlk_move( 1,  0);
+    case NSUpArrowFunctionKey:    return vlk_move( 0, -1);
+    case NSDownArrowFunctionKey:  return vlk_move( 0,  1);
 
     //case ' ': return vlk_toggle();
   }

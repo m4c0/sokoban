@@ -5,6 +5,8 @@ void vlk_init();
 void vlk_frame();
 void vlk_deinit();
 
+void vlk_move(int dx, int dy);
+
 #ifdef VLK_IMPL
 #include "gme.h"
 #include "lvl.h"
@@ -226,6 +228,11 @@ void vlk_deinit() {
 
   vlk_destroy_img(&vlk_map);
   vlk_destroy();
+}
+
+void vlk_move(int dx, int dy) {
+  gme_move(dx, dy);
+  vlk_record_buf2img(vlk_map.h_buf, vlk_map.img, LVL_WIDTH, LVL_WIDTH);
 }
 
 #endif
