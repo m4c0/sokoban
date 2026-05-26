@@ -11,6 +11,8 @@ void vlk_move(int dx, int dy);
 #ifdef VLK_IMPL
 #include "gme.h"
 #include "lvl.h"
+#include "sfx.h"
+#include "snd.h"
 #include "tim.h"
 #include "vlk.h"
 
@@ -216,6 +218,8 @@ void vlk_init() {
 
   vkDestroyShaderModule(vlk_dev, vert, NULL);
   vkDestroyShaderModule(vlk_dev, frag, NULL);
+
+  snd_init(&sfx_filler);
 }
 
 void vlk_deinit() {
@@ -229,6 +233,8 @@ void vlk_deinit() {
 
   vlk_destroy_img(&vlk_map);
   vlk_destroy();
+
+  snd_deinit();
 }
 
 void vlk_reset() {
