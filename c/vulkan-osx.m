@@ -2,6 +2,7 @@
 #import <CoreFoundation/CoreFoundation.h>
 #import <MetalKit/MetalKit.h>
 
+#include "skb.h"
 #include "vlk-sokoban.h"
 
 @interface POCViewDelegate : NSObject<MTKViewDelegate>
@@ -12,6 +13,7 @@
 }
 - (void)drawInMTKView:(MTKView *)view {
   if (!self.ready) {
+    skb_init();
     vlk_init();
     self.ready = YES;
   }
@@ -31,12 +33,12 @@
 
   unichar c = [chrs characterAtIndex:0];
   switch (c) {
-    case NSLeftArrowFunctionKey:  return vlk_move(-1,  0);
-    case NSRightArrowFunctionKey: return vlk_move( 1,  0);
-    case NSUpArrowFunctionKey:    return vlk_move( 0, -1);
-    case NSDownArrowFunctionKey:  return vlk_move( 0,  1);
+    case NSLeftArrowFunctionKey:  return skb_api->move(-1,  0);
+    case NSRightArrowFunctionKey: return skb_api->move( 1,  0);
+    case NSUpArrowFunctionKey:    return skb_api->move( 0, -1);
+    case NSDownArrowFunctionKey:  return skb_api->move( 0,  1);
 
-    case 27: return vlk_reset();
+    case 27: return skb_api->reset();
   }
 }
 @end

@@ -5,8 +5,7 @@ void vlk_init();
 void vlk_frame();
 void vlk_deinit();
 
-void vlk_reset();
-void vlk_move(int dx, int dy);
+void vlk_update_map();
 
 #ifdef VLK_IMPL
 #include "gme.h"
@@ -58,7 +57,7 @@ static void vlk_record(VkCommandBuffer cb) {
   vkCmdDraw(cb, 3, 1, 0, 0);
 }
 
-static void vlk_update_map() {
+void vlk_update_map() {
   vlk_record_buf2img(vlk_map.h_buf, vlk_map.img, LVL_WIDTH, LVL_WIDTH);
 }
 static void vlk_load_map(int lvl) {
@@ -235,15 +234,6 @@ void vlk_deinit() {
   vlk_destroy();
 
   snd_deinit();
-}
-
-void vlk_reset() {
-  lvl_load(lvl_current, gme_map);
-  vlk_record_buf2img(vlk_map.h_buf, vlk_map.img, LVL_WIDTH, LVL_WIDTH);
-}
-void vlk_move(int dx, int dy) {
-  gme_move(dx, dy);
-  vlk_record_buf2img(vlk_map.h_buf, vlk_map.img, LVL_WIDTH, LVL_WIDTH);
 }
 
 #endif
