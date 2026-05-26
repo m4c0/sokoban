@@ -2,7 +2,8 @@
 #define SKB_H
 
 typedef struct {
-  void (*reset)();
+  void (*escape)();
+  void (*space)();
   void (*move)(int dx, int dy);
 } skb_api_t;
 
@@ -15,6 +16,10 @@ void skb_init();
 #include "lvl.h"
 #include "vlk-sokoban.h"
 
+const skb_api_t * skb_api;
+
+void skb_main_menu() {
+}
 void skb_reset() {
   lvl_load(lvl_current, gme_map);
   vlk_update_map();
@@ -24,11 +29,10 @@ void skb_move(int dx, int dy) {
   vlk_update_map();
 }
 const skb_api_t skb_api_game = {
-  .reset = &skb_reset,
-  .move  = &skb_move,
+  .escape = &skb_main_menu,
+  .space  = &skb_reset,
+  .move   = &skb_move,
 };
-
-const skb_api_t * skb_api;
 
 void skb_init() {
   skb_api = &skb_api_game;

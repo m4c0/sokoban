@@ -38,7 +38,8 @@
     case NSUpArrowFunctionKey:    return skb_api->move( 0, -1);
     case NSDownArrowFunctionKey:  return skb_api->move( 0,  1);
 
-    case 27: return skb_api->reset();
+    case 27: return skb_api->escape();
+    case 32: return skb_api->space();
   }
 }
 @end
