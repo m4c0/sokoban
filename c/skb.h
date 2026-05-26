@@ -18,13 +18,23 @@ void skb_init();
 
 const skb_api_t * skb_api;
 
-void skb_main_menu() {
+static void skb_nil() {}
+static void skb_game();
+const skb_api_t skb_api_menu = {
+  .escape = &skb_game,
+  .space  = &skb_nil,
+  .move   = &skb_nil,
+};
+
+static void skb_main_menu() {
+  vlk_menu_size(4, 3);
+  skb_api = &skb_api_menu;
 }
-void skb_reset() {
+static void skb_reset() {
   lvl_load(lvl_current, gme_map);
   vlk_update_map();
 }
-void skb_move(int dx, int dy) {
+static void skb_move(int dx, int dy) {
   gme_move(dx, dy);
   vlk_update_map();
 }
@@ -33,6 +43,11 @@ const skb_api_t skb_api_game = {
   .space  = &skb_reset,
   .move   = &skb_move,
 };
+
+static void skb_game() {
+  vlk_menu_size(0, 0);
+  skb_api = &skb_api_game;
+}
 
 void skb_init() {
   skb_api = &skb_api_game;

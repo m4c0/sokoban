@@ -6,6 +6,7 @@ void vlk_frame();
 void vlk_deinit();
 
 void vlk_update_map();
+void vlk_menu_size(float x, float y);
 
 #ifdef VLK_IMPL
 #include "gme.h"
@@ -15,15 +16,12 @@ void vlk_update_map();
 #include "tim.h"
 #include "vlk.h"
 
-typedef struct vlk_vec2 {
-  float x, y;
-} vlk_vec2_t;
 typedef struct vlk_upc {
   float sel_rect_x, sel_rect_y, sel_rect_w, sel_rect_h;
   float player_pos_x, player_pos_y;
   float label_pos_x, label_pos_y;
   float cursor_x, cursor_y;
-  vlk_vec2_t menu_size;
+  float menu_size_x, menu_size_y;
   float level;
   float aspect;
   float time;
@@ -40,6 +38,11 @@ static VkDescriptorSet       vlk_dset;
 static VkPipelineLayout      vlk_pl;
 static VkPipeline            vlk_ppl;
 static VkSampler             vlk_smp;
+
+void vlk_menu_size(float x, float y) {
+  vlk_pc.menu_size_x = x;
+  vlk_pc.menu_size_y = y;
+}
 
 static void vlk_record(VkCommandBuffer cb) {
   vlk_pc.cursor_x = vlk_pc.cursor_y = 10000;
