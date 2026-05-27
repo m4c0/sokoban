@@ -7,6 +7,7 @@ void vlk_deinit();
 
 void vlk_update_map();
 void vlk_menu_size(float x, float y);
+void vlk_sel(float x, float y, float w, float h);
 
 #ifdef VLK_IMPL
 #include "gme.h"
@@ -43,6 +44,12 @@ static VkSampler             vlk_smp;
 void vlk_menu_size(float x, float y) {
   vlk_pc.menu_size_x = x;
   vlk_pc.menu_size_y = y;
+}
+void vlk_sel(float x, float y, float w, float h) {
+  vlk_pc.sel_rect_x = x;
+  vlk_pc.sel_rect_y = y;
+  vlk_pc.sel_rect_w = w;
+  vlk_pc.sel_rect_h = h;
 }
 
 static void vlk_record(VkCommandBuffer cb) {
