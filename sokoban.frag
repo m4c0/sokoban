@@ -240,7 +240,7 @@ vec3 level_label(vec3 f) {
 }
 
 vec3 menu(vec3 f) {
-  float d = sd_rnd_box(q_pos, vec2(8, 5) / 8, 0.05);
+  float d = sd_rnd_box(q_pos, vec2(8, 4) / 8, 0.05);
 
   float cd = smoothstep(0.4, 1, 0.005 / abs(d));
   
@@ -249,7 +249,7 @@ vec3 menu(vec3 f) {
   vec3 c = mix(c0, c1, cd);
 
   vec2 p = vec2(15.5, 11.75);
-  c = atlas_d(p, vec2(6.0, 4.0) * 3, vec2(4, 0), vec2(10, 4), c);
+  c = atlas_d(p, vec2(6.0, 3.0) * 3, vec2(4, 1), vec2(10, 4), c);
 
   float a = 0.9 - 0.2 * step(0, d);
   a *= step(0.001, length(pc.menu_size));
