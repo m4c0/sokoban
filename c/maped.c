@@ -1,4 +1,4 @@
-#include "vlk-bited.h"
+#include "vlk-maped.h"
 
 HWND vlk_hwnd;
 
@@ -42,11 +42,18 @@ static LRESULT window_proc(HWND hwnd, UINT msg, WPARAM w_param, LPARAM l_param) 
       if (HIWORD(l_param) & KF_REPEAT) return 0;
 
       switch (LOWORD(w_param)) {
-        case VK_LEFT:  vlk_load_prev_level(); break;
-        case VK_RIGHT: vlk_load_next_level(); break;
-        // case VK_UP:    gme_up();       break;
-        // case VK_DOWN:  gme_down();     break;
-        // case VK_SPACE: gme_new_game(); break;
+        case VK_LEFT:  vlk_cursor(-1,  0);    break;
+        case VK_RIGHT: vlk_cursor( 1,  0);    break;
+        case VK_UP:    vlk_cursor( 0, -1);    break;
+        case VK_DOWN:  vlk_cursor( 0,  1);    break;
+        case VK_SPACE: vlk_empty();           break;
+        case VK_OEM_4: vlk_load_prev_level(); break;
+        case VK_OEM_6: vlk_load_next_level(); break;
+
+        case 'B': vlk_box();    break;
+        case 'P': vlk_player(); break;
+        case 'T': vlk_target(); break;
+        case 'W': vlk_wall();   break;
       }
 
       return 0;
