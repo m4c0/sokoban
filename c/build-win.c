@@ -27,8 +27,8 @@ static int run(char ** args) {
   return 1;
 }
 
-static int cp_atlas() {
-  FILE * f = fopen("atlas.img", "rb");
+static int cp(const char * src, const char * dst) {
+  FILE * f = fopen(src, "rb");
   assert(f);
 
   assert(0 == fseek(f, 0, SEEK_END));
@@ -40,7 +40,7 @@ static int cp_atlas() {
   assert(1 == fread(data, sz, 1, f));
   fclose(f);
 
-  FILE * o = fopen("app/atlas.img", "wb");
+  FILE * o = fopen(dst, "wb");
   assert(o);
   assert(1 == fwrite(data, sz, 1, o));
   fclose(o);
@@ -105,8 +105,9 @@ static int link_exe() {
     "clang", "-Wall", OPT,
     "-o", "app/sokoban.exe", 
     "gme.o", "spr.o", "volk.o",
+    "gme.o", "lvl.o", "sfx.o", "snd.o", "skb.o", "volk.o",
     "vlk-sokoban.o", "vulkan-win.o",
-    "-luser32",
+    "-lole32", "-luser32",
     0 };
   return run(args);
 }
@@ -122,16 +123,20 @@ int main(int argc, char ** argv) {
 
   if (hdr("gme.h", "gme.o", "GME_IMPL")) return 1;
   if (hdr("lvl.h", "lvl.o", "LVL_IMPL")) return 1;
-  if (hdr("vlk-sokoban.h", "vlk-sokoban.o", "VLK_IMPL")) return 1;
+  if (hdr("sfx.h", "sfx.o", "SFX_IMPL")) return 1;
+  if (hdr("skb.h", "skb.o", "SKB_IMPL")) return 1;
+  if (hdr("snd.h", "snd.o", "SND_IMPL")) return 1;
+
   if (cc("vulkan-win.c", "vulkan-win.o")) return 1;
+  if (hdr("vlk-sokoban.h", "vlk-sokoban.o", "VLK_IMPL")) return 1;
   if (link_exe()) return 1;
 
-  if (hdr("vlk-bited.h", "vlk-bited.o", "VLK_IMPL")) return 1;
   if (cc("bited.c", "bited.o")) return 1;
+  if (hdr("vlk-bited.h", "vlk-bited.o", "VLK_IMPL")) return 1;
   if (bited_exe()) return 1;
 
-  if (hdr("vlk-maped.h", "vlk-maped.o", "VLK_IMPL")) return 1;
   if (cc("maped.c", "maped.o")) return 1;
+  if (hdr("vlk-maped.h", "vlk-maped.o", "VLK_IMPL")) return 1;
   if (maped_exe()) return 1;
 
   if (shader("bited.frag")) return 1;
@@ -139,7 +144,8 @@ int main(int argc, char ** argv) {
   if (shader("sokoban.frag")) return 1;
   if (shader("sokoban.vert")) return 1;
 
-  if (cp_atlas()) return 1;
+  if (cp("atlas.img",  "app/atlas.img"))  return 1;
+  if (cp("levels.txt", "app/levels.txt")) return 1;
 
   return 0;
 }
