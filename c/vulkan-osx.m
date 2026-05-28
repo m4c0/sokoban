@@ -13,7 +13,6 @@
 }
 - (void)drawInMTKView:(MTKView *)view {
   if (!self.ready) {
-    skb_init();
     vlk_init();
     self.ready = YES;
   }

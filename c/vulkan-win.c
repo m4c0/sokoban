@@ -1,18 +1,16 @@
-#include "gme.h"
-
-#define _CRT_SECURE_NO_WARNINGS
-#define WIN32_MEAN_AND_LEAN
-#include <stdio.h>
-#include <windows.h>
+#include "skb.h"
+#include "vlk-sokoban.h"
 
 HWND vlk_hwnd;
 
-void vlk_init();
-void vlk_frame();
-void vlk_deinit();
+FILE * vlk_open(const char * name, const char * ext) {
+  char exe[MAX_PATH];
+  GetModuleFileName(NULL, exe, MAX_PATH);
 
-FILE * vlk_open(const char * name) {
-  char buf[128]; snprintf(buf, 128, "%s.spv", name);
+  char * p = strrchr(exe, '\\');
+  if (p) *p = 0;
+
+  char buf[MAX_PATH]; snprintf(buf, MAX_PATH, "%s\\%s.%s", exe, name, ext);
   return fopen(buf, "rb");
 }
 
@@ -45,11 +43,12 @@ static LRESULT window_proc(HWND hwnd, UINT msg, WPARAM w_param, LPARAM l_param) 
       if (HIWORD(l_param) & KF_REPEAT) return 0;
 
       switch (LOWORD(w_param)) {
-        // case VK_LEFT:  gme_left();     break;
-        // case VK_RIGHT: gme_right();    break;
-        // case VK_UP:    gme_up();       break;
-        // case VK_DOWN:  gme_down();     break;
-        // case VK_SPACE: gme_new_game(); break;
+        case VK_LEFT:   skb_api->move(-1,  0); break;
+        case VK_RIGHT:  skb_api->move( 1,  0); break;
+        case VK_UP:     skb_api->move( 0, -1); break;
+        case VK_DOWN:   skb_api->move( 0,  1); break;
+        case VK_SPACE:  skb_api->space();      break;
+        case VK_ESCAPE: skb_api->escape();     break;
       }
 
       return 0;
@@ -71,7 +70,7 @@ int WinMain(HINSTANCE h_instance, HINSTANCE h_prev, LPSTR cmd_line, int cmd_show
     .hIcon         = h_icon,
     .hCursor       = LoadCursor(NULL, IDC_ARROW),
     .hbrBackground = (HBRUSH)(COLOR_WINDOW + 1),
-    .lpszClassName = "m4c0-snake-window",
+    .lpszClassName = "m4c0-sokoban-window",
     .hIconSm       = h_icon,
   };
   if (!RegisterClassEx(&wcex)) {
@@ -82,10 +81,10 @@ int WinMain(HINSTANCE h_instance, HINSTANCE h_prev, LPSTR cmd_line, int cmd_show
   DWORD style = WS_OVERLAPPEDWINDOW ^ WS_SIZEBOX ^ WS_MAXIMIZEBOX;
 
   HWND hwnd = CreateWindow(
-      "m4c0-snake-window",
-      "Casually Casual Snake Game",
+      "m4c0-sokoban-window",
+      "Casually Casual Warehouse Game",
       style, CW_USEDEFAULT, CW_USEDEFAULT,
-      600, 800, 
+      800, 600, 
       NULL, NULL, h_instance, NULL);
   if (!hwnd) {
     MessageBox(NULL, "Failed to create window", "Unhandled error", 0);

@@ -13,6 +13,7 @@ void vlk_menu_size(float x, float y);
 #include "lvl.h"
 #include "sfx.h"
 #include "snd.h"
+#include "skb.h"
 #include "tim.h"
 #include "vlk.h"
 
@@ -222,6 +223,7 @@ void vlk_init() {
   vkDestroyShaderModule(vlk_dev, frag, NULL);
 
   snd_init(&sfx_filler);
+  skb_init();
 }
 
 void vlk_deinit() {
