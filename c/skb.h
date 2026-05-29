@@ -18,6 +18,9 @@ void skb_init();
 
 const skb_api_t * skb_api;
 
+static void skb_game();
+static void skb_reset();
+
 static int skb_main_menu_sel = 0;
 static void skb_sel(int i) {
   if      (i < 0) skb_main_menu_sel = 0;
@@ -27,14 +30,20 @@ static void skb_sel(int i) {
   vlk_sel(0, skb_main_menu_sel * 2.35 - 2.3, 8, 1);
 }
 
-static void skb_nil() {}
-static void skb_game();
 static void skb_main_menu_move(int dx, int dy) {
   skb_sel(skb_main_menu_sel + dy);
 }
+static void skb_main_menu_click() {
+  switch (skb_main_menu_sel) {
+    case 0:
+    case 1:
+      break;
+    case 2: return (skb_reset(), skb_game());
+  }
+}
 const skb_api_t skb_api_menu = {
   .escape = &skb_game,
-  .space  = &skb_nil,
+  .space  = &skb_main_menu_click,
   .move   = &skb_main_menu_move,
 };
 
