@@ -102,7 +102,7 @@ static int link_exe() {
     "-framework", "MetalKit",
     "-o", "sokoban.app/Contents/MacOS/sokoban", 
     "gme.o", "lvl.o", "sfx.o", "snd.o", "skb.o", "volk.o",
-    "vlk-sokoban.o", "vulkan-osx.o",
+    "microui.o", "vlk-sokoban.o", "vulkan-osx.o",
     0 };
   return run(args);
 }
@@ -152,6 +152,8 @@ int main(int argc, char ** argv) {
   if (hdr("sfx.h", "sfx.o", "SFX_IMPL")) return 1;
   if (hdr("skb.h", "skb.o", "SKB_IMPL")) return 1;
   if (hdr("snd.h", "snd.o", "SND_IMPL")) return 1;
+
+  if (cc("microui.c", "microui.o")) return 1;
 
   if (app("sokoban")) return 1;
   if (cm("vulkan-osx.m", "vulkan-osx.o")) return 1;
