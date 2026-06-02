@@ -101,7 +101,7 @@ static int link_exe() {
     "-framework", "AudioToolbox",
     "-framework", "MetalKit",
     "-o", "sokoban.app/Contents/MacOS/sokoban", 
-    "gme.o", "lvl.o", "sfx.o", "snd.o", "skb.o", "volk.o",
+    "gme.o", "lvl.o", "mui.o", "sfx.o", "snd.o", "skb.o", "volk.o",
     "microui.o", "vlk-sokoban.o", "vulkan-osx.o",
     0 };
   return run(args);
@@ -149,6 +149,7 @@ int main(int argc, char ** argv) {
 
   if (hdr("gme.h", "gme.o", "GME_IMPL")) return 1;
   if (hdr("lvl.h", "lvl.o", "LVL_IMPL")) return 1;
+  if (hdr("mui.h", "mui.o", "MUI_IMPL")) return 1;
   if (hdr("sfx.h", "sfx.o", "SFX_IMPL")) return 1;
   if (hdr("skb.h", "skb.o", "SKB_IMPL")) return 1;
   if (hdr("snd.h", "snd.o", "SND_IMPL")) return 1;

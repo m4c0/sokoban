@@ -12,6 +12,7 @@ void vlk_sel(float x, float y, float w, float h);
 #ifdef VLK_IMPL
 #include "gme.h"
 #include "lvl.h"
+#include "mui.h"
 #include "sfx.h"
 #include "snd.h"
 #include "skb.h"
@@ -229,6 +230,7 @@ void vlk_init() {
   vkDestroyShaderModule(vlk_dev, vert, NULL);
   vkDestroyShaderModule(vlk_dev, frag, NULL);
 
+  mui_init();
   snd_init(&sfx_filler);
   skb_init();
 }
