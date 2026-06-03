@@ -6,7 +6,7 @@ layout(push_constant) uniform upc {
   vec4 uv;
 } pc;
 
-layout(binding = 0) uniform sampler2D txt;
+layout(binding = 1) uniform sampler2D txt;
 
 layout(location = 0) in vec2 f_pos;
 

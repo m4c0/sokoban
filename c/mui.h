@@ -15,11 +15,14 @@ int mui_font_height();
 mu_Context mui_ctx = {0};
 
 int mui_font_width(char c) {
-  return 14;
+  if (c == 'I') return 1 + 1;
+  if (c == 'M') return 5 + 1;
+  if (c == 'N') return 4 + 1;
+  return 3 + 1;
 }
 
 int mui_font_height() {
-  return 21;
+  return 5 + 1;
 }
 
 static int font_width(mu_Font f, const char * txt, int len) {

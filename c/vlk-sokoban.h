@@ -80,18 +80,15 @@ static void vlk_record(VkCommandBuffer cb) {
             cmd->text.color.r / 255.f,
             cmd->text.color.g / 255.f,
             cmd->text.color.b / 255.f,
-            1,
+            0,
           },
-          .uv = { 0, 0, 1./16., 1./8. },
+          .uv = { 0, 0, 1, 1 },
           .extent = { vlk_ext.width / 2, vlk_ext.height / 2 },
         };
         vkCmdPushConstants(cb, vlk_mui_pl, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(vlk_mui_upc_t), &pc);
 
         for (char * c = cmd->text.str; *c; c++) {
-          char i = *c - 32;
           pc.rect[2] = mui_font_width(*c);
-          pc.uv[0] = (i % 16) / 16.;
-          pc.uv[1] = (i / 16) / 8.;
 
           vkCmdPushConstants(cb, vlk_mui_pl, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(vlk_mui_upc_t), &pc);
           vkCmdDraw(cb, 4, 1, 0, 0);
