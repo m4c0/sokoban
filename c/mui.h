@@ -7,15 +7,28 @@ extern mu_Context mui_ctx;
 void mui_init();
 void mui_run(unsigned sw, unsigned sh);
 
+int mui_font_width(char c);
+int mui_font_height();
+
 #ifdef MUI_IMPL
 
 mu_Context mui_ctx = {0};
 
+int mui_font_width(char c) {
+  return 14;
+}
+
+int mui_font_height() {
+  return 21;
+}
+
 static int font_width(mu_Font f, const char * txt, int len) {
-  return 14 * strlen(txt);
+  int w = 0;
+  for (; *txt; txt++) w += mui_font_width(*txt);
+  return w;
 }
 static int font_height(mu_Font f) {
-  return 21;
+  return mui_font_height();
 }
 
 void mui_init() {
