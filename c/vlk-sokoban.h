@@ -54,10 +54,10 @@ static void uv(float * uv, char c) {
   if (c >= 'A' && c <= 'Z') c |= 0x20;
   if (c >= 'a' && c <= 'z') {
     float u = 32;
-    for (char cc = 'a'; cc < c; cc++) u += mui_font_width(cc);
+    for (char cc = 'a'; cc < c; cc++) u += mui_font_width(cc) + 1;
 
     uv[0] = u / 128.f;
-    uv[1] = 0;
+    uv[1] = 1.f / 32.f;
     uv[2] = mui_font_width(c) / 128.f;
     uv[3] = mui_font_height() / 32.f;
     return;
@@ -91,7 +91,7 @@ static void vlk_record(VkCommandBuffer cb) {
     switch (cmd->type) {
       case MU_COMMAND_TEXT: {
         vlk_mui_upc_t pc = {
-          .rect   = { cmd->text.pos.x, cmd->text.pos.y, 0, mui_font_height() },
+          .rect   = { cmd->text.pos.x, cmd->text.pos.y, 0, mui_font_height() * 3 },
           .colour = {
             cmd->text.color.r / 255.f,
             cmd->text.color.g / 255.f,
@@ -103,12 +103,12 @@ static void vlk_record(VkCommandBuffer cb) {
         vkCmdPushConstants(cb, vlk_mui_pl, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(vlk_mui_upc_t), &pc);
 
         for (char * c = cmd->text.str; *c; c++) {
-          pc.rect[2] = mui_font_width(*c);
+          pc.rect[2] = mui_font_width(*c) * 3;
           uv(pc.uv, *c);
 
           vkCmdPushConstants(cb, vlk_mui_pl, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(vlk_mui_upc_t), &pc);
           vkCmdDraw(cb, 4, 1, 0, 0);
-          pc.rect[0] += pc.rect[2];
+          pc.rect[0] += pc.rect[2] + 2;
         }
         break;
       }

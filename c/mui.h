@@ -15,23 +15,23 @@ int mui_font_height();
 mu_Context mui_ctx = {0};
 
 int mui_font_width(char c) {
-  if (c == 'I') return 1 + 1;
-  if (c == 'M') return 5 + 1;
-  if (c == 'N') return 4 + 1;
-  return 3 + 1;
+  if ((c | 0x20) == 'i') return 1;
+  if ((c | 0x20) == 'm') return 5;
+  if ((c | 0x20) == 'n') return 4;
+  return 3;
 }
 
 int mui_font_height() {
-  return 5 + 1;
+  return 5;
 }
 
 static int font_width(mu_Font f, const char * txt, int len) {
   int w = 0;
-  for (; *txt; txt++) w += mui_font_width(*txt);
+  for (; *txt; txt++) w += mui_font_width(*txt) * 3 + 2;
   return w;
 }
 static int font_height(mu_Font f) {
-  return mui_font_height();
+  return mui_font_height() * 3;
 }
 
 void mui_init() {
