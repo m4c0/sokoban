@@ -173,6 +173,8 @@ int main(int argc, char ** argv) {
 
   if (shader("bited", "bited.frag")) return 1;
   if (shader("bited", "bited.vert")) return 1;
+  if (shader("sokoban", "mui-vlk.frag")) return 1;
+  if (shader("sokoban", "mui-vlk.vert")) return 1;
   if (shader("sokoban", "sokoban.frag")) return 1;
   if (shader("sokoban", "sokoban.vert")) return 1;
   if (cp_frag()) return 1;
