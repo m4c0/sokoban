@@ -36,20 +36,23 @@ static int font_height(mu_Font f) {
 
 void mui_init() {
   mu_init(&mui_ctx);
+
   mui_ctx.text_width  = &font_width;
   mui_ctx.text_height = &font_height;
+
+  mui_ctx.style->padding = 24;
+  mui_ctx.style->spacing = 24;
+
+  mui_ctx.style->colors[MU_COLOR_WINDOWBG] = mu_color(10,  30, 20, 255);
+  mui_ctx.style->colors[MU_COLOR_BUTTON]   = mu_color(70, 120, 90, 255);
 }
 void mui_run(unsigned sw, unsigned sh) {
   int wx = (sw - 300) / 2;
   int wy = (sh - 200) / 2;
 
-  mui_ctx.style->padding = 8;
-  mui_ctx.style->spacing = 8;
-  mui_ctx.style->title_height = 32;
-
   mu_begin(&mui_ctx);
-  int opt = MU_OPT_NOCLOSE;
-  if (mu_begin_window_ex(&mui_ctx, "Window", mu_rect(wx, wy, 300, 200), opt)) {
+  int opt = MU_OPT_NOCLOSE | MU_OPT_NOTITLE;
+  if (mu_begin_window_ex(&mui_ctx, "", mu_rect(wx, wy, 300, 200), opt)) {
     mu_layout_row(&mui_ctx, 1, (int[]) { -1 }, 32);
 
     if (mu_button(&mui_ctx, "Le button")) {

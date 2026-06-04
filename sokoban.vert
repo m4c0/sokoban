@@ -5,10 +5,10 @@ layout(push_constant) uniform upc {
   vec2 player_pos;
   vec2 label_pos;
   vec2 cursor;
-  vec2 menu_size;
   float level;
   float aspect;
   float time;
+  float overlay;
   float back_btn_dim;
   float menu_btn_dim;
 } pc;

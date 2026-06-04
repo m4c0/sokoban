@@ -7,10 +7,10 @@ layout(push_constant) uniform upc {
   vec2 player_pos;
   vec2 label_pos;
   vec2 cursor;
-  vec2 menu_size;
   float level;
   float aspect;
   float time;
+  float overlay;
   float back_btn_dim;
   float menu_btn_dim;
 } pc;
@@ -240,21 +240,7 @@ vec3 level_label(vec3 f) {
 }
 
 vec3 menu(vec3 f) {
-  float d = sd_rnd_box(q_pos, vec2(8, 4) / 8, 0.05);
-
-  float cd = smoothstep(0.4, 1, 0.005 / abs(d));
-  
-  vec3 c0 = vec3(0.01, 0.02, 0.03);
-  vec3 c1 = vec3(0.80, 0.82, 0.84);
-  vec3 c = mix(c0, c1, cd);
-
-  vec2 p = vec2(15.5, 11.75);
-  c = atlas_d(p, vec2(6.0, 3.0) * 3, vec2(4, 1), vec2(10, 4), c);
-
-  float a = 0.9 - 0.2 * step(0, d);
-  a *= step(0.001, length(pc.menu_size));
-
-  return mix(f, c, a);
+  return mix(f, vec3(0.1, 0.3, 0.2), pc.overlay);
 }
 
 vec3 selection(vec3 f) {

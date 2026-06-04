@@ -22,10 +22,10 @@ typedef struct vlk_upc {
   float player_pos_x, player_pos_y;
   float label_pos_x, label_pos_y;
   float cursor_x, cursor_y;
-  float menu_size_x, menu_size_y;
   float level;
   float aspect;
   float time;
+  float overlay;
   float back_btn_dim;
   float menu_btn_dim;
 } vlk_upc_t;
@@ -75,6 +75,7 @@ static void vlk_record(VkCommandBuffer cb) {
   vlk_pc.level = lvl_current + 1;
   vlk_pc.aspect = (float)vlk_ext.width / (float)vlk_ext.height;
   vlk_pc.time = tim_now();
+  vlk_pc.overlay = 0.3;
 
   vkCmdPushConstants(cb, vlk_pl, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(vlk_upc_t), &vlk_pc);
   vkCmdBindPipeline(cb, VK_PIPELINE_BIND_POINT_GRAPHICS, vlk_ppl);
