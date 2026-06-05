@@ -5,7 +5,9 @@
 extern mu_Context mui_ctx;
 
 void mui_init();
-void mui_run(unsigned sw, unsigned sh);
+
+void mui_none(unsigned, unsigned);
+void mui_options(unsigned sw, unsigned sh);
 
 int mui_font_width(char c);
 int mui_font_height();
@@ -46,7 +48,13 @@ void mui_init() {
   mui_ctx.style->colors[MU_COLOR_WINDOWBG] = mu_color(10,  30, 20, 255);
   mui_ctx.style->colors[MU_COLOR_BUTTON]   = mu_color(70, 120, 90, 255);
 }
-void mui_run(unsigned sw, unsigned sh) {
+
+void mui_none(unsigned sw, unsigned sh) {
+  mu_begin(&mui_ctx);
+  mu_end(&mui_ctx);
+}
+
+void mui_options(unsigned sw, unsigned sh) {
   int wx = (sw - 300) / 2;
   int wy = (sh - 200) / 2;
 

@@ -85,7 +85,7 @@ static void vlk_record(VkCommandBuffer cb) {
   vkCmdBindPipeline(cb, VK_PIPELINE_BIND_POINT_GRAPHICS, vlk_mui_ppl);
   vkCmdBindDescriptorSets(cb, VK_PIPELINE_BIND_POINT_GRAPHICS, vlk_mui_pl, 0, 1, &vlk_dset, 0, NULL);
 
-  mui_run(vlk_ext.width / 2, vlk_ext.height / 2);
+  skb_api->ui(vlk_ext.width / 2, vlk_ext.height / 2);
 
   mu_Command * cmd = NULL;
   while (mu_next_command(&mui_ctx, &cmd)) {
