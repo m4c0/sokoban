@@ -6,6 +6,7 @@ void vlk_frame();
 void vlk_deinit();
 
 void vlk_update_map();
+void vlk_overlay(int on);
 
 #ifdef VLK_IMPL
 #include "gme.h"
@@ -50,6 +51,10 @@ static VkSampler             vlk_smp;
 static VkPipelineLayout      vlk_mui_pl;
 static VkPipeline            vlk_mui_ppl;
 
+void vlk_overlay(int on) {
+  vlk_pc.overlay = on ? 0.3 : 0.0;
+}
+
 static void uv(float * uv, char c) {
   if (c >= 'A' && c <= 'Z') c |= 0x20;
   if (c >= 'a' && c <= 'z') {
@@ -75,7 +80,6 @@ static void vlk_record(VkCommandBuffer cb) {
   vlk_pc.level = lvl_current + 1;
   vlk_pc.aspect = (float)vlk_ext.width / (float)vlk_ext.height;
   vlk_pc.time = tim_now();
-  vlk_pc.overlay = 0.3;
 
   vkCmdPushConstants(cb, vlk_pl, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(vlk_upc_t), &vlk_pc);
   vkCmdBindPipeline(cb, VK_PIPELINE_BIND_POINT_GRAPHICS, vlk_ppl);
