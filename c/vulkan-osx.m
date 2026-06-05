@@ -41,6 +41,24 @@
     case 32: return skb_api->space();
   }
 }
+- (void) mouseDown:(NSEvent *)event {
+  CGPoint liw = [event locationInWindow];
+  CGPoint p = [self convertPoint:liw fromView:nil];
+  skb_api->mouse_down(p.x, self.frame.size.height - p.y);
+}
+- (void) mouseUp:(NSEvent *)event {
+  CGPoint liw = [event locationInWindow];
+  CGPoint p = [self convertPoint:liw fromView:nil];
+  skb_api->mouse_up(p.x, self.frame.size.height - p.y);
+}
+- (void) mouseMoved:(NSEvent *)event {
+  CGPoint liw = [event locationInWindow];
+  CGPoint p = [self convertPoint:liw fromView:nil];
+  skb_api->mouse_move(p.x, self.frame.size.height - p.y);
+}
+- (void) mouseDragged:(NSEvent *)event {
+  [self mouseMoved: event];
+}
 @end
 
 @interface POCAppDelegate : NSObject<NSApplicationDelegate>
@@ -75,6 +93,7 @@ static void run() {
   v.delegate = [POCViewDelegate new];
 
   NSWindow * w = [NSWindow new];
+  w.acceptsMouseMovedEvents = YES;
   w.contentView = v;
   w.styleMask = NSWindowStyleMaskTitled | NSWindowStyleMaskClosable | NSWindowStyleMaskMiniaturizable;
 
