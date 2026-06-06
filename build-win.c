@@ -49,9 +49,8 @@ static int cp(const char * src, const char * dst) {
 
 static int shader(char * name) {
   char spv[1024]; snprintf(spv, 1024, "app/%s.spv", name);
-  char src[1024]; snprintf(src, 1024, "../%s", name);
 
-  char * args[] = { "glslang", "-V", src, "-o", spv, 0 };
+  char * args[] = { "glslang", "-V", name, "-o", spv, 0 };
   return run(args);
 }
 
@@ -62,6 +61,12 @@ static int pch() {
     "-D", "VK_USE_PLATFORM_WIN32_KHR",
     "-D", "VLK_USE_VOLK",
     "-o", "pch.pch", "pch.h", 0 };
+  return run(args);
+}
+
+static int cc_nopch(char * src, char * o) {
+  char * args[] = {
+    "clang", "-Wall", OPT, "-o", o, "-c", src, 0 };
   return run(args);
 }
 
@@ -104,9 +109,8 @@ static int link_exe() {
   char * args[] = {
     "clang", "-Wall", OPT,
     "-o", "app/sokoban.exe", 
-    "gme.o", "spr.o", "volk.o",
-    "gme.o", "lvl.o", "sfx.o", "snd.o", "skb.o", "volk.o",
-    "vlk-sokoban.o", "vulkan-win.o",
+    "gme.o", "lvl.o", "mui.o", "sfx.o", "snd.o", "skb.o", "volk.o",
+    "microui.o", "vlk-sokoban.o", "vulkan-win.o",
     "-lole32", "-luser32",
     0 };
   return run(args);
@@ -123,9 +127,12 @@ int main(int argc, char ** argv) {
 
   if (hdr("gme.h", "gme.o", "GME_IMPL")) return 1;
   if (hdr("lvl.h", "lvl.o", "LVL_IMPL")) return 1;
+  if (hdr("mui.h", "mui.o", "MUI_IMPL")) return 1;
   if (hdr("sfx.h", "sfx.o", "SFX_IMPL")) return 1;
   if (hdr("skb.h", "skb.o", "SKB_IMPL")) return 1;
   if (hdr("snd.h", "snd.o", "SND_IMPL")) return 1;
+
+  if (cc_nopch("microui.c", "microui.o")) return 1;
 
   if (cc("vulkan-win.c", "vulkan-win.o")) return 1;
   if (hdr("vlk-sokoban.h", "vlk-sokoban.o", "VLK_IMPL")) return 1;
@@ -141,6 +148,8 @@ int main(int argc, char ** argv) {
 
   if (shader("bited.frag")) return 1;
   if (shader("bited.vert")) return 1;
+  if (shader("mui-vlk.frag")) return 1;
+  if (shader("mui-vlk.vert")) return 1;
   if (shader("sokoban.frag")) return 1;
   if (shader("sokoban.vert")) return 1;
 
