@@ -1,6 +1,7 @@
 app
 build-ios
 build-osx
+export
 *.app
 *.dylib
 *.exe

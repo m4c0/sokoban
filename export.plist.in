@@ -4,7 +4,7 @@
   <dict>
     <key>method</key>
     <!--<string>app-store-connect</string>-->
-    <string>development</string>
+    <string>debugging</string>
     <key>teamID</key>
     <string>&IOS_TEAM;</string>
     <key>thinning</key>

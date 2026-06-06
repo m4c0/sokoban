@@ -110,7 +110,7 @@ static int codesign() {
 static int symbols() {
   char * args[] = {
     "dsymutil", 
-    "export.xcarchive/Products/Applications/sokoban.app/boas", 
+    "export.xcarchive/Products/Applications/sokoban.app/sokoban", 
     "-o", "export.xcarchive/dSYMS/sokoban.app.dSYM",
     0 };
   return run(args);
@@ -223,7 +223,7 @@ static int link_exe() {
     "-framework", "MetalKit",
     "-framework", "QuartzCore",
     "-framework", "UIKit",
-    "-o", "export.xcarchive/Products/Applications/sokoban.app/boas", 
+    "-o", "export.xcarchive/Products/Applications/sokoban.app/sokoban", 
     "gme.o", "lvl.o", "mui.o", "sfx.o", "snd.o", "skb.o",
     "microui.o", "vlk-sokoban.o", "vulkan-ios.o",
     "MoltenVK.xcframework/ios-arm64/libMoltenVK.a",
