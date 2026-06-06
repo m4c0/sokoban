@@ -30,9 +30,7 @@ static int run(char ** args) {
 
 static int shader(const char * app, char * name) {
   char spv[1024]; snprintf(spv, 1024, "%s.app/Contents/Resources/%s.spv", app, name);
-  char src[1024]; snprintf(src, 1024, "../%s", name);
-
-  char * args[] = { "glslang", "-V", src, "-o", spv, 0 };
+  char * args[] = { "glslang", "-V", name, "-o", spv, 0 };
   return run(args);
 }
 
