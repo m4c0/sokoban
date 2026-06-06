@@ -24,10 +24,10 @@ CAMetalLayer * g_layer;
 }
 @end
 
-@interface POCAppDelegate : NSObject<UIApplicationDelegate>
-@property(nonatomic, strong) UIWindow * window;
+@interface POCWindowSceneDelegate : NSObject<UIWindowSceneDelegate>
+@property (nonatomic, strong) UIWindow * window;
 @end
-@implementation POCAppDelegate
+@implementation POCWindowSceneDelegate
 - (void)swipeLeft   { skb_api->move(-1,  0); }
 - (void)swipeRight  { skb_api->move( 1,  0); }
 - (void)swipeTop    { skb_api->move( 0, -1); }
@@ -35,7 +35,10 @@ CAMetalLayer * g_layer;
 
 - (void)tap { skb_api->escape(); }
 
-- (BOOL)application:(UIApplication *)app didFinishLaunchingWithOptions:(id)options {
+- (void) scene:(UIScene *) scene willConnectToSession:(UISceneSession *) session options:(UISceneConnectionOptions *) connectionOptions
+{
+  UIWindowScene * windowScene = (UIWindowScene *)scene;
+
   MTKView * view = [MTKView new];
   view.delegate = [POCViewDelegate new];
 
@@ -73,13 +76,29 @@ CAMetalLayer * g_layer;
   [tap addTarget:self action:@selector(tap)];
   [vc.view addGestureRecognizer:tap];
 
-  self.window = [UIWindow new];
-  self.window.frame = [UIScreen mainScreen].bounds;
+  self.window = [[UIWindow alloc] initWithWindowScene:windowScene];
   self.window.rootViewController = vc;
   [self.window makeKeyAndVisible];
-  return YES;
 }
-- (void)applicationWillTerminate:(UIApplication *)app {
+@end
+
+@interface POCAppDelegate : NSObject<UIApplicationDelegate>
+@end
+@implementation POCAppDelegate
+- (UISceneConfiguration *) application:(UIApplication *) application 
+configurationForConnectingSceneSession:(UISceneSession *) connectingSceneSession 
+                               options:(UISceneConnectionOptions *) options
+{
+  UISceneConfiguration * res = [[UISceneConfiguration alloc] initWithName:@"Default"
+                                                              sessionRole:connectingSceneSession.role];
+  res.sceneClass = [UIWindowScene class];
+  res.delegateClass = [POCWindowSceneDelegate class];
+  return res;
+}
+
+- (void)applicationWillTerminate:(UIApplication *)app 
+{
+  // TODO: is this still the right place in this UIScene world?
   vlk_deinit();
 }
 @end
