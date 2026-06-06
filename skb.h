@@ -65,10 +65,10 @@ const skb_api_t skb_api_game = {
   .escape     = &skb_main_menu,
   .space      = &skb_reset,
   .move       = &skb_move,
-  .ui         = &mui_none,
-  .mouse_move = &skb_nil,
-  .mouse_down = &skb_nil,
-  .mouse_up   = &skb_nil,
+  .ui         = &mui_main,
+  .mouse_move = &skb_mui_mouse_move,
+  .mouse_down = &skb_mui_mouse_down,
+  .mouse_up   = &skb_mui_mouse_up,
 };
 
 static void skb_game() {

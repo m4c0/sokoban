@@ -6,7 +6,8 @@ extern mu_Context mui_ctx;
 
 void mui_init();
 
-void mui_none(unsigned, unsigned);
+void mui_none   (unsigned sw, unsigned sh);
+void mui_main   (unsigned sw, unsigned sh);
 void mui_options(unsigned sw, unsigned sh);
 
 int mui_font_width(char c);
@@ -48,6 +49,24 @@ void mui_init() {
 
 void mui_none(unsigned sw, unsigned sh) {
   mu_begin(&mui_ctx);
+  mu_end(&mui_ctx);
+}
+
+void mui_main(unsigned sw, unsigned sh) {
+  mu_begin(&mui_ctx);
+
+  mui_ctx.style->padding = 12;
+  mui_ctx.style->spacing = 8;
+
+  int opt = MU_OPT_NOCLOSE | MU_OPT_NOTITLE | MU_OPT_NOFRAME;
+  if (mu_begin_window_ex(&mui_ctx, "", mu_rect(0, 0, sw, sh), opt)) {
+    mu_layout_row(&mui_ctx, 2, (int[]) { -64, -1 }, 64);
+    mu_layout_next(&mui_ctx);
+    if (mu_button_ex(&mui_ctx, "", 0xEE00, 0)) {
+    }
+    mu_end_window(&mui_ctx);
+  }
+
   mu_end(&mui_ctx);
 }
 
