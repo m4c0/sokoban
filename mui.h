@@ -42,9 +42,6 @@ void mui_init() {
   mui_ctx.text_width  = &font_width;
   mui_ctx.text_height = &font_height;
 
-  mui_ctx.style->padding = 24;
-  mui_ctx.style->spacing = 24;
-
   mui_ctx.style->colors[MU_COLOR_WINDOWBG] = mu_color(10,  30, 20, 255);
   mui_ctx.style->colors[MU_COLOR_BUTTON]   = mu_color(70, 120, 90, 255);
 }
@@ -54,29 +51,44 @@ void mui_none(unsigned sw, unsigned sh) {
   mu_end(&mui_ctx);
 }
 
+static void mui_label(const char * txt) {
+  int pad = mui_ctx.style->padding;
+
+  mui_ctx.style->padding = 0;
+  mu_label(&mui_ctx, txt);
+  mui_ctx.style->padding = pad;
+}
+static void mui_vspace() {
+  mu_layout_row(&mui_ctx, 1, (int[]) { -1 }, 12);
+  mu_layout_next(&mui_ctx);
+}
+
+static int mui_snd_on = 1;
 void mui_options(unsigned sw, unsigned sh) {
   int wx = (sw - 300) / 2;
   int wy = (sh - 200) / 2;
 
+  mui_ctx.style->padding = 12;
+  mui_ctx.style->spacing = 8;
+
   mu_begin(&mui_ctx);
   int opt = MU_OPT_NOCLOSE | MU_OPT_NOTITLE;
   if (mu_begin_window_ex(&mui_ctx, "", mu_rect(wx, wy, 300, 200), opt)) {
+    mu_layout_row(&mui_ctx, 3, (int[]) { -60, -1 }, 32);
+    mui_label("Sound");
+    if (mu_button(&mui_ctx, mui_snd_on ? "ON" : "")) {
+      mui_snd_on = !mui_snd_on;
+    }
+
+    mui_vspace();
+
     mu_layout_row(&mui_ctx, 1, (int[]) { -1 }, 32);
+    if (mu_button(&mui_ctx, "Level select")) {}
 
-    if (mu_button(&mui_ctx, "Le button")) {
-      mu_open_popup(&mui_ctx, "popup");
-    }
-    if (mu_button(&mui_ctx, "Le otro button")) {
-      mu_open_popup(&mui_ctx, "popup");
-    }
-    if (mu_button(&mui_ctx, "Mas uno button")) {
-      mu_open_popup(&mui_ctx, "popup");
-    }
+    mui_vspace();
 
-    if (mu_begin_popup(&mui_ctx, "popup")) {
-      mu_label(&mui_ctx, "Le popup");
-      mu_end_popup(&mui_ctx);
-    }
+    mu_layout_row(&mui_ctx, 1, (int[]) { -1 }, 32);
+    if (mu_button(&mui_ctx, "Restart level")) {}
 
     mu_end_window(&mui_ctx);
   }
