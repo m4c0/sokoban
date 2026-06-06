@@ -10,9 +10,7 @@ layout(push_constant) uniform upc {
 layout(location = 0) out vec2 f_pos;
 
 void main() {
-  vec2 p = vec2(gl_VertexIndex & 1, (gl_VertexIndex >> 1) & 1);
-
-  f_pos = pc.uv.xy + p * pc.uv.zw;
+  vec2 p = f_pos = vec2(gl_VertexIndex & 1, (gl_VertexIndex >> 1) & 1);
 
   p = pc.rect.xy + (p * pc.rect.zw);
   p /= pc.extent;

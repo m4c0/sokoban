@@ -100,6 +100,7 @@ static void vlk_record(VkCommandBuffer cb) {
   float sh = vlk_ext.height * VLK_EXT_SCALE;
   skb_api->ui(sw, sh);
 
+  // TODO: batch these into fewer calls
   mu_Command * cmd = NULL;
   while (mu_next_command(&mui_ctx, &cmd)) {
     switch (cmd->type) {
@@ -146,7 +147,7 @@ static void vlk_record(VkCommandBuffer cb) {
             cmd->rect.color.r / 255.f,
             cmd->rect.color.g / 255.f,
             cmd->rect.color.b / 255.f,
-            1,
+            0xFFFF,
           },
           .extent = { sw, sh },
         };
@@ -154,8 +155,26 @@ static void vlk_record(VkCommandBuffer cb) {
         vkCmdDraw(cb, 4, 1, 0, 0);
         break;
       }
-      case MU_COMMAND_ICON:
+      case MU_COMMAND_ICON: {
+        vlk_mui_upc_t pc = {
+          .rect   = {
+            cmd->icon.rect.x,
+            cmd->icon.rect.y,
+            cmd->icon.rect.w,
+            cmd->icon.rect.h,
+          },
+          .colour = {
+            cmd->icon.color.r / 255.f,
+            cmd->icon.color.g / 255.f,
+            cmd->icon.color.b / 255.f,
+            cmd->icon.id,
+          },
+          .extent = { sw, sh },
+        };
+        vkCmdPushConstants(cb, vlk_mui_pl, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(vlk_mui_upc_t), &pc);
+        vkCmdDraw(cb, 4, 1, 0, 0);
         break;
+      }
     }
   }
 }
