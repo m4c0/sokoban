@@ -6,3 +6,4 @@ build-osx
 *.exe
 *.pch
 *.o
+*.xcframework

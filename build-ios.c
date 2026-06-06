@@ -224,8 +224,8 @@ static int link_exe() {
     "-framework", "QuartzCore",
     "-framework", "UIKit",
     "-o", "export.xcarchive/Products/Applications/boas.app/boas", 
-    "gme.o", "sfx.o", "snd.o", "snk.o", "tmr.o",
-    "vlk-sokoban.o", "vulkan-ios.o",
+    "gme.o", "lvl.o", "mui.o", "sfx.o", "snd.o", "skb.o",
+    "microui.o", "vlk-sokoban.o", "vulkan-ios.o",
     "MoltenVK.xcframework/ios-arm64/libMoltenVK.a",
     "-lc++",
     0 };
@@ -251,6 +251,7 @@ int main(int argc, char ** argv) {
 
   if (cc("microui.c", "microui.o")) return 1;
 
+  if (hdr("vlk-sokoban.h", "vlk-sokoban.o", "VLK_IMPL")) return 1;
   if (cm("vulkan-ios.m", "vulkan-ios.o")) return 1;
   if (link_exe()) return 1;
 
