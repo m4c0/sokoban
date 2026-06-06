@@ -10,6 +10,8 @@
 #define SDK_PATH "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk"
 #define TARGET "arm64-apple-ios26.0"
 
+#define APP_PATH "export.xcarchive/Products/Applications/sokoban.app"
+
 static void usage() {
   fprintf(stderr, "just call 'build' without arguments\n");
 }
@@ -90,7 +92,7 @@ static int apply(char * src, char * tgt) {
 
 static int shader(char * name) {
   char spv[1024];
-  sprintf(spv, "export.xcarchive/Products/Applications/sokoban.app/%s.spv", name);
+  sprintf(spv, APP_PATH "/%s.spv", name);
 
   char * args[] = { "glslang", "-V", name, "-o", spv, 0 };
   return run(args);
@@ -100,17 +102,14 @@ static int codesign() {
   char * team = getenv("IOS_TEAM");
   assert(team && "Missing IOS_TEAM environment variable");
 
-  char * args[] = {
-    "codesign", "-s", strdup(team),
-    "export.xcarchive/Products/Applications/sokoban.app",
-    0 };
+  char * args[] = { "codesign", "-f", "-s", strdup(team), APP_PATH, 0 };
   return run(args);
 }
  
 static int symbols() {
   char * args[] = {
     "dsymutil", 
-    "export.xcarchive/Products/Applications/sokoban.app/sokoban", 
+    APP_PATH "/sokoban", 
     "-o", "export.xcarchive/dSYMS/sokoban.app.dSYM",
     0 };
   return run(args);
@@ -143,7 +142,7 @@ static int actool() {
     "--development-region", "en",
     "--minimum-deployment-target", "26",
     "--output-partial-info-plist", "icon-partial.plist",
-    "--compile", "export.xcarchive/Products/Applications/sokoban.app",
+    "--compile", APP_PATH,
     "Assets.xcassets",
     0
   };
@@ -223,7 +222,7 @@ static int link_exe() {
     "-framework", "MetalKit",
     "-framework", "QuartzCore",
     "-framework", "UIKit",
-    "-o", "export.xcarchive/Products/Applications/sokoban.app/sokoban", 
+    "-o", APP_PATH "/sokoban", 
     "gme.o", "lvl.o", "mui.o", "sfx.o", "snd.o", "skb.o",
     "microui.o", "vlk-sokoban.o", "vulkan-ios.o",
     "MoltenVK.xcframework/ios-arm64/libMoltenVK.a",
@@ -238,7 +237,7 @@ int main(int argc, char ** argv) {
   mkdir("export.xcarchive", 0777);
   mkdir("export.xcarchive/Products", 0777);
   mkdir("export.xcarchive/Products/Applications", 0777);
-  mkdir("export.xcarchive/Products/Applications/sokoban.app", 0777);
+  mkdir(APP_PATH, 0777);
 
   if (pch()) return 1;
 
@@ -263,6 +262,11 @@ int main(int argc, char ** argv) {
   if (apply("export.plist.in",    "export.plist")) return 1;
   if (apply("xcarchive.plist.in", "export.xcarchive/Info.plist")) return 1;
   if (apply("app.plist.in",       "export.xcarchive/Products/Applications/sokoban.app/Info.plist")) return 1;
+
+  { char * argv[] = { "cp", "atlas.img", APP_PATH, 0 };
+    if (run(argv)) return 1; }
+  { char * argv[] = { "cp", "levels.txt", APP_PATH, 0 };
+    if (run(argv)) return 1; }
 
   if (actool())   return 1;
   if (codesign()) return 1;
