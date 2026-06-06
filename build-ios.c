@@ -224,7 +224,7 @@ static int link_exe() {
     "-framework", "UIKit",
     "-o", APP_PATH "/sokoban", 
     "gme.o", "lvl.o", "mui.o", "sfx.o", "snd.o", "skb.o",
-    "microui.o", "vlk-sokoban.o", "vulkan-ios.o",
+    "microui.o", "vlk-sokoban.o", "sokoban-ios.o",
     "MoltenVK.xcframework/ios-arm64/libMoltenVK.a",
     "-lc++",
     0 };
@@ -251,7 +251,7 @@ int main(int argc, char ** argv) {
   if (cc("microui.c", "microui.o")) return 1;
 
   if (hdr("vlk-sokoban.h", "vlk-sokoban.o", "VLK_IMPL")) return 1;
-  if (cm("vulkan-ios.m", "vulkan-ios.o")) return 1;
+  if (cm("sokoban-ios.m", "sokoban-ios.o")) return 1;
   if (link_exe()) return 1;
 
   if (shader("mui-vlk.frag")) return 1;

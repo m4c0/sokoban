@@ -110,7 +110,7 @@ static int link_exe() {
     "clang", "-Wall", OPT,
     "-o", "app/sokoban.exe", 
     "gme.o", "lvl.o", "mui.o", "sfx.o", "snd.o", "skb.o", "volk.o",
-    "microui.o", "vlk-sokoban.o", "vulkan-win.o",
+    "microui.o", "vlk-sokoban.o", "sokoban-win.o",
     "-lole32", "-luser32",
     0 };
   return run(args);
@@ -134,7 +134,7 @@ int main(int argc, char ** argv) {
 
   if (cc_nopch("microui.c", "microui.o")) return 1;
 
-  if (cc("vulkan-win.c", "vulkan-win.o")) return 1;
+  if (cc("sokoban-win.c", "sokoban-win.o")) return 1;
   if (hdr("vlk-sokoban.h", "vlk-sokoban.o", "VLK_IMPL")) return 1;
   if (link_exe()) return 1;
 
