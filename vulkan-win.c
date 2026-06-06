@@ -17,7 +17,7 @@ FILE * vlk_open(const char * name, const char * ext) {
 static char vlk_log_buf[1024];
 void vlk_log(int r, const char * msg) {
   snprintf(vlk_log_buf, 1024, "Vulkan call failed (code=%d): %s\n", r, msg);
-  MessageBox(vlk_hwnd, vlk_log_buf, "Vulkan error", 0);
+  MessageBox(NULL, vlk_log_buf, "Vulkan error", 0);
 
   // This is the only way to properly programatically exit an app from any
   // thread. Other attempts froze the app or kept it as a "background app".
