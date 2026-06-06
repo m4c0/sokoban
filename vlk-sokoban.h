@@ -18,6 +18,13 @@ void vlk_overlay(int on);
 #include "tim.h"
 #include "vlk.h"
 
+// Almost sure there is a way to do this with some Vulkan call
+#ifdef __APPLE__
+#  define VLK_EXT_SCALE 0.5f // Retina
+#else
+#  define VLK_EXT_SCALE 1.0f
+#endif
+
 typedef struct vlk_upc {
   float sel_rect_x, sel_rect_y, sel_rect_w, sel_rect_h;
   float player_pos_x, player_pos_y;
@@ -89,7 +96,9 @@ static void vlk_record(VkCommandBuffer cb) {
   vkCmdBindPipeline(cb, VK_PIPELINE_BIND_POINT_GRAPHICS, vlk_mui_ppl);
   vkCmdBindDescriptorSets(cb, VK_PIPELINE_BIND_POINT_GRAPHICS, vlk_mui_pl, 0, 1, &vlk_dset, 0, NULL);
 
-  skb_api->ui(vlk_ext.width / 2, vlk_ext.height / 2);
+  float sw = vlk_ext.width  * VLK_EXT_SCALE;
+  float sh = vlk_ext.height * VLK_EXT_SCALE;
+  skb_api->ui(sw, sh);
 
   mu_Command * cmd = NULL;
   while (mu_next_command(&mui_ctx, &cmd)) {
@@ -103,7 +112,7 @@ static void vlk_record(VkCommandBuffer cb) {
             cmd->text.color.b / 255.f,
             0,
           },
-          .extent = { vlk_ext.width / 2, vlk_ext.height / 2 },
+          .extent = { sw, sh },
         };
         vkCmdPushConstants(cb, vlk_mui_pl, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(vlk_mui_upc_t), &pc);
 
@@ -139,7 +148,7 @@ static void vlk_record(VkCommandBuffer cb) {
             cmd->rect.color.b / 255.f,
             1,
           },
-          .extent = { vlk_ext.width / 2, vlk_ext.height / 2 },
+          .extent = { sw, sh },
         };
         vkCmdPushConstants(cb, vlk_mui_pl, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(vlk_mui_upc_t), &pc);
         vkCmdDraw(cb, 4, 1, 0, 0);
