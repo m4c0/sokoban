@@ -52,24 +52,6 @@ void mui_none(unsigned sw, unsigned sh) {
   mu_end(&mui_ctx);
 }
 
-void mui_main(unsigned sw, unsigned sh) {
-  mu_begin(&mui_ctx);
-
-  mui_ctx.style->padding = 12;
-  mui_ctx.style->spacing = 8;
-
-  int opt = MU_OPT_NOCLOSE | MU_OPT_NOTITLE | MU_OPT_NOFRAME;
-  if (mu_begin_window_ex(&mui_ctx, "", mu_rect(0, 0, sw, sh), opt)) {
-    mu_layout_row(&mui_ctx, 2, (int[]) { -64, -1 }, 64);
-    mu_layout_next(&mui_ctx);
-    if (mu_button_ex(&mui_ctx, "", 0xEE00, 0)) {
-    }
-    mu_end_window(&mui_ctx);
-  }
-
-  mu_end(&mui_ctx);
-}
-
 static void mui_label(const char * txt) {
   int pad = mui_ctx.style->padding;
 
@@ -83,6 +65,58 @@ static void mui_vspace(int n) {
 }
 
 static int mui_snd_on = 1;
+
+void mui_main(unsigned sw, unsigned sh) {
+  mu_begin(&mui_ctx);
+
+  mui_ctx.style->padding = 12;
+  mui_ctx.style->spacing = 8;
+
+  int toggle_options = 0;
+
+  int opt = MU_OPT_NOCLOSE | MU_OPT_NOTITLE | MU_OPT_NOFRAME;
+  if (mu_begin_window_ex(&mui_ctx, "!main", mu_rect(0, 0, sw, sh), opt)) {
+    mu_layout_row(&mui_ctx, 2, (int[]) { -56, -1 }, 48);
+    mu_layout_next(&mui_ctx);
+    if (mu_button_ex(&mui_ctx, "", 0xEE00, opt)) toggle_options = 1;
+    mu_end_window(&mui_ctx);
+  }
+
+  if (toggle_options) {
+    mu_Container * cnt = mu_get_container(&mui_ctx, "!options");
+    cnt->open = 1 - cnt->open;
+  }
+  int wx = (sw - 300) / 2;
+  int wy = (sh - 200) / 2;
+  opt = MU_OPT_NOCLOSE | MU_OPT_NOTITLE | MU_OPT_CLOSED;
+  if (mu_begin_window_ex(&mui_ctx, "!options", mu_rect(wx, wy, 300, 200), opt)) {
+    mui_vspace(6);
+
+    mu_layout_row(&mui_ctx, 3, (int[]) { -60, -1 }, 32);
+    mui_label("Sound");
+    if (mu_button(&mui_ctx, mui_snd_on ? "ON" : "")) {
+      mui_snd_on = !mui_snd_on;
+    }
+
+    mui_vspace(12);
+
+    mu_layout_row(&mui_ctx, 4, (int[]) { -160, -100, -60, -1 }, 32);
+    mui_label("Level");
+    if (mu_button(&mui_ctx, "M")) {}
+    mu_draw_control_text(&mui_ctx, "OO", mu_layout_next(&mui_ctx), MU_COLOR_TEXT, MU_OPT_ALIGNCENTER);
+    if (mu_button(&mui_ctx, "P")) {}
+
+    mui_vspace(12);
+
+    mu_layout_row(&mui_ctx, 1, (int[]) { -1 }, 32);
+    if (mu_button(&mui_ctx, "Restart level")) {}
+
+    mu_end_window(&mui_ctx);
+  }
+
+  mu_end(&mui_ctx);
+}
+
 void mui_options(unsigned sw, unsigned sh) {
   int wx = (sw - 300) / 2;
   int wy = (sh - 200) / 2;
