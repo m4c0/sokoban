@@ -263,7 +263,7 @@ void vlk_init() {
   vlk_create_img(&vlk_map, LVL_WIDTH, LVL_WIDTH, VK_FORMAT_R8_UINT);
   _(vkMapMemory(vlk_dev, vlk_map.h_mem, 0, VK_WHOLE_SIZE, 0, (void **)&gme_map));
 
-  lvl_init(fopen("levels.txt", "r+"));
+  lvl_init(vlk_open("levels", "txt"));
 
   vlk_load_atlas(vlk_open("atlas", "img"));
   vlk_load_map(0);

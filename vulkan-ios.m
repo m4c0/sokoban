@@ -105,9 +105,10 @@ configurationForConnectingSceneSession:(UISceneSession *) connectingSceneSession
 
 CAMetalLayer * vlk_metal_layer() { return g_layer; }
 
-FILE * vlk_open(const char * name) {
+FILE * vlk_open(const char * name, const char * ext) {
   NSString * n = [NSString stringWithFormat:@"%s", name];
-  NSString * path = [[NSBundle mainBundle] pathForResource:n ofType:@"spv"];
+  NSString * e = [NSString stringWithFormat:@"%s", ext];
+  NSString * path = [[NSBundle mainBundle] pathForResource:n ofType:e];
   return fopen(path.UTF8String, "rb");
 }
 
