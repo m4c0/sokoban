@@ -178,17 +178,34 @@ static int validate(char * verb) {
   return run(args);
 }
 
+static int pch() {
+  char * args[] = {
+    "clang", "-Wall", "-O3", "-x", "c-header",
+    "-target", TARGET, "-isysroot", SDK_PATH,
+    "-IVulkan-Headers/include",
+    "-D", "VK_USE_PLATFORM_METAL_EXT",
+    "-o", "pch.pch", "pch.h", 0 };
+  return run(args);
+}
+
 static int cc(char * src, char * o) {
   char * args[] = {
     "clang", "-Wall", "-O3", "-target", TARGET, "-isysroot", SDK_PATH,
-    "-IVulkan-Headers/include",
-    "-o", o, "-c", src, 0 };
+    "-include-pch", "pch.pch", "-o", o, "-c", src, 0 };
+  return run(args);
+}
+
+static int cm(char * src, char * o) {
+  char * args[] = {
+    "clang", "-Wall", "-O3", "-target", TARGET, "-isysroot", SDK_PATH,
+    "-fmodules", "-o", o, "-c", src, 0 };
   return run(args);
 }
 
 static int hdr(char * src, char * o, char * d) {
   char * args[] = {
     "clang", "-Wall", "-O3", "-target", TARGET, "-isysroot", SDK_PATH,
+    "-include-pch", "pch.pch",
     "-x", "c", "-g", "-D", d, "-o", o, "-c", src, 0
   };
   return run(args);
@@ -223,17 +240,24 @@ int main(int argc, char ** argv) {
   mkdir("export.xcarchive/Products/Applications", 0777);
   mkdir("export.xcarchive/Products/Applications/boas.app", 0777);
 
-  if (cc("vulkan.c",     "vulkan.o"    )) return 1;
-  if (cc("vulkan-ios.m", "vulkan-ios.o")) return 1;
-  if (hdr("gme.h", "gme.o", "GME_IMPLEMENTATION")) return 1;
-  if (hdr("sfx.h", "sfx.o", "SFX_IMPLEMENTATION")) return 1;
-  if (hdr("snd.h", "snd.o", "SND_IMPLEMENTATION")) return 1;
-  if (hdr("snk.h", "snk.o", "SNK_IMPLEMENTATION")) return 1;
-  if (hdr("tmr.h", "tmr.o", "TMR_IMPLEMENTATION")) return 1;
+  if (pch()) return 1;
+
+  if (hdr("gme.h", "gme.o", "GME_IMPL")) return 1;
+  if (hdr("lvl.h", "lvl.o", "LVL_IMPL")) return 1;
+  if (hdr("mui.h", "mui.o", "MUI_IMPL")) return 1;
+  if (hdr("sfx.h", "sfx.o", "SFX_IMPL")) return 1;
+  if (hdr("skb.h", "skb.o", "SKB_IMPL")) return 1;
+  if (hdr("snd.h", "snd.o", "SND_IMPL")) return 1;
+
+  if (cc("microui.c", "microui.o")) return 1;
+
+  if (cm("vulkan-ios.m", "vulkan-ios.o")) return 1;
   if (link_exe()) return 1;
 
-  if (shader("boav.frag")) return 1;
-  if (shader("boav.vert")) return 1;
+  if (shader("mui-vlk.frag")) return 1;
+  if (shader("mui-vlk.vert")) return 1;
+  if (shader("sokoban.frag")) return 1;
+  if (shader("sokoban.vert")) return 1;
 
   if (apply("export.plist.in",    "export.plist")) return 1;
   if (apply("xcarchive.plist.in", "export.xcarchive/Info.plist")) return 1;
@@ -243,7 +267,7 @@ int main(int argc, char ** argv) {
   if (codesign()) return 1;
   if (symbols())  return 1;
   if (export())   return 1;
-#if 0
+#if 1
   if (install())  return 1;
   if (validate("--validate-app")) return 1;
 #else
