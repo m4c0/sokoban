@@ -90,7 +90,7 @@ static int apply(char * src, char * tgt) {
 
 static int shader(char * name) {
   char spv[1024];
-  sprintf(spv, "export.xcarchive/Products/Applications/boas.app/%s.spv", name);
+  sprintf(spv, "export.xcarchive/Products/Applications/sokoban.app/%s.spv", name);
 
   char * args[] = { "glslang", "-V", name, "-o", spv, 0 };
   return run(args);
@@ -102,7 +102,7 @@ static int codesign() {
 
   char * args[] = {
     "codesign", "-s", strdup(team),
-    "export.xcarchive/Products/Applications/boas.app",
+    "export.xcarchive/Products/Applications/sokoban.app",
     0 };
   return run(args);
 }
@@ -110,8 +110,8 @@ static int codesign() {
 static int symbols() {
   char * args[] = {
     "dsymutil", 
-    "export.xcarchive/Products/Applications/boas.app/boas", 
-    "-o", "export.xcarchive/dSYMS/boas.app.dSYM",
+    "export.xcarchive/Products/Applications/sokoban.app/boas", 
+    "-o", "export.xcarchive/dSYMS/sokoban.app.dSYM",
     0 };
   return run(args);
 }
@@ -143,7 +143,7 @@ static int actool() {
     "--development-region", "en",
     "--minimum-deployment-target", "26",
     "--output-partial-info-plist", "icon-partial.plist",
-    "--compile", "export.xcarchive/Products/Applications/boas.app",
+    "--compile", "export.xcarchive/Products/Applications/sokoban.app",
     "Assets.xcassets",
     0
   };
@@ -158,7 +158,7 @@ static int install() {
   }
 
   char * args[] = {
-    "xcrun", "devicectl", "device", "install", "app", "--device", device, "export/boas.ipa", 0
+    "xcrun", "devicectl", "device", "install", "app", "--device", device, "export/sokoban.ipa", 0
   };
   return run(args);
 }
@@ -171,7 +171,7 @@ static int validate(char * verb) {
 
   char * args[] = {
     "xcrun", "altool", verb, "-t", "iphoneos",
-    "-f", "export/boas.ipa",
+    "-f", "export/sokoban.ipa",
     "--apiKey", strdup(api_key),
     "--apiIssuer", strdup(api_issuer),
     0 };
@@ -223,7 +223,7 @@ static int link_exe() {
     "-framework", "MetalKit",
     "-framework", "QuartzCore",
     "-framework", "UIKit",
-    "-o", "export.xcarchive/Products/Applications/boas.app/boas", 
+    "-o", "export.xcarchive/Products/Applications/sokoban.app/boas", 
     "gme.o", "lvl.o", "mui.o", "sfx.o", "snd.o", "skb.o",
     "microui.o", "vlk-sokoban.o", "vulkan-ios.o",
     "MoltenVK.xcframework/ios-arm64/libMoltenVK.a",
@@ -238,7 +238,7 @@ int main(int argc, char ** argv) {
   mkdir("export.xcarchive", 0777);
   mkdir("export.xcarchive/Products", 0777);
   mkdir("export.xcarchive/Products/Applications", 0777);
-  mkdir("export.xcarchive/Products/Applications/boas.app", 0777);
+  mkdir("export.xcarchive/Products/Applications/sokoban.app", 0777);
 
   if (pch()) return 1;
 
@@ -262,7 +262,7 @@ int main(int argc, char ** argv) {
 
   if (apply("export.plist.in",    "export.plist")) return 1;
   if (apply("xcarchive.plist.in", "export.xcarchive/Info.plist")) return 1;
-  if (apply("app.plist.in",       "export.xcarchive/Products/Applications/boas.app/Info.plist")) return 1;
+  if (apply("app.plist.in",       "export.xcarchive/Products/Applications/sokoban.app/Info.plist")) return 1;
 
   if (actool())   return 1;
   if (codesign()) return 1;
