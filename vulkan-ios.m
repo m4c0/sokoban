@@ -2,11 +2,8 @@
 #import <MetalKit/MetalKit.h>
 #import <UIKit/UIKit.h>
 
-#include "gme.h"
-
-void vlk_init();
-void vlk_frame();
-void vlk_deinit();
+#include "skb.h"
+#include "vlk-sokoban.h"
 
 CAMetalLayer * g_layer;
 
@@ -31,12 +28,12 @@ CAMetalLayer * g_layer;
 @property(nonatomic, strong) UIWindow * window;
 @end
 @implementation POCAppDelegate
-- (void)swipeLeft   { gme_left  (); }
-- (void)swipeRight  { gme_right (); }
-- (void)swipeTop    { gme_up    (); }
-- (void)swipeBottom { gme_down  (); }
+- (void)swipeLeft   { skb_api->move(-1,  0); }
+- (void)swipeRight  { skb_api->move( 1,  0); }
+- (void)swipeTop    { skb_api->move( 0, -1); }
+- (void)swipeBottom { skb_api->move( 0,  1); }
 
-- (void)tap { gme_new_game(); }
+- (void)tap { skb_api->escape(); }
 
 - (BOOL)application:(UIApplication *)app didFinishLaunchingWithOptions:(id)options {
   MTKView * view = [MTKView new];
