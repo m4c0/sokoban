@@ -5,5 +5,7 @@ build-osx
 *.dylib
 *.exe
 *.pch
+*.plist
 *.o
+*.xcarchive
 *.xcframework
