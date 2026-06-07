@@ -135,7 +135,7 @@ void mui_options(unsigned sw, unsigned sh) {
     mu_layout_row(&mui_ctx, 4, (int[]) { -160, -100, -60, -1 }, 32);
     mui_label("Level");
     if (mu_button(&mui_ctx, "M")) {}
-    mu_draw_control_text(&mui_ctx, "OO", mu_layout_next(&mui_ctx), MU_COLOR_TEXT, MU_OPT_ALIGNCENTER);
+    mu_draw_control_text(&mui_ctx, "49", mu_layout_next(&mui_ctx), MU_COLOR_TEXT, MU_OPT_ALIGNCENTER);
     if (mu_button(&mui_ctx, "P")) {}
 
     mui_vspace(12);

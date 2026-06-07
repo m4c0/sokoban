@@ -62,16 +62,31 @@ void vlk_overlay(int on) {
   vlk_pc.overlay = on ? 0.3 : 0.0;
 }
 
+static float cuv(char c, char base) {
+  float u = 0;
+  for (char cc = base; cc < c; cc++) u += mui_font_width(cc) + 1;
+  return u;
+}
+
 static void uv(float * uv, char c) {
+  uv[2] = mui_font_width(c) / 128.f;
+  uv[3] = mui_font_height() / 32.f;
+
   if (c >= 'A' && c <= 'Z') c |= 0x20;
   if (c >= 'a' && c <= 'z') {
-    float u = 32;
-    for (char cc = 'a'; cc < c; cc++) u += mui_font_width(cc) + 1;
-
-    uv[0] = u / 128.f;
+    uv[0] = (32 + cuv(c, 'a')) / 128.f;
     uv[1] = 1.f / 32.f;
-    uv[2] = mui_font_width(c) / 128.f;
-    uv[3] = mui_font_height() / 32.f;
+    return;
+  }
+
+  if (c >= '0' && c <= '5') {
+    uv[0] = (32 + cuv(c, '0')) / 128.f;
+    uv[1] = 9.f / 32.f;
+    return;
+  }
+  if (c >= '6' && c <= '9') {
+    uv[0] = (32 + cuv(c, '6')) / 128.f;
+    uv[1] = 17.f / 32.f;
     return;
   }
 
