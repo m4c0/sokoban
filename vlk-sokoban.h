@@ -80,12 +80,12 @@ static void uv(float * uv, char c) {
   }
 
   if (c >= '0' && c <= '5') {
-    uv[0] = (32 + cuv(c, '0')) / 128.f;
+    uv[0] = (8 + cuv(c, '0')) / 128.f;
     uv[1] = 9.f / 32.f;
     return;
   }
   if (c >= '6' && c <= '9') {
-    uv[0] = (32 + cuv(c, '6')) / 128.f;
+    uv[0] = (8 + cuv(c, '6')) / 128.f;
     uv[1] = 17.f / 32.f;
     return;
   }
