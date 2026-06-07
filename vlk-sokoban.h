@@ -113,7 +113,7 @@ static void vlk_record(VkCommandBuffer cb) {
 
   float sw = vlk_ext.width  * VLK_EXT_SCALE;
   float sh = vlk_ext.height * VLK_EXT_SCALE;
-  skb_api->ui(sw, sh);
+  mui_run(sw, sh);
 
   // TODO: batch these into fewer calls
   mu_Command * cmd = NULL;

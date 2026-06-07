@@ -6,7 +6,6 @@ typedef struct {
   void (*space)();
   void (*move)(int dx, int dy);
 
-  void (*ui)(unsigned sw, unsigned sh);
   void (*mouse_move)(int dx, int dy);
   void (*mouse_down)(int dx, int dy);
   void (*mouse_up)(int dx, int dy);
@@ -43,7 +42,6 @@ const skb_api_t skb_api_menu = {
   .escape     = &skb_game,
   .space      = &skb_nil,
   .move       = &skb_nil,
-  .ui         = &mui_options,
   .mouse_move = &skb_mui_mouse_move,
   .mouse_down = &skb_mui_mouse_down,
   .mouse_up   = &skb_mui_mouse_up,
@@ -65,7 +63,6 @@ const skb_api_t skb_api_game = {
   .escape     = &skb_main_menu,
   .space      = &skb_reset,
   .move       = &skb_move,
-  .ui         = &mui_main,
   .mouse_move = &skb_mui_mouse_move,
   .mouse_down = &skb_mui_mouse_down,
   .mouse_up   = &skb_mui_mouse_up,

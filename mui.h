@@ -5,10 +5,7 @@
 extern mu_Context mui_ctx;
 
 void mui_init();
-
-void mui_none   (unsigned sw, unsigned sh);
-void mui_main   (unsigned sw, unsigned sh);
-void mui_options(unsigned sw, unsigned sh);
+void mui_run(unsigned sw, unsigned sh);
 
 int mui_font_width(char c);
 int mui_font_height();
@@ -61,7 +58,7 @@ static void mui_vspace(int n) {
 
 static int mui_snd_on = 1;
 
-void mui_main(unsigned sw, unsigned sh) {
+void mui_run(unsigned sw, unsigned sh) {
   mu_begin(&mui_ctx);
 
   mui_ctx.style->padding = 12;
@@ -98,43 +95,6 @@ void mui_main(unsigned sw, unsigned sh) {
     mu_layout_row(&mui_ctx, 4, (int[]) { -160, -100, -60, -1 }, 32);
     mui_label("Level");
     if (mu_button(&mui_ctx, "M")) {}
-    mu_draw_control_text(&mui_ctx, "OO", mu_layout_next(&mui_ctx), MU_COLOR_TEXT, MU_OPT_ALIGNCENTER);
-    if (mu_button(&mui_ctx, "P")) {}
-
-    mui_vspace(12);
-
-    mu_layout_row(&mui_ctx, 1, (int[]) { -1 }, 32);
-    if (mu_button(&mui_ctx, "Restart level")) {}
-
-    mu_end_window(&mui_ctx);
-  }
-
-  mu_end(&mui_ctx);
-}
-
-void mui_options(unsigned sw, unsigned sh) {
-  int wx = (sw - 300) / 2;
-  int wy = (sh - 200) / 2;
-
-  mui_ctx.style->padding = 12;
-  mui_ctx.style->spacing = 8;
-
-  mu_begin(&mui_ctx);
-  int opt = MU_OPT_NOCLOSE | MU_OPT_NOTITLE;
-  if (mu_begin_window_ex(&mui_ctx, "", mu_rect(wx, wy, 300, 200), opt)) {
-    mui_vspace(6);
-
-    mu_layout_row(&mui_ctx, 3, (int[]) { -60, -1 }, 32);
-    mui_label("Sound");
-    if (mu_button(&mui_ctx, mui_snd_on ? "ON" : "")) {
-      mui_snd_on = !mui_snd_on;
-    }
-
-    mui_vspace(12);
-
-    mu_layout_row(&mui_ctx, 4, (int[]) { -160, -100, -60, -1 }, 32);
-    mui_label("Level");
-    if (mu_button(&mui_ctx, "M")) {}
     mu_draw_control_text(&mui_ctx, "49", mu_layout_next(&mui_ctx), MU_COLOR_TEXT, MU_OPT_ALIGNCENTER);
     if (mu_button(&mui_ctx, "P")) {}
 
@@ -145,6 +105,7 @@ void mui_options(unsigned sw, unsigned sh) {
 
     mu_end_window(&mui_ctx);
   }
+
   mu_end(&mui_ctx);
 }
 
