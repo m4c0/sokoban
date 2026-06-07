@@ -47,11 +47,6 @@ void mui_init() {
   mui_ctx.style->colors[MU_COLOR_BUTTON]   = mu_color(70, 120, 90, 255);
 }
 
-void mui_none(unsigned sw, unsigned sh) {
-  mu_begin(&mui_ctx);
-  mu_end(&mui_ctx);
-}
-
 static void mui_label(const char * txt) {
   int pad = mui_ctx.style->padding;
 
@@ -75,7 +70,7 @@ void mui_main(unsigned sw, unsigned sh) {
   int toggle_options = 0;
 
   int opt = MU_OPT_NOCLOSE | MU_OPT_NOTITLE | MU_OPT_NOFRAME;
-  if (mu_begin_window_ex(&mui_ctx, "!main", mu_rect(0, 0, sw, sh), opt)) {
+  if (mu_begin_window_ex(&mui_ctx, "!main", mu_rect(0, 0, sw, 60), opt)) {
     mu_layout_row(&mui_ctx, 2, (int[]) { -56, -1 }, 48);
     mu_layout_next(&mui_ctx);
     if (mu_button_ex(&mui_ctx, "", 0xEE00, opt)) toggle_options = 1;
