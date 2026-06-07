@@ -11,6 +11,7 @@ int mui_font_width(char c);
 int mui_font_height();
 
 #ifdef MUI_IMPL
+#include "vlk-sokoban.h"
 
 mu_Context mui_ctx = {0};
 
@@ -66,8 +67,8 @@ void mui_run(unsigned sw, unsigned sh) {
 
   int toggle_options = 0;
 
-  int opt = MU_OPT_NOCLOSE | MU_OPT_NOTITLE | MU_OPT_NOFRAME;
-  if (mu_begin_window_ex(&mui_ctx, "!main", mu_rect(0, 0, sw, 60), opt)) {
+  int opt = MU_OPT_NOCLOSE | MU_OPT_NOTITLE | MU_OPT_NOFRAME | MU_OPT_NOSCROLL;
+  if (mu_begin_window_ex(&mui_ctx, "!main", mu_rect(0, 0, sw, 70), opt)) {
     mu_layout_row(&mui_ctx, 2, (int[]) { -56, -1 }, 48);
     mu_layout_next(&mui_ctx);
     if (mu_button_ex(&mui_ctx, "", 0xEE00, opt)) toggle_options = 1;
@@ -77,6 +78,7 @@ void mui_run(unsigned sw, unsigned sh) {
   if (toggle_options) {
     mu_Container * cnt = mu_get_container(&mui_ctx, "!options");
     cnt->open = 1 - cnt->open;
+    vlk_overlay(cnt->open);    
   }
   int wx = (sw - 300) / 2;
   int wy = (sh - 200) / 2;
