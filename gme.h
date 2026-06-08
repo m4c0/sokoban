@@ -34,8 +34,8 @@ void gme_level(int l) {
   vlk_update_map();
 
   sav_data.cur_level = lvl_current;
-  if (sav_data.cur_level >= sav_data.max_level) sav_data.max_level = sav_data.cur_level + 1;
-  sav_save();
+  if (sav_data.cur_level >= sav_data.max_level) sav_data.max_level = sav_data.cur_level;
+  //sav_save();
 }
 
 void gme_move(int dx, int dy) {
