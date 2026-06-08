@@ -35,7 +35,11 @@ CAMetalLayer * g_layer;
   CGPoint p = [[touches anyObject] locationInView:[self view]];
   mu_input_mousedown(&mui_ctx, p.x, p.y, 1);
 }
-- (void) touchesUp:(NSSet<UITouch *> *) touches withEvent:(UIEvent *) event {
+- (void) touchesCancelled:(NSSet<UITouch *> *) touches withEvent:(UIEvent *) event {
+  CGPoint p = [[touches anyObject] locationInView:[self view]];
+  mu_input_mouseup(&mui_ctx, p.x, p.y, 1);
+}
+- (void) touchesEnded:(NSSet<UITouch *> *) touches withEvent:(UIEvent *) event {
   CGPoint p = [[touches anyObject] locationInView:[self view]];
   mu_input_mouseup(&mui_ctx, p.x, p.y, 1);
 }
