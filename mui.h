@@ -58,6 +58,18 @@ static void mui_vspace(int n) {
 }
 
 static int mui_snd_on = 1;
+static int mui_lvl = 1;
+
+static int int_slider(mu_Context *ctx, int * value, int low, int high) {
+  static float tmp;
+  mu_push_id(ctx, &value, sizeof(value));
+  tmp = *value;
+  int res = mu_slider_ex(ctx, &tmp, low, high, 0, "%.0f", MU_OPT_ALIGNCENTER);
+  *value = tmp;
+  mu_pop_id(ctx);
+  return res;
+}
+
 
 void mui_run(unsigned sw, unsigned sh) {
   mu_begin(&mui_ctx);
@@ -78,7 +90,8 @@ void mui_run(unsigned sw, unsigned sh) {
   if (toggle_options) {
     mu_Container * cnt = mu_get_container(&mui_ctx, "!options");
     cnt->open = 1 - cnt->open;
-    vlk_overlay(cnt->open);    
+    vlk_overlay(cnt->open);
+    mui_lvl = 1;
   }
   int wx = (sw - 300) / 2;
   int wy = (sh - 200) / 2;
@@ -94,11 +107,10 @@ void mui_run(unsigned sw, unsigned sh) {
 
     mui_vspace(12);
 
-    mu_layout_row(&mui_ctx, 4, (int[]) { -160, -100, -60, -1 }, 32);
+    mu_layout_row(&mui_ctx, 2, (int[]) { -160, -1 }, 32);
     mui_label("Level");
-    if (mu_button(&mui_ctx, "M")) {}
-    mu_draw_control_text(&mui_ctx, "49", mu_layout_next(&mui_ctx), MU_COLOR_TEXT, MU_OPT_ALIGNCENTER);
-    if (mu_button(&mui_ctx, "P")) {}
+    if (int_slider(&mui_ctx, &mui_lvl, 1, 60)) {
+    }
 
     mui_vspace(12);
 
