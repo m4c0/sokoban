@@ -30,7 +30,7 @@ void sfx_filler(float * buf, unsigned sz) {
     mult = 0;
   }
   for (unsigned i = 0; i < sz; ++i) {
-    buf[i] = 0.25f * mult * ((ssp / d) % 2) - 0.5f;
+    buf[i] = 0.25f * mult * (((ssp / d) % 2) - 0.5f);
     ssp++;
   }
   sp = ssp;
