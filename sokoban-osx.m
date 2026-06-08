@@ -2,7 +2,8 @@
 #import <CoreFoundation/CoreFoundation.h>
 #import <MetalKit/MetalKit.h>
 
-#include "skb.h"
+#include "gme.h"
+#include "mui.h"
 #include "vlk-sokoban.h"
 
 @interface POCViewDelegate : NSObject<MTKViewDelegate>
@@ -32,29 +33,26 @@
 
   unichar c = [chrs characterAtIndex:0];
   switch (c) {
-    case NSLeftArrowFunctionKey:  return skb_api->move(-1,  0);
-    case NSRightArrowFunctionKey: return skb_api->move( 1,  0);
-    case NSUpArrowFunctionKey:    return skb_api->move( 0, -1);
-    case NSDownArrowFunctionKey:  return skb_api->move( 0,  1);
-
-    case 27: return skb_api->escape();
-    case 32: return skb_api->space();
+    case NSLeftArrowFunctionKey:  return gme_move(-1,  0);
+    case NSRightArrowFunctionKey: return gme_move( 1,  0);
+    case NSUpArrowFunctionKey:    return gme_move( 0, -1);
+    case NSDownArrowFunctionKey:  return gme_move( 0,  1);
   }
 }
 - (void) mouseDown:(NSEvent *)event {
   CGPoint liw = [event locationInWindow];
   CGPoint p = [self convertPoint:liw fromView:nil];
-  skb_api->mouse_down(p.x, self.frame.size.height - p.y);
+  mu_input_mousedown(&mui_ctx, p.x, self.frame.size.height - p.y, 1);
 }
 - (void) mouseUp:(NSEvent *)event {
   CGPoint liw = [event locationInWindow];
   CGPoint p = [self convertPoint:liw fromView:nil];
-  skb_api->mouse_up(p.x, self.frame.size.height - p.y);
+  mu_input_mouseup(&mui_ctx, p.x, self.frame.size.height - p.y, 1);
 }
 - (void) mouseMoved:(NSEvent *)event {
   CGPoint liw = [event locationInWindow];
   CGPoint p = [self convertPoint:liw fromView:nil];
-  skb_api->mouse_move(p.x, self.frame.size.height - p.y);
+  mu_input_mousemove(&mui_ctx, p.x, self.frame.size.height - p.y);
 }
 - (void) mouseDragged:(NSEvent *)event {
   [self mouseMoved: event];

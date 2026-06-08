@@ -15,7 +15,6 @@ void vlk_overlay(int on);
 #include "sav.h"
 #include "sfx.h"
 #include "snd.h"
-#include "skb.h"
 #include "tim.h"
 #include "vlk.h"
 
@@ -448,7 +447,6 @@ void vlk_init() {
 
   mui_init();
   snd_init(&sfx_filler);
-  skb_init();
 }
 
 void vlk_deinit() {

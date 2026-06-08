@@ -13,6 +13,7 @@ enum gme_blocks {
 };
 
 extern char * gme_map;
+extern int gme_enabled;
 
 void gme_level(int l);
 void gme_move(int dx, int dy);
@@ -24,6 +25,7 @@ void gme_move(int dx, int dy);
 #include "vlk-sokoban.h"
 
 char * gme_map;
+int gme_enabled = 1;
 
 void gme_level(int l) {
   if (l < 60) lvl_current = l;
@@ -37,6 +39,8 @@ void gme_level(int l) {
 }
 
 void gme_move(int dx, int dy) {
+  if (!gme_enabled) return;
+
   int px = lvl_px + dx;
   int py = lvl_py + dy;
   int p = py * LVL_WIDTH + px;
@@ -48,7 +52,8 @@ void gme_move(int dx, int dy) {
   switch (gme_map[p]) {
     case gme_b_outside:
     case gme_b_wall:
-      return sfx_fail();
+      sfx_fail();
+      break;
     case gme_b_empty:
     case gme_b_target:
     case gme_b_player:
@@ -82,10 +87,12 @@ void gme_move(int dx, int dy) {
           }
           break;
         default:
-          return sfx_fail();
+          sfx_fail();
+          break;
       }
       break;
   }
+  vlk_update_map();
 }
 
 #endif
