@@ -117,6 +117,16 @@ void vlk_log(int r, const char * msg) {
   exit(1);
 }
 
+void sav_get_path(char * buf, unsigned buf_sz) {
+  NSArray * arr = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES);
+  NSString * dir = [arr firstObject];
+  [[NSFileManager defaultManager] createDirectoryAtPath:dir
+                            withIntermediateDirectories:YES
+                                             attributes:nil
+                                                  error:nil];
+  strncpy(buf, dir.UTF8String, buf_sz);
+}
+
 int main(int argc, char ** argv) {
   @autoreleasepool {
     return UIApplicationMain(argc, argv, nil, @"POCAppDelegate");

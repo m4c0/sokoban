@@ -83,6 +83,16 @@ FILE * vlk_open(const char * name, const char * ext) {
   return fopen(path.UTF8String, "rb");
 }
 
+void sav_get_path(char * buf, unsigned buf_sz) {
+  NSArray * arr = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES);
+  NSString * dir = [arr firstObject];
+  [[NSFileManager defaultManager] createDirectoryAtPath:dir
+                            withIntermediateDirectories:YES
+                                             attributes:nil
+                                                  error:nil];
+  strncpy(buf, dir.UTF8String, buf_sz);
+}
+
 void vlk_log(int r, const char * msg) {
   NSLog(@"Vulkan call failed (code=%d): %s\n", r, msg);
   exit(1);

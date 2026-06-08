@@ -109,7 +109,7 @@ static int link_exe() {
   char * args[] = {
     "clang", "-Wall", OPT,
     "-o", "app/sokoban.exe", 
-    "gme.o", "lvl.o", "mui.o", "sfx.o", "snd.o", "skb.o", "volk.o",
+    "gme.o", "lvl.o", "mui.o", "sav.o", "sfx.o", "snd.o", "skb.o", "volk.o",
     "microui.o", "vlk-sokoban.o", "sokoban-win.o",
     "-lole32", "-luser32",
     0 };
@@ -128,6 +128,7 @@ int main(int argc, char ** argv) {
   if (hdr("gme.h", "gme.o", "GME_IMPL")) return 1;
   if (hdr("lvl.h", "lvl.o", "LVL_IMPL")) return 1;
   if (hdr("mui.h", "mui.o", "MUI_IMPL")) return 1;
+  if (hdr("sav.h", "sav.o", "SAV_IMPL")) return 1;
   if (hdr("sfx.h", "sfx.o", "SFX_IMPL")) return 1;
   if (hdr("skb.h", "skb.o", "SKB_IMPL")) return 1;
   if (hdr("snd.h", "snd.o", "SND_IMPL")) return 1;

@@ -26,6 +26,21 @@ void vlk_log(int r, const char * msg) {
   if (vlk_hwnd) SendNotifyMessage(vlk_hwnd, WM_CLOSE, 0, 0);
 }
 
+void sav_get_path(char * buf, unsigned sz) {
+  // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shgetknownfolderpath
+  // FOLDERID_SavedGames
+  PWSTR sg {};
+
+  if (S_OK != SHGetKnownFolderPath(FOLDERID_SavedGames, KF_FLAG_CREATE, nullptr, &sg)) {
+    buf[0] = 0;
+    return;
+  }
+
+  size_t count {};
+  wcstombs_s(&count, buf, buf_sz, sg, buf_sz - 1);
+  CoTaskMemFree(sg);
+}
+
 static LRESULT window_proc(HWND hwnd, UINT msg, WPARAM w_param, LPARAM l_param) {
   switch (msg) {
     case WM_CLOSE:
