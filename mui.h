@@ -13,6 +13,7 @@ int mui_font_height();
 #ifdef MUI_IMPL
 #include "gme.h"
 #include "lvl.h"
+#include "sfx.h"
 #include "vlk-sokoban.h"
 
 mu_Context mui_ctx = {0};
@@ -59,7 +60,6 @@ static void mui_vspace(int n) {
   mu_layout_next(&mui_ctx);
 }
 
-static int mui_snd_on = 1;
 static float mui_lvl = 1;
 
 void mui_run(unsigned sw, unsigned sh) {
@@ -92,8 +92,8 @@ void mui_run(unsigned sw, unsigned sh) {
 
     mu_layout_row(&mui_ctx, 3, (int[]) { -60, -1 }, 32);
     mui_label("Sound");
-    if (mu_button(&mui_ctx, mui_snd_on ? "ON" : "")) {
-      mui_snd_on = !mui_snd_on;
+    if (mu_button(&mui_ctx, sfx_enabled ? "ON" : "")) {
+      sfx_enabled = !sfx_enabled;
     }
 
     mui_vspace(12);
