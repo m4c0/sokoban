@@ -26,6 +26,8 @@ void gme_move(int dx, int dy);
 char * gme_map;
 
 void gme_level(int l) {
+  if (l < 60) lvl_current = l;
+
   lvl_load(lvl_current, gme_map);
   vlk_update_map();
 
