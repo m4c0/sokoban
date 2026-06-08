@@ -2,7 +2,8 @@
 #import <MetalKit/MetalKit.h>
 #import <UIKit/UIKit.h>
 
-#include "skb.h"
+#include "gme.h"
+#include "mui.h"
 #include "vlk-sokoban.h"
 
 CAMetalLayer * g_layer;
@@ -24,16 +25,34 @@ CAMetalLayer * g_layer;
 }
 @end
 
+@interface POCViewController : UIViewController
+@end
+@implementation POCViewController
+- (BOOL)canBecomeFirstResponder {
+  return YES;
+}
+- (void) touchesBegan:(NSSet<UITouch *> *) touches withEvent:(UIEvent *) event {
+  CGPoint p = [[touches anyObject] locationInView:[self view]];
+  mu_input_mousedown(&mui_ctx, p.x, p.y, 1);
+}
+- (void) touchesUp:(NSSet<UITouch *> *) touches withEvent:(UIEvent *) event {
+  CGPoint p = [[touches anyObject] locationInView:[self view]];
+  mu_input_mouseup(&mui_ctx, p.x, p.y, 1);
+}
+- (void) touchesMoved:(NSSet<UITouch *> *) touches withEvent:(UIEvent *) event {
+  CGPoint p = [[touches anyObject] locationInView:[self view]];
+  mu_input_mousemove(&mui_ctx, p.x, p.y);
+}
+@end
+
 @interface POCWindowSceneDelegate : NSObject<UIWindowSceneDelegate>
 @property (nonatomic, strong) UIWindow * window;
 @end
 @implementation POCWindowSceneDelegate
-- (void)swipeLeft   { skb_api->move(-1,  0); }
-- (void)swipeRight  { skb_api->move( 1,  0); }
-- (void)swipeTop    { skb_api->move( 0, -1); }
-- (void)swipeBottom { skb_api->move( 0,  1); }
-
-- (void)tap { skb_api->escape(); }
+- (void)swipeLeft   { gme_move(-1,  0); }
+- (void)swipeRight  { gme_move( 1,  0); }
+- (void)swipeTop    { gme_move( 0, -1); }
+- (void)swipeBottom { gme_move( 0,  1); }
 
 - (void) scene:(UIScene *) scene willConnectToSession:(UISceneSession *) session options:(UISceneConnectionOptions *) connectionOptions
 {
@@ -42,7 +61,7 @@ CAMetalLayer * g_layer;
   MTKView * view = [MTKView new];
   view.delegate = [POCViewDelegate new];
 
-  UIViewController * vc = [UIViewController new];
+  POCViewController * vc = [POCViewController new];
   vc.view = view;
 
   UISwipeGestureRecognizer * left = [UISwipeGestureRecognizer new];
@@ -68,13 +87,6 @@ CAMetalLayer * g_layer;
   bottom.cancelsTouchesInView = NO;
   [bottom addTarget:self action:@selector(swipeBottom)];
   [vc.view addGestureRecognizer:bottom];
-
-  UITapGestureRecognizer * tap = [UITapGestureRecognizer new];
-  tap.numberOfTapsRequired = 1;
-  tap.numberOfTouchesRequired = 1;
-  tap.cancelsTouchesInView = NO;
-  [tap addTarget:self action:@selector(tap)];
-  [vc.view addGestureRecognizer:tap];
 
   self.window = [[UIWindow alloc] initWithWindowScene:windowScene];
   self.window.rootViewController = vc;
