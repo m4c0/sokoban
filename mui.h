@@ -100,7 +100,7 @@ void mui_run(unsigned sw, unsigned sh) {
     mui_vspace(12);
 
     mu_layout_row(&mui_ctx, 1, (int[]) { -1 }, 32);
-    if (mu_slider_ex(&mui_ctx, &mui_lvl, 1, sav_data.max_level + 1, 1, "Level %.0f", MU_OPT_ALIGNCENTER)) {
+    if (mu_slider_ex(&mui_ctx, &mui_lvl, 1, sav_data.max_level, 1, "Level %.0f", MU_OPT_ALIGNCENTER)) {
       gme_level(mui_lvl - 1);
     }
 

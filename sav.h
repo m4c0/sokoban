@@ -2,8 +2,8 @@
 #define SAV_H
 
 typedef struct sav_s {
-  unsigned cur_level;
-  unsigned max_level;
+  unsigned cur_level; // zero-based
+  unsigned max_level; // one-based, for reasons
 } sav_t;
 
 extern sav_t sav_data;

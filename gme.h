@@ -27,10 +27,11 @@ char * gme_map;
 
 void gme_level(int l) {
   lvl_load(lvl_current, gme_map);
-  sav_data.cur_level = lvl_current;
-  if (sav_data.cur_level > sav_data.max_level) sav_data.max_level = sav_data.cur_level;
-  sav_save();
   vlk_update_map();
+
+  sav_data.cur_level = lvl_current;
+  if (sav_data.cur_level >= sav_data.max_level) sav_data.max_level = sav_data.cur_level + 1;
+  sav_save();
 }
 
 void gme_move(int dx, int dy) {
