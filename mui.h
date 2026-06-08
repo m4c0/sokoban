@@ -11,6 +11,8 @@ int mui_font_width(char c);
 int mui_font_height();
 
 #ifdef MUI_IMPL
+#include "gme.h"
+#include "lvl.h"
 #include "vlk-sokoban.h"
 
 mu_Context mui_ctx = {0};
@@ -58,18 +60,7 @@ static void mui_vspace(int n) {
 }
 
 static int mui_snd_on = 1;
-static int mui_lvl = 1;
-
-static int int_slider(mu_Context *ctx, int * value, int low, int high) {
-  static float tmp;
-  mu_push_id(ctx, &value, sizeof(value));
-  tmp = *value;
-  int res = mu_slider_ex(ctx, &tmp, low, high, 0, "%.0f", MU_OPT_ALIGNCENTER);
-  *value = tmp;
-  mu_pop_id(ctx);
-  return res;
-}
-
+static float mui_lvl = 1;
 
 void mui_run(unsigned sw, unsigned sh) {
   mu_begin(&mui_ctx);
@@ -91,7 +82,7 @@ void mui_run(unsigned sw, unsigned sh) {
     mu_Container * cnt = mu_get_container(&mui_ctx, "!options");
     cnt->open = 1 - cnt->open;
     vlk_overlay(cnt->open);
-    mui_lvl = 1;
+    mui_lvl = lvl_current + 1;
   }
   int wx = (sw - 300) / 2;
   int wy = (sh - 200) / 2;
@@ -107,15 +98,19 @@ void mui_run(unsigned sw, unsigned sh) {
 
     mui_vspace(12);
 
-    mu_layout_row(&mui_ctx, 2, (int[]) { -160, -1 }, 32);
-    mui_label("Level");
-    if (int_slider(&mui_ctx, &mui_lvl, 1, 60)) {
+    mu_layout_row(&mui_ctx, 1, (int[]) { -1 }, 32);
+    if (mu_slider_ex(&mui_ctx, &mui_lvl, 1, 60, 1, "Level %.0f", MU_OPT_ALIGNCENTER)) {
+      lvl_current = mui_lvl - 1;
+      lvl_load(lvl_current, gme_map);
+      vlk_update_map();
     }
 
     mui_vspace(12);
 
-    mu_layout_row(&mui_ctx, 1, (int[]) { -1 }, 32);
-    if (mu_button(&mui_ctx, "Restart level")) {}
+    if (mu_button(&mui_ctx, "Restart level")) {
+      lvl_load(lvl_current, gme_map);
+      vlk_update_map();
+    }
 
     mu_end_window(&mui_ctx);
   }

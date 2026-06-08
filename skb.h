@@ -48,7 +48,6 @@ const skb_api_t skb_api_menu = {
 };
 
 static void skb_main_menu() {
-  vlk_overlay(1);
   skb_api = &skb_api_menu;
 }
 static void skb_reset() {
