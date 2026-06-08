@@ -107,6 +107,7 @@ void mui_run(unsigned sw, unsigned sh) {
 
     mui_vspace(12);
 
+    mu_layout_row(&mui_ctx, 1, (int[]) { -1 }, 32);
     if (mu_button(&mui_ctx, "Restart level")) {
       lvl_load(lvl_current, gme_map);
       vlk_update_map();
