@@ -6,8 +6,10 @@ typedef struct sav_s {
   unsigned max_level;
 } sav_t;
 
-void sav_load(sav_t * v);
-void sav_save(const sav_t * v);
+extern sav_t sav_data;
+
+void sav_load();
+void sav_save();
 
 #ifdef SAV_IMPL
 #ifdef _WIN32
@@ -18,6 +20,8 @@ void sav_save(const sav_t * v);
 #  define SEP "/"
 #  define _mkdir(X) mkdir(X, 0777)
 #endif
+
+sav_t sav_data;
 
 void sav_get_path(char * buf, unsigned sz);
 
@@ -34,15 +38,19 @@ static FILE * sav_open(const char * mode) {
   return fopen(path, mode);
 }
 
-void sav_load(sav_t * v) {
+void sav_load() {
   FILE * f = sav_open("rb");
-  fread(v, sizeof(sav_t), 1, f);
+  if (!f) {
+    sav_data.cur_level = sav_data.max_level = 1;
+    return;
+  }
+  fread(&sav_data, sizeof(sav_t), 1, f);
   fclose(f);
 }
 
-void sav_save(const sav_t * v) {
+void sav_save() {
   FILE * f = sav_open("wb");
-  fwrite(v, sizeof(sav_t), 1, f);
+  fwrite(&sav_data, sizeof(sav_t), 1, f);
   fclose(f);
 }
 

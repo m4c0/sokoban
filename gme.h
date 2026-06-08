@@ -14,13 +14,24 @@ enum gme_blocks {
 
 extern char * gme_map;
 
+void gme_level(int l);
 void gme_move(int dx, int dy);
 
 #ifdef GME_IMPL
 #include "lvl.h"
+#include "sav.h"
 #include "sfx.h"
+#include "vlk-sokoban.h"
 
 char * gme_map;
+
+void gme_level(int l) {
+  lvl_load(lvl_current + 1, gme_map);
+  sav_data.cur_level = lvl_current;
+  if (sav_data.cur_level > sav_data.max_level) sav_data.max_level = sav_data.cur_level;
+  sav_save();
+  vlk_update_map();
+}
 
 void gme_move(int dx, int dy) {
   int px = lvl_px + dx;
@@ -60,7 +71,7 @@ void gme_move(int dx, int dy) {
           }
           if (open_tgts == 0) {
             sfx_eol();
-            lvl_load(lvl_current + 1, gme_map);
+            gme_level(lvl_current + 1);
           } else if (gme_map[b] == gme_b_target_box) {
             sfx_target();
           } else {

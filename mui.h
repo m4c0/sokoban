@@ -100,17 +100,14 @@ void mui_run(unsigned sw, unsigned sh) {
 
     mu_layout_row(&mui_ctx, 1, (int[]) { -1 }, 32);
     if (mu_slider_ex(&mui_ctx, &mui_lvl, 1, 60, 1, "Level %.0f", MU_OPT_ALIGNCENTER)) {
-      lvl_current = mui_lvl - 1;
-      lvl_load(lvl_current, gme_map);
-      vlk_update_map();
+      gme_level(mui_lvl - 1);
     }
 
     mui_vspace(12);
 
     mu_layout_row(&mui_ctx, 1, (int[]) { -1 }, 32);
     if (mu_button(&mui_ctx, "Restart level")) {
-      lvl_load(lvl_current, gme_map);
-      vlk_update_map();
+      gme_level(lvl_current);
     }
 
     mu_end_window(&mui_ctx);

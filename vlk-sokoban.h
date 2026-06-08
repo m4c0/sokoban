@@ -12,6 +12,7 @@ void vlk_overlay(int on);
 #include "gme.h"
 #include "lvl.h"
 #include "mui.h"
+#include "sav.h"
 #include "sfx.h"
 #include "snd.h"
 #include "skb.h"
@@ -197,10 +198,6 @@ static void vlk_record(VkCommandBuffer cb) {
 void vlk_update_map() {
   vlk_record_buf2img(vlk_map.h_buf, vlk_map.img, LVL_WIDTH, LVL_WIDTH);
 }
-static void vlk_load_map(int lvl) {
-  lvl_load(lvl, gme_map);
-  vlk_update_map();
-}
 
 static void vlk_mui_create_pipeline_layout() {
   VkPipelineLayoutCreateInfo pl_info = {
@@ -300,7 +297,10 @@ void vlk_init() {
   lvl_init(vlk_open("levels", "txt"));
 
   vlk_load_atlas(vlk_open("atlas", "img"));
-  vlk_load_map(0);
+
+  sav_load();
+  lvl_load(sav_data.cur_level, gme_map);
+  vlk_update_map();
 
   VkDescriptorSetLayoutCreateInfo dsl_info = {
     .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
