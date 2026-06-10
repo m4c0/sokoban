@@ -4,6 +4,7 @@
 
 #include "gme.h"
 #include "mui.h"
+#include "sfx.h"
 #include "vlk-sokoban.h"
 
 CAMetalLayer * g_layer;
@@ -16,6 +17,10 @@ CAMetalLayer * g_layer;
 }
 - (void)drawInMTKView:(MTKView *)view {
   if (!self.ready) {
+    Boolean exists;
+    Boolean res = CFPreferencesGetAppBooleanValue(CFSTR("sound"), kCFPreferencesCurrentApplication, &exists);
+    sfx_init(exists ? res : 1);
+
     g_layer = (CAMetalLayer *)view.layer;
 
     vlk_init();
@@ -133,6 +138,12 @@ FILE * vlk_open(const char * name, const char * ext) {
 void vlk_log(int r, const char * msg) {
   NSLog(@"Vulkan call failed (code=%d): %s\n", r, msg);
   exit(1);
+}
+
+void sfx_save_prefs() {
+  CFPropertyListRef value = sfx_enabled() ? kCFBooleanTrue : kCFBooleanFalse;
+  CFPreferencesSetAppValue(CFSTR("sound"), value, kCFPreferencesCurrentApplication);
+  CFPreferencesAppSynchronize(kCFPreferencesCurrentApplication);
 }
 
 void sav_get_path(char * buf, unsigned buf_sz) {
