@@ -116,6 +116,11 @@ void mui_run(unsigned sw, unsigned sh) {
     mu_layout_row(&mui_ctx, 1, (int[]) { -1 }, 32);
     if (mu_button(&mui_ctx, "Restart level")) {
       gme_level(lvl_current);
+
+      mu_Container * cnt = mu_get_current_container(&mui_ctx);
+      cnt->open = 0;
+      vlk_overlay(0);
+      gme_enabled = 1;
     }
 
     mu_end_window(&mui_ctx);
