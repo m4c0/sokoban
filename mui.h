@@ -62,6 +62,7 @@ static void mui_vspace(int n) {
 }
 
 static float mui_lvl = 1;
+static int mui_first_open_ever = 1;
 
 void mui_run(unsigned sw, unsigned sh) {
   mu_begin(&mui_ctx);
@@ -81,7 +82,13 @@ void mui_run(unsigned sw, unsigned sh) {
 
   if (toggle_options) {
     mu_Container * cnt = mu_get_container(&mui_ctx, "!options");
-    cnt->open = 1 - cnt->open;
+    if (mui_first_open_ever) {
+      // mu_get_container always "open" the container when it creates and we
+      // don't have a clear way of detecting this.
+      mui_first_open_ever = 0;
+    } else {
+      cnt->open = 1 - cnt->open;
+    }
     mui_lvl = lvl_current + 1;
     vlk_overlay(cnt->open);
     gme_enabled = !cnt->open;
