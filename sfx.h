@@ -1,7 +1,9 @@
 #ifndef SFX_H
 #define SFX_H
 
-extern int sfx_enabled;
+void sfx_init(int enabled);
+int  sfx_enabled();
+void sfx_toggle();
 
 void sfx_filler(float * buf, unsigned sz);
 
@@ -12,10 +14,22 @@ void sfx_target();
 
 #ifdef SFX_IMPL
 
-int sfx_enabled = 1;
+int  sfx_load_prefs();
+void sfx_save_prefs();
+
+static int enabled = 1;
 
 static unsigned sp = 0;
 static unsigned d = 1;
+
+void sfx_init(int e) { enabled = e; }
+
+int sfx_enabled() { return enabled; }
+
+void sfx_toggle() {
+  enabled = !enabled;
+  sfx_save_prefs();
+}
 
 void sfx_filler(float * buf, unsigned sz) {
   int ssp = sp;
@@ -37,7 +51,7 @@ void sfx_filler(float * buf, unsigned sz) {
 }
 
 static void sfx_play(unsigned div) {
-  if (!sfx_enabled) return;
+  if (!enabled) return;
 
   d = div;
   sp = 0;

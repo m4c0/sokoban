@@ -102,9 +102,7 @@ void mui_run(unsigned sw, unsigned sh) {
 
     mu_layout_row(&mui_ctx, 3, (int[]) { -60, -1 }, 32);
     mui_label("Sound");
-    if (mu_button(&mui_ctx, sfx_enabled ? "ON" : "")) {
-      sfx_enabled = !sfx_enabled;
-    }
+    if (mu_button(&mui_ctx, sfx_enabled() ? "ON" : "")) sfx_toggle();
 
     mui_vspace(12);
 

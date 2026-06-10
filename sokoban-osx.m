@@ -4,6 +4,7 @@
 
 #include "gme.h"
 #include "mui.h"
+#include "sfx.h"
 #include "vlk-sokoban.h"
 
 @interface POCViewDelegate : NSObject<MTKViewDelegate>
@@ -14,6 +15,10 @@
 }
 - (void)drawInMTKView:(MTKView *)view {
   if (!self.ready) {
+    Boolean exists;
+    Boolean res = CFPreferencesGetAppBooleanValue(CFSTR("sound"), kCFPreferencesCurrentApplication, &exists);
+    sfx_init(exists ? res : 1);
+
     vlk_init();
     self.ready = YES;
   }
@@ -96,6 +101,12 @@ void sav_get_path(char * buf, unsigned buf_sz) {
 void vlk_log(int r, const char * msg) {
   NSLog(@"Vulkan call failed (code=%d): %s\n", r, msg);
   exit(1);
+}
+
+void sfx_save_prefs() {
+  CFPropertyListRef value = sfx_enabled() ? kCFBooleanTrue : kCFBooleanFalse;
+  CFPreferencesSetAppValue(CFSTR("sound"), value, kCFPreferencesCurrentApplication);
+  CFPreferencesAppSynchronize(kCFPreferencesCurrentApplication);
 }
 
 static void run() {
