@@ -42,8 +42,6 @@
 - (void) mouseDown:(NSEvent *)event {
   CGPoint liw = [event locationInWindow];
   CGPoint p = [self convertPoint:liw fromView:nil];
-  mu_input_mousemove(&mui_ctx, p.x, self.frame.size.height - p.y);
-  mui_run(self.frame.size.width, self.frame.size.height);
   mu_input_mousedown(&mui_ctx, p.x, self.frame.size.height - p.y, 1);
 }
 - (void) mouseUp:(NSEvent *)event {
@@ -52,9 +50,9 @@
   mu_input_mouseup(&mui_ctx, p.x, self.frame.size.height - p.y, 1);
 }
 - (void) mouseMoved:(NSEvent *)event {
-  //CGPoint liw = [event locationInWindow];
-  //CGPoint p = [self convertPoint:liw fromView:nil];
-  //mu_input_mousemove(&mui_ctx, p.x, self.frame.size.height - p.y);
+  CGPoint liw = [event locationInWindow];
+  CGPoint p = [self convertPoint:liw fromView:nil];
+  mu_input_mousemove(&mui_ctx, p.x, self.frame.size.height - p.y);
 }
 - (void) mouseDragged:(NSEvent *)event {
   CGPoint liw = [event locationInWindow];
