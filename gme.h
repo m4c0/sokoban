@@ -35,7 +35,7 @@ void gme_level(int l) {
 
   sav_data.cur_level = lvl_current;
   if (sav_data.cur_level >= sav_data.max_level) sav_data.max_level = sav_data.cur_level;
-  //sav_save();
+  sav_save();
 }
 
 void gme_move(int dx, int dy) {
