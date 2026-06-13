@@ -59,9 +59,8 @@ static HKEY sfx_key() {
 }
 
 void sfx_save_prefs() {
-  uint32_t value = sfx_enabled() ? 1 : 0;
-  DWORD size = sizeof(value);
-  RegQueryValueExA(sfx_key(), "sound", NULL, NULL, (void *)&value, &size);
+  uint32_t val = sfx_enabled() ? 1 : 0;
+  RegSetValueExA(sfx_key(), "sound", 0, REG_DWORD, (void *)&val, sizeof(val));
 }
 
 static LRESULT window_proc(HWND hwnd, UINT msg, WPARAM w_param, LPARAM l_param) {
@@ -142,8 +141,9 @@ int WinMain(HINSTANCE h_instance, HINSTANCE h_prev, LPSTR cmd_line, int cmd_show
   ShowWindow(hwnd, cmd_show);
   UpdateWindow(hwnd);
 
-  uint32_t val = 0;
-  RegSetValueExA(sfx_key(), SFX_KEY_NAME, 0, REG_DWORD, (void *)&val, sizeof(val));
+  uint32_t val = 1;
+  DWORD size = sizeof(val);
+  RegQueryValueExA(sfx_key(), "sound", NULL, NULL, (void *)&val, &size);
   sfx_init(val ? 1 : 0);
 
   vlk_hwnd = hwnd;
