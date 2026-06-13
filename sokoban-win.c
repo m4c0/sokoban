@@ -1,5 +1,9 @@
-#include "skb.h"
+#include "gme.h"
+#include "mui.h"
 #include "vlk-sokoban.h"
+
+#include <knownfolders.h>
+#include <shlobj.h>
 
 HWND vlk_hwnd;
 
@@ -29,15 +33,15 @@ void vlk_log(int r, const char * msg) {
 void sav_get_path(char * buf, unsigned sz) {
   // https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/nf-shlobj_core-shgetknownfolderpath
   // FOLDERID_SavedGames
-  PWSTR sg {};
+  PWSTR sg;
 
-  if (S_OK != SHGetKnownFolderPath(FOLDERID_SavedGames, KF_FLAG_CREATE, nullptr, &sg)) {
+  if (S_OK != SHGetKnownFolderPath(&FOLDERID_SavedGames, KF_FLAG_CREATE, 0, &sg)) {
     buf[0] = 0;
     return;
   }
 
-  size_t count {};
-  wcstombs_s(&count, buf, buf_sz, sg, buf_sz - 1);
+  size_t count;
+  wcstombs_s(&count, buf, sz, sg, sz - 1);
   CoTaskMemFree(sg);
 }
 
@@ -53,25 +57,23 @@ static LRESULT window_proc(HWND hwnd, UINT msg, WPARAM w_param, LPARAM l_param) 
       return 0;
 
     case WM_MOUSEMOVE:
-      skb_api->mouse_move(GET_X_LPARAM(l_param), GET_Y_LPARAM(l_param));
+      mu_input_mousemove(&mui_ctx, GET_X_LPARAM(l_param), GET_Y_LPARAM(l_param));
       return 0;
     case WM_LBUTTONDOWN:
-      skb_api->mouse_down(GET_X_LPARAM(l_param), GET_Y_LPARAM(l_param));
+      mu_input_mousedown(&mui_ctx, GET_X_LPARAM(l_param), GET_Y_LPARAM(l_param), 1);
       return 0;
     case WM_LBUTTONUP:
-      skb_api->mouse_up(GET_X_LPARAM(l_param), GET_Y_LPARAM(l_param));
+      mu_input_mouseup(&mui_ctx, GET_X_LPARAM(l_param), GET_Y_LPARAM(l_param), 1);
       return 0;
 
     case WM_KEYDOWN:
       if (HIWORD(l_param) & KF_REPEAT) return 0;
 
       switch (LOWORD(w_param)) {
-        case VK_LEFT:   skb_api->move(-1,  0); break;
-        case VK_RIGHT:  skb_api->move( 1,  0); break;
-        case VK_UP:     skb_api->move( 0, -1); break;
-        case VK_DOWN:   skb_api->move( 0,  1); break;
-        case VK_SPACE:  skb_api->space();      break;
-        case VK_ESCAPE: skb_api->escape();     break;
+        case VK_LEFT:   gme_move(-1,  0); break;
+        case VK_RIGHT:  gme_move( 1,  0); break;
+        case VK_UP:     gme_move( 0, -1); break;
+        case VK_DOWN:   gme_move( 0,  1); break;
       }
 
       return 0;
