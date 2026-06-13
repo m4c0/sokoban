@@ -29,10 +29,12 @@ static FILE * sav_open(const char * mode) {
   char path[10240];
   sav_get_path(path, sizeof(path));
 
-  strlcat(path, SEP "sokoban", sizeof(path));
+  int len = strlen(path);
+  strncat(path + len, SEP "sokoban", sizeof(path) - len);
   _mkdir(path);
 
-  strlcat(path, SEP "save.dat", sizeof(path));
+  len = strlen(path);
+  strncat(path + len, SEP "save.dat", sizeof(path) - len);
   return fopen(path, mode);
 }
 
