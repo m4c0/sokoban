@@ -12,9 +12,7 @@
 
 #define APP_PATH "export.xcarchive/Products/Applications/sokoban.app"
 
-static void usage() {
-  fprintf(stderr, "just call 'build' without arguments\n");
-}
+static int uploading;
 
 static char * slurp(const char * file) {
   FILE * f = fopen(file, "rb");
@@ -232,7 +230,7 @@ static int link_exe() {
 }
 
 int main(int argc, char ** argv) {
-  if (argc != 1) return (usage(), 1);
+  uploading = getenv("IOS_UPLOAD") != NULL;
 
   mkdir("export.xcarchive", 0777);
   mkdir("export.xcarchive/Products", 0777);
@@ -268,16 +266,19 @@ int main(int argc, char ** argv) {
   { char * argv[] = { "cp", "levels.txt", APP_PATH, 0 };
     if (run(argv)) return 1; }
 
+  if (getenv("IOS_BUILD_ONLY")) return 0;
+
   if (actool())   return 1;
   if (codesign()) return 1;
   if (symbols())  return 1;
   if (export())   return 1;
-#if 1
-  if (install())  return 1;
-  if (validate("--validate-app")) return 1;
-#else
-  if (validate("--upload-app")) return 1;
-#endif
+
+  if (uploading) {
+    if (validate("--upload-app")) return 1;
+  } else {
+    if (install()) return 1;
+    if (validate("--validate-app")) return 1;
+  }
 
   return 0;
 }
