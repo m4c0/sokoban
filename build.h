@@ -1,7 +1,7 @@
 #ifndef BUILD_H
 #define BUILD_H
 
-#define APP "chesstor"
+#define APP "sokoban"
 
 #ifdef __APPLE__
 #  include <sys/stat.h>

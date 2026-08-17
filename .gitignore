@@ -8,5 +8,6 @@ export
 *.pch
 *.plist
 *.o
+*.spv
 *.xcarchive
 *.xcframework
