@@ -4,7 +4,7 @@
 
 #include "vlk-bited.h"
 
-@interface POCViewDelegate : NSObject<MTKViewDelegate>
+@interface POCViewDelegate : MTKView<MTKViewDelegate>
 @property (nonatomic) BOOL ready;
 @end
 @implementation POCViewDelegate
@@ -17,11 +17,7 @@
   }
   vlk_frame();
 }
-@end
 
-@interface POCView : MTKView
-@end
-@implementation POCView
 - (BOOL)acceptsFirstResponder {
   return YES;
 }
@@ -42,6 +38,11 @@
     case 'w': return vlk_save();
   }
 }
+@end
+
+@interface POCViewController : NSViewController
+@end
+@implementation POCViewController
 @end
 
 @interface POCAppDelegate : NSObject<NSApplicationDelegate>
@@ -72,11 +73,14 @@ void vlk_log(int r, const char * msg) {
 }
 
 static void run() {
-  MTKView * v = [POCView new];
-  v.delegate = [POCViewDelegate new];
+  POCViewDelegate * v = [POCViewDelegate new];
+  v.delegate = v;
+
+  POCViewController * vc = [POCViewController new];
+  vc.view = v;
 
   NSWindow * w = [NSWindow new];
-  w.contentView = v;
+  w.contentViewController = vc;
   w.styleMask = NSWindowStyleMaskTitled | NSWindowStyleMaskClosable | NSWindowStyleMaskMiniaturizable;
 
   NSRect crect = NSMakeRect(0, 0, 1024, 256);
