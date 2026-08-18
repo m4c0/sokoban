@@ -23,7 +23,7 @@ static int mpd_cur_y = LVL_HEIGHT / 2;
 
 static char mpd_ptr[LVL_WIDTH * LVL_HEIGHT];
 
-void mpd_update_map() {}
+void mpd_update_map();
 
 static void mpd_load_map(int lvl) {
   lvl_load(lvl, mpd_ptr);
@@ -142,6 +142,12 @@ static id<MTLLibrary> load_library(id<MTLDevice> device, NSString * name) {
   return lib;
 }
 
+static id<MTLTexture> mpd_level;
+void mpd_update_map() {
+  MTLRegion r = { {0,0,0}, {LVL_WIDTH,LVL_HEIGHT,1} };
+  [mpd_level replaceRegion:r mipmapLevel:0 withBytes:mpd_ptr bytesPerRow:LVL_WIDTH];
+}
+
 @interface POCViewDelegate : MTKView<MTKViewDelegate>
 @property (nonatomic,strong) id<MTLCommandQueue> queue;
 @property (nonatomic,strong) id<MTLRenderPipelineState> pipeline;
@@ -160,7 +166,7 @@ static id<MTLLibrary> load_library(id<MTLDevice> device, NSString * name) {
   td.pixelFormat = MTLPixelFormatR8Unorm;
   td.width       = LVL_WIDTH;
   td.height      = LVL_HEIGHT;
-  d.level = [device newTextureWithDescriptor:td];
+  mpd_level = d.level = [device newTextureWithDescriptor:td];
 
   td = [MTLTextureDescriptor new];
   td.pixelFormat = MTLPixelFormatR8Unorm;
