@@ -1,25 +1,57 @@
 @import MetalKit;
 
-#include "vlk-maped.h"
+static id<MTLLibrary> load_library(id<MTLDevice> device, NSString * name) {
+  NSString * path = [[NSBundle mainBundle] pathForResource:name ofType:@"metal"];
+  NSString * src = [NSString stringWithContentsOfFile:path encoding:NSUTF8StringEncoding error:nil];
+  MTLCompileOptions * opts = [MTLCompileOptions new];
+  NSError * err;
+  id<MTLLibrary> lib = [device newLibraryWithSource:src options:opts error:&err];
+  if (err) {
+    NSLog(@"Error compiling shader: %@", err);
+    return nil;
+  }
+  return lib;
+}
 
-@interface POCViewDelegate : NSObject<MTKViewDelegate>
-@property (nonatomic) BOOL ready;
+@interface POCViewDelegate : MTKView<MTKViewDelegate>
+@property (nonatomic,strong) id<MTLCommandQueue> queue;
+@property (nonatomic,strong) id<MTLRenderPipelineState> pipeline;
+@property (nonatomic,strong) id<MTLTexture> texture;
+@property (nonatomic,strong) id<MTLSamplerState> sampler;
++ (id)newWithDevice:(id<MTLDevice>)device;
 @end
 @implementation POCViewDelegate
-- (void)mtkView:(MTKView *)view drawableSizeWillChange:(CGSize)size {
-}
-- (void)drawInMTKView:(MTKView *)view {
-  if (!self.ready) {
-    vlk_init();
-    self.ready = YES;
-  }
-  vlk_frame();
-}
-@end
++ (id)newWithDevice:(id<MTLDevice>)device {
+  POCViewDelegate * d = [POCViewDelegate new];
+  d.device = device;
+  d.queue = [device newCommandQueue];
 
-@interface POCView : MTKView
-@end
-@implementation POCView
+  MTLTextureDescriptor * td = [MTLTextureDescriptor new];
+  td.pixelFormat = MTLPixelFormatR8Unorm;
+  td.width       = 128;
+  td.height      = 32;
+  btd_texture = d.texture = [device newTextureWithDescriptor:td];
+  btd_load();
+
+  MTLSamplerDescriptor * sd = [MTLSamplerDescriptor new];
+  sd.minFilter = sd.magFilter = MTLSamplerMinMagFilterNearest;
+  d.sampler = [device newSamplerStateWithDescriptor:sd];
+
+  id<MTLLibrary> vert = load_library(device, @"bited.vert");
+  id<MTLLibrary> frag = load_library(device, @"bited.frag");
+  if (!vert || !frag) return nil;
+
+  MTLRenderPipelineDescriptor * pd = [MTLRenderPipelineDescriptor new];
+  pd.vertexFunction   = [vert newFunctionWithName:@"main0"];
+  pd.fragmentFunction = [frag newFunctionWithName:@"main0"];
+  pd.colorAttachments[0].pixelFormat = MTLPixelFormatRGBA8Unorm;
+  NSError * err;
+  d.pipeline = [device newRenderPipelineStateWithDescriptor:pd error:&err];
+  if (err) return (NSLog(@"Error creating pipeline: %@", err), nil);
+
+  return d;
+}
+
 - (BOOL)acceptsFirstResponder {
   return YES;
 }
@@ -48,11 +80,15 @@
 }
 @end
 
+@interface POCViewController : NSViewController
+@end
+@implementation POCViewController
+@end
+
 @interface POCAppDelegate : NSObject<NSApplicationDelegate>
 @end
 @implementation POCAppDelegate
 - (void)applicationWillTerminate:(NSApplication *)app {
-  vlk_deinit();
 }
 - (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)app {
   return YES;
@@ -63,11 +99,16 @@
 @end
 
 static void run() {
-  MTKView * v = [POCView new];
-  v.delegate = [POCViewDelegate new];
+  id<MTLDevice> device = MTLCreateSystemDefaultDevice();
+
+  POCViewDelegate * v = [POCViewDelegate newWithDevice:device];
+  v.delegate = v;
+
+  POCViewController * vc = [POCViewController new];
+  vc.view = v;
 
   NSWindow * w = [NSWindow new];
-  w.contentView = v;
+  w.contentViewController = vc;
   w.styleMask = NSWindowStyleMaskTitled | NSWindowStyleMaskClosable | NSWindowStyleMaskMiniaturizable;
 
   NSRect crect = NSMakeRect(0, 0, 800, 600);
@@ -83,7 +124,7 @@ static void run() {
                action:@selector(save)
         keyEquivalent:@"s"]];
   [menu       addItem:[[NSMenuItem alloc]
-        initWithTitle:@"Quit Bited"
+        initWithTitle:@"Quit Maped"
                action:@selector(terminate:)
         keyEquivalent:@"q"]];
 

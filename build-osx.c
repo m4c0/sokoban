@@ -22,12 +22,8 @@ static int bited_exe() {
 }
 
 static int maped_exe() {
-  char * args[] = {
-    "clang", "-Wall",
-    "-o", APP".app/Contents/MacOS/maped", 
-    "lvl.o", "maped.o", "vlk-maped.o", "volk.o",
-    0 };
-  return run(args);
+  RUN("clang", "-Wall", "-o", APP".app/Contents/MacOS/maped", "lvl.o", "maped.o");
+  return 0;
 }
 
 static int link_exe() {
