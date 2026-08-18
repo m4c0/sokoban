@@ -62,22 +62,6 @@
 }
 @end
 
-CAMetalLayer * vlk_metal_layer() {
-  return (CAMetalLayer *)[NSApplication sharedApplication].windows[0].contentView.layer;
-}
-
-FILE * vlk_open(const char * name, const char * ext) {
-  NSString * n = [NSString stringWithFormat:@"%s", name];
-  NSString * e = [NSString stringWithFormat:@"%s", ext];
-  NSString * path = [[NSBundle mainBundle] pathForResource:n ofType:e];
-  return fopen(path.UTF8String, "rb");
-}
-
-void vlk_log(int r, const char * msg) {
-  NSLog(@"Vulkan call failed (code=%d): %s\n", r, msg);
-  exit(1);
-}
-
 static void run() {
   MTKView * v = [POCView new];
   v.delegate = [POCViewDelegate new];
