@@ -71,6 +71,7 @@ static id<MTLLibrary> load_library(id<MTLDevice> device, NSString * name) {
   td.width       = 128;
   td.height      = 32;
   btd_texture = d.texture = [device newTextureWithDescriptor:td];
+  btd_load();
 
   MTLSamplerDescriptor * sd = [MTLSamplerDescriptor new];
   sd.minFilter = sd.magFilter = MTLSamplerMinMagFilterNearest;
@@ -142,28 +143,11 @@ static id<MTLLibrary> load_library(id<MTLDevice> device, NSString * name) {
 @end
 @implementation POCAppDelegate
 - (void)applicationWillTerminate:(NSApplication *)app {
-  vlk_deinit();
 }
 - (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)app {
   return YES;
 }
 @end
-
-CAMetalLayer * vlk_metal_layer() {
-  return (CAMetalLayer *)[NSApplication sharedApplication].windows[0].contentView.layer;
-}
-
-FILE * vlk_open(const char * name, const char * ext) {
-  NSString * n = [NSString stringWithFormat:@"%s", name];
-  NSString * e = [NSString stringWithFormat:@"%s", ext];
-  NSString * path = [[NSBundle mainBundle] pathForResource:n ofType:e];
-  return fopen(path.UTF8String, "rb");
-}
-
-void vlk_log(int r, const char * msg) {
-  NSLog(@"Vulkan call failed (code=%d): %s\n", r, msg);
-  exit(1);
-}
 
 static void run() {
   id<MTLDevice> device = MTLCreateSystemDefaultDevice();

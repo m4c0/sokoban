@@ -178,25 +178,6 @@ void vlk_deinit() {
   vlk_destroy();
 }
 
-void vlk_cursor(int dx, int dy) {
-  int x = vlk_pc.x + dx;
-  if (x >= 0 && x < 128) vlk_pc.x = x;
-
-  int y = vlk_pc.y + dy;
-  if (y >= 0 && y < 128) vlk_pc.y = y;
-}
-
-void vlk_toggle() {
-  unsigned char * data;
-  _(vkMapMemory(vlk_dev, vlk_atlas.h_mem, 0, VK_WHOLE_SIZE, 0, (void **)&data));
-
-  int i = vlk_pc.y * 128 + vlk_pc.x;
-  data[i] = data[i] ? 0 : 255;
-
-  vkUnmapMemory(vlk_dev, vlk_atlas.h_mem);
-  vlk_record_buf2img(vlk_atlas.h_buf, vlk_atlas.img, 128, 32);
-}
-
 void vlk_load() {
   FILE * f = fopen("atlas.img", "rb");
 
