@@ -1,6 +1,4 @@
-#import <AppKit/AppKit.h>
-#import <CoreFoundation/CoreFoundation.h>
-#import <MetalKit/MetalKit.h>
+@import MetalKit;
 
 #include "vlk-maped.h"
 

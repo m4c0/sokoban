@@ -1,6 +1,5 @@
-#import <AppKit/AppKit.h>
-#import <CoreFoundation/CoreFoundation.h>
-#import <MetalKit/MetalKit.h>
+@import AudioToolbox;
+@import MetalKit;
 
 #include "gme.h"
 #include "mui.h"

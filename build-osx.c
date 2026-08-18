@@ -26,9 +26,6 @@ static int bited_exe() {
 static int maped_exe() {
   char * args[] = {
     "clang", "-Wall",
-    "-framework", "AppKit",
-    "-framework", "AudioToolbox",
-    "-framework", "MetalKit",
     "-o", APP".app/Contents/MacOS/maped", 
     "lvl.o", "maped.o", "vlk-maped.o", "volk.o",
     0 };
@@ -38,9 +35,6 @@ static int maped_exe() {
 static int link_exe() {
   char * args[] = {
     "clang", "-Wall",
-    "-framework", "AppKit",
-    "-framework", "AudioToolbox",
-    "-framework", "MetalKit",
     "-o", APP".app/Contents/MacOS/sokoban", 
     "gme.o", "lvl.o", "mui.o", "sav.o", "sfx.o", "snd.o", "volk.o",
     "microui.o", "vlk-sokoban.o", "sokoban-osx.o",
