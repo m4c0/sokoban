@@ -1,7 +1,44 @@
 @import Metal;
 @import MetalKit;
 
-#include "vlk-bited.h"
+typedef struct btd_upc {
+  int x, y;
+} btd_upc_t;
+static btd_upc_t btd_pc;
+
+void btd_cursor(int dx, int dy) {
+  int x = btd_pc.x + dx;
+  if (x >= 0 && x < 128) btd_pc.x = x;
+
+  int y = btd_pc.y + dy;
+  if (y >= 0 && y < 128) btd_pc.y = y;
+}
+
+static uint8_t btd_atlas[128 * 32];
+static id<MTLTexture> btd_texture;
+
+void btd_replace_atlas() {
+  MTLRegion r = { {0,0,0}, {128,32,1} };
+  [btd_texture replaceRegion:r mipmapLevel:0 withBytes:btd_atlas bytesPerRow:128];
+}
+
+void btd_toggle() {
+  int i = btd_pc.y * 128 + btd_pc.x;
+  btd_atlas[i] = btd_atlas[i] ? 0 : 255;
+  btd_replace_atlas();
+}
+
+void btd_load() {
+  FILE * f = fopen("atlas.img", "rb");
+  fread(btd_atlas, 128 * 32, 1, f);
+  fclose(f);
+  btd_replace_atlas();
+}
+void btd_save() {
+  FILE * f = fopen("atlas.img", "wb");
+  fwrite(btd_atlas, 128 * 32, 1, f);
+  fclose(f);
+}
 
 static id<MTLLibrary> load_library(id<MTLDevice> device, NSString * name) {
   NSString * path = [[NSBundle mainBundle] pathForResource:name ofType:@"metal"];
@@ -19,13 +56,25 @@ static id<MTLLibrary> load_library(id<MTLDevice> device, NSString * name) {
 @interface POCViewDelegate : MTKView<MTKViewDelegate>
 @property (nonatomic,strong) id<MTLCommandQueue> queue;
 @property (nonatomic,strong) id<MTLRenderPipelineState> pipeline;
-@property (nonatomic) BOOL ready;
+@property (nonatomic,strong) id<MTLTexture> texture;
+@property (nonatomic,strong) id<MTLSamplerState> sampler;
 + (id)newWithDevice:(id<MTLDevice>)device;
 @end
 @implementation POCViewDelegate
 + (id)newWithDevice:(id<MTLDevice>)device {
   POCViewDelegate * d = [POCViewDelegate new];
+  d.device = device;
   d.queue = [device newCommandQueue];
+
+  MTLTextureDescriptor * td = [MTLTextureDescriptor new];
+  td.pixelFormat = MTLPixelFormatR8Unorm;
+  td.width       = 128;
+  td.height      = 32;
+  btd_texture = d.texture = [device newTextureWithDescriptor:td];
+
+  MTLSamplerDescriptor * sd = [MTLSamplerDescriptor new];
+  sd.minFilter = sd.magFilter = MTLSamplerMinMagFilterNearest;
+  d.sampler = [device newSamplerStateWithDescriptor:sd];
 
   id<MTLLibrary> vert = load_library(device, @"bited.vert");
   id<MTLLibrary> frag = load_library(device, @"bited.frag");
@@ -44,23 +93,17 @@ static id<MTLLibrary> load_library(id<MTLDevice> device, NSString * name) {
 - (void)mtkView:(MTKView *)view drawableSizeWillChange:(CGSize)size {
 }
 - (void)drawInMTKView:(MTKView *)view {
-  if (!self.ready) {
-    vlk_init();
-    self.ready = YES;
-  }
-  vlk_frame();
-
   MTLRenderPassDescriptor * rpd = view.currentRenderPassDescriptor;
   if (rpd == nil) return;
-
-  // glu_frame();
 
   id<MTLCommandBuffer> cb = [self.queue commandBuffer];
 
   id<MTLRenderCommandEncoder> enc = [cb renderCommandEncoderWithDescriptor:rpd];
   [enc setRenderPipelineState:self.pipeline];
-  // [enc setVertexBytes:&glu_pc length:sizeof(glu_upc_t) atIndex:0];
-  // [enc setFragmentBytes:&glu_pc length:sizeof(glu_upc_t) atIndex:0];
+  [enc setVertexBytes:&btd_pc length:sizeof(btd_upc_t) atIndex:0];
+  [enc setFragmentBytes:&btd_pc length:sizeof(btd_upc_t) atIndex:0];
+  [enc setFragmentTexture:self.texture atIndex:0];
+  [enc setFragmentSamplerState:self.sampler atIndex:0];
   [enc drawPrimitives:MTLPrimitiveTypeTriangle vertexStart:0 vertexCount:3];
   [enc endEncoding];
 
@@ -77,15 +120,15 @@ static id<MTLLibrary> load_library(id<MTLDevice> device, NSString * name) {
 
   unichar c = [chrs characterAtIndex:0];
   switch (c) {
-    case NSLeftArrowFunctionKey:  return vlk_cursor(-1,  0);
-    case NSRightArrowFunctionKey: return vlk_cursor( 1,  0);
-    case NSUpArrowFunctionKey:    return vlk_cursor( 0, -1);
-    case NSDownArrowFunctionKey:  return vlk_cursor( 0,  1);
+    case NSLeftArrowFunctionKey:  return btd_cursor(-1,  0);
+    case NSRightArrowFunctionKey: return btd_cursor( 1,  0);
+    case NSUpArrowFunctionKey:    return btd_cursor( 0, -1);
+    case NSDownArrowFunctionKey:  return btd_cursor( 0,  1);
 
-    case ' ': return vlk_toggle();
+    case ' ': return btd_toggle();
 
-    case 'e': return vlk_load();
-    case 'w': return vlk_save();
+    case 'e': return btd_load();
+    case 'w': return btd_save();
   }
 }
 @end

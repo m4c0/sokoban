@@ -17,12 +17,8 @@ static int pch() {
 }
 
 static int bited_exe() {
-  char * args[] = {
-    "clang", "-Wall",
-    "-o", APP".app/Contents/MacOS/bited", 
-    "bited.o", "vlk-bited.o", "volk.o",
-    0 };
-  return run(args);
+  RUN("clang", "-Wall", "-o", APP".app/Contents/MacOS/bited", "bited.o");
+  return 0;
 }
 
 static int maped_exe() {
