@@ -4,18 +4,15 @@
 #include "lvl.h"
 #include "tim.h"
 
-typedef struct mpd_vec2 {
-  float x, y;
-} mpd_vec2_t;
 typedef struct mpd_upc {
   float sel_rect_x, sel_rect_y, sel_rect_w, sel_rect_h;
   float player_pos_x, player_pos_y;
   float label_pos_x, label_pos_y;
   float cursor_x, cursor_y;
-  mpd_vec2_t menu_size;
   float level;
   float aspect;
   float time;
+  float overlay;
   float back_btn_dim;
   float menu_btn_dim;
 } mpd_upc_t;
