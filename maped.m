@@ -2,6 +2,7 @@
 
 #include "gme.h"
 #include "lvl.h"
+#include "tim.h"
 
 typedef struct mpd_vec2 {
   float x, y;
@@ -23,9 +24,9 @@ static mpd_upc_t mpd_pc;
 static int mpd_cur_x = LVL_WIDTH / 2;
 static int mpd_cur_y = LVL_HEIGHT / 2;
 
-static char * mpd_ptr;
+static char mpd_ptr[LVL_WIDTH * LVL_HEIGHT];
 
-void mpd_update_map();
+void mpd_update_map() {}
 
 static void mpd_load_map(int lvl) {
   lvl_load(lvl, mpd_ptr);
@@ -147,7 +148,8 @@ static id<MTLLibrary> load_library(id<MTLDevice> device, NSString * name) {
 @interface POCViewDelegate : MTKView<MTKViewDelegate>
 @property (nonatomic,strong) id<MTLCommandQueue> queue;
 @property (nonatomic,strong) id<MTLRenderPipelineState> pipeline;
-@property (nonatomic,strong) id<MTLTexture> texture;
+@property (nonatomic,strong) id<MTLTexture> atlas;
+@property (nonatomic,strong) id<MTLTexture> level;
 @property (nonatomic,strong) id<MTLSamplerState> sampler;
 + (id)newWithDevice:(id<MTLDevice>)device;
 @end
@@ -159,16 +161,29 @@ static id<MTLLibrary> load_library(id<MTLDevice> device, NSString * name) {
 
   MTLTextureDescriptor * td = [MTLTextureDescriptor new];
   td.pixelFormat = MTLPixelFormatR8Unorm;
+  td.width       = LVL_WIDTH;
+  td.height      = LVL_HEIGHT;
+  d.level = [device newTextureWithDescriptor:td];
+
+  td = [MTLTextureDescriptor new];
+  td.pixelFormat = MTLPixelFormatR8Unorm;
   td.width       = 128;
   td.height      = 32;
-  d.texture = [device newTextureWithDescriptor:td];
+  d.atlas = [device newTextureWithDescriptor:td];
+
+  char atlas[128 * 32];
+  FILE * f = fopen("atlas.img", "rb");
+  fread(atlas, 128 * 32, 1, f);
+  fclose(f);
+  MTLRegion r = { {0,0,0}, {128,32,1} };
+  [d.atlas replaceRegion:r mipmapLevel:0 withBytes:atlas bytesPerRow:128];
 
   MTLSamplerDescriptor * sd = [MTLSamplerDescriptor new];
   sd.minFilter = sd.magFilter = MTLSamplerMinMagFilterNearest;
   d.sampler = [device newSamplerStateWithDescriptor:sd];
 
-  id<MTLLibrary> vert = load_library(device, @"bited.vert");
-  id<MTLLibrary> frag = load_library(device, @"bited.frag");
+  id<MTLLibrary> vert = load_library(device, @"sokoban.vert");
+  id<MTLLibrary> frag = load_library(device, @"sokoban.frag");
   if (!vert || !frag) return nil;
 
   MTLRenderPipelineDescriptor * pd = [MTLRenderPipelineDescriptor new];
@@ -179,6 +194,9 @@ static id<MTLLibrary> load_library(id<MTLDevice> device, NSString * name) {
   d.pipeline = [device newRenderPipelineStateWithDescriptor:pd error:&err];
   if (err) return (NSLog(@"Error creating pipeline: %@", err), nil);
 
+  lvl_init(fopen("levels.txt", "r+"));
+  mpd_load_map(0);
+
   return d;
 }
 - (void)mtkView:(MTKView *)view drawableSizeWillChange:(CGSize)size {
@@ -187,14 +205,26 @@ static id<MTLLibrary> load_library(id<MTLDevice> device, NSString * name) {
   MTLRenderPassDescriptor * rpd = view.currentRenderPassDescriptor;
   if (rpd == nil) return;
 
+  mpd_pc.cursor_x = mpd_cur_x;
+  mpd_pc.cursor_y = mpd_cur_y;
+  mpd_pc.label_pos_x = lvl_min_x;
+  mpd_pc.label_pos_y = lvl_min_y - 1;
+  mpd_pc.player_pos_x = lvl_px;
+  mpd_pc.player_pos_y = lvl_py;
+  mpd_pc.level = lvl_current + 1;
+  mpd_pc.aspect = (float)800 / (float)600;
+  mpd_pc.time = tim_now();
+
   id<MTLCommandBuffer> cb = [self.queue commandBuffer];
 
   id<MTLRenderCommandEncoder> enc = [cb renderCommandEncoderWithDescriptor:rpd];
   [enc setRenderPipelineState:self.pipeline];
   [enc setVertexBytes:&mpd_pc length:sizeof(mpd_upc_t) atIndex:0];
   [enc setFragmentBytes:&mpd_pc length:sizeof(mpd_upc_t) atIndex:0];
-  [enc setFragmentTexture:self.texture atIndex:0];
+  [enc setFragmentTexture:self.level atIndex:0];
+  [enc setFragmentTexture:self.atlas atIndex:1];
   [enc setFragmentSamplerState:self.sampler atIndex:0];
+  [enc setFragmentSamplerState:self.sampler atIndex:1];
   [enc drawPrimitives:MTLPrimitiveTypeTriangle vertexStart:0 vertexCount:3];
   [enc endEncoding];
 
