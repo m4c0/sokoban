@@ -2,6 +2,8 @@
 
 #include "build.h"
 
+#define CROSS(X) SHADER(X); RUN("spirv-cross", X".spv", "--msl", "--output", APP".app/Contents/Resources/"X".metal", "--flip-vert-y");
+
 static void print_key(FILE * f, const char * key) {}
 
 static int pch() {
@@ -73,12 +75,12 @@ int main(int argc, char ** argv) {
   HDR("vlk-maped", "VLK_IMPL");
   if (maped_exe()) return 1;
 
-  SHADER("bited.frag");
-  SHADER("bited.vert");
-  SHADER("mui-vlk.frag");
-  SHADER("mui-vlk.vert");
-  SHADER("sokoban.frag");
-  SHADER("sokoban.vert");
+  CROSS("bited.frag");
+  CROSS("bited.vert");
+  CROSS("mui-vlk.frag");
+  CROSS("mui-vlk.vert");
+  CROSS("sokoban.frag");
+  CROSS("sokoban.vert");
 
   RUN("cp", "atlas.img",  APP".app/Contents/Resources/");
   RUN("cp", "levels.txt", APP".app/Contents/Resources/");
