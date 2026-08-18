@@ -1,6 +1,5 @@
-#import <AppKit/AppKit.h>
-#import <CoreFoundation/CoreFoundation.h>
-#import <MetalKit/MetalKit.h>
+@import Metal;
+@import MetalKit;
 
 #include "vlk-bited.h"
 

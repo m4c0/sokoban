@@ -17,9 +17,6 @@ static int pch() {
 static int bited_exe() {
   char * args[] = {
     "clang", "-Wall",
-    "-framework", "AppKit",
-    "-framework", "AudioToolbox",
-    "-framework", "MetalKit",
     "-o", APP".app/Contents/MacOS/bited", 
     "bited.o", "vlk-bited.o", "volk.o",
     0 };

@@ -104,7 +104,7 @@ int run(char ** args) {
 #define CC1(src, o, ...) RUN("clang", "-Wall", __VA_ARGS__, "-o", o, "-c", src)
 #define HDR(src, d) CC1(src".h", src".o", "-x", "c", "-D", d, "-include-pch", "pch.pch", CFLAGS)
 #define CC(src) CC1(src".c", src".o", "-include-pch", "pch.pch", CFLAGS)
-#define CM(src) CC1(src".m", src".o", CFLAGS)
+#define CM(src) CC1(src".m", src".o", "-fmodules", CFLAGS)
 
 #define SHADER(src) RUN("glslang", "-V", src, "-o", src ".spv")
 
