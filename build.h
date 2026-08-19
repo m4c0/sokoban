@@ -110,7 +110,9 @@ int run(char ** args) {
 
 static int compile_common() {
   HDR("gme", "GME_IMPL");
-  HDR("mve", "MVE_IMPL");
+  HDR("lvl", "LVL_IMPL");
+  HDR("mui", "MUI_IMPL");
+  HDR("sav", "SAV_IMPL");
   HDR("sfx", "SFX_IMPL");
   HDR("snd", "SND_IMPL");
   return 0;
