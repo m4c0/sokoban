@@ -21,7 +21,7 @@ static mpd_upc_t mpd_pc;
 static int mpd_cur_x = LVL_WIDTH / 2;
 static int mpd_cur_y = LVL_HEIGHT / 2;
 
-static char mpd_ptr[LVL_WIDTH * LVL_HEIGHT];
+static char mpd_ptr[LVL_SZ];
 
 void mpd_update_map();
 
@@ -142,18 +142,17 @@ static id<MTLLibrary> load_library(id<MTLDevice> device, NSString * name) {
   return lib;
 }
 
-static id<MTLTexture> mpd_level;
+static unsigned * mpd_grid_ptr;
 void mpd_update_map() {
-  MTLRegion r = { {0,0,0}, {LVL_WIDTH,LVL_HEIGHT,1} };
-  [mpd_level replaceRegion:r mipmapLevel:0 withBytes:mpd_ptr bytesPerRow:LVL_WIDTH];
+  for (int i = 0; i < LVL_SZ; i++) mpd_grid_ptr[i] = mpd_ptr[i];
 }
 
 @interface POCViewDelegate : MTKView<MTKViewDelegate>
 @property (nonatomic,strong) id<MTLCommandQueue> queue;
 @property (nonatomic,strong) id<MTLRenderPipelineState> pipeline;
+@property (nonatomic,strong) id<MTLBuffer> grid;
 @property (nonatomic,strong) id<MTLTexture> atlas;
-@property (nonatomic,strong) id<MTLTexture> level;
-@property (nonatomic,strong) id<MTLSamplerState> sampler;
+@property (nonatomic,strong) id<MTLSamplerState> atlas_smp;
 + (id)newWithDevice:(id<MTLDevice>)device;
 @end
 @implementation POCViewDelegate
@@ -161,14 +160,10 @@ void mpd_update_map() {
   POCViewDelegate * d = [POCViewDelegate new];
   d.device = device;
   d.queue = [device newCommandQueue];
+  d.grid = [device newBufferWithLength:LVL_SZ * 4 options:MTLResourceStorageModeShared];
+  mpd_grid_ptr = d.grid.contents;
 
   MTLTextureDescriptor * td = [MTLTextureDescriptor new];
-  td.pixelFormat = MTLPixelFormatR8Unorm;
-  td.width       = LVL_WIDTH;
-  td.height      = LVL_HEIGHT;
-  mpd_level = d.level = [device newTextureWithDescriptor:td];
-
-  td = [MTLTextureDescriptor new];
   td.pixelFormat = MTLPixelFormatR8Unorm;
   td.width       = 128;
   td.height      = 32;
@@ -183,7 +178,7 @@ void mpd_update_map() {
 
   MTLSamplerDescriptor * sd = [MTLSamplerDescriptor new];
   sd.minFilter = sd.magFilter = MTLSamplerMinMagFilterNearest;
-  d.sampler = [device newSamplerStateWithDescriptor:sd];
+  d.atlas_smp = [device newSamplerStateWithDescriptor:sd];
 
   id<MTLLibrary> vert = load_library(device, @"sokoban.vert");
   id<MTLLibrary> frag = load_library(device, @"sokoban.frag");
@@ -223,11 +218,10 @@ void mpd_update_map() {
   id<MTLRenderCommandEncoder> enc = [cb renderCommandEncoderWithDescriptor:rpd];
   [enc setRenderPipelineState:self.pipeline];
   [enc setVertexBytes:&mpd_pc length:sizeof(mpd_upc_t) atIndex:0];
-  [enc setFragmentBytes:&mpd_pc length:sizeof(mpd_upc_t) atIndex:0];
-  [enc setFragmentTexture:self.level atIndex:0];
-  [enc setFragmentTexture:self.atlas atIndex:1];
-  [enc setFragmentSamplerState:self.sampler atIndex:0];
-  [enc setFragmentSamplerState:self.sampler atIndex:1];
+  [enc setFragmentBytes:&mpd_pc length:sizeof(mpd_upc_t) atIndex:1];
+  [enc setFragmentBuffer:self.grid offset:0 atIndex:0];
+  [enc setFragmentTexture:self.atlas atIndex:0];
+  [enc setFragmentSamplerState:self.atlas_smp atIndex:0];
   [enc drawPrimitives:MTLPrimitiveTypeTriangle vertexStart:0 vertexCount:3];
   [enc endEncoding];
 

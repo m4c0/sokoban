@@ -15,7 +15,7 @@ layout(push_constant) uniform upc {
   float menu_btn_dim;
 } pc;
 
-layout(set = 0, binding = 0) uniform usampler2D u_map;
+layout(set = 0, binding = 0) readonly buffer u_map { uint map[]; };
 layout(set = 0, binding = 1) uniform sampler2D u_atlas;
 
 layout(location = 0) in vec2 q_pos;
@@ -72,17 +72,18 @@ vec3 brick(vec2 p) {
   return c;
 }
 
-uvec4 map_at(vec2 p, vec2 d) {
+uint map_at(vec2 p, vec2 d) {
   vec2 uv = p;
   uv = floor(d + uv * aww - vec2(0, 8)) / 32.0;
   uv = uv * 0.5 + 0.5;
   uv = clamp(uv, 0, 1);
-  return texture(u_map, uv);
+  uvec2 id = uvec2(uv * 32);
+  return map[id.x + 32 * id.y];
 }
 
 float shadow_side(vec2 p, vec2 d, float b, float m) {
-  uvec4 map = map_at(p, d);
-  float f = (map.r == 88) ? 0.0 : 1.0;
+  uint map = map_at(p, d);
+  float f = (map == 88) ? 0.0 : 1.0;
   f = mix(f, 1.0, b); 
   return min(m, f);
 }
@@ -285,19 +286,19 @@ void main() {
   aw = clamp(16 - pc.label_pos.y, 8, 12);
   aww = aw * 2;
 
-  uvec4 map = map_at(q_pos, vec2(0));
+  uint map = map_at(q_pos, vec2(0));
   vec2 b = fract(q_pos * vec2(aw)) - 0.5;
 
   vec3 f;
-  if (map.r == 88) { // 'X' - wall
+  if (map == 88) { // 'X' - wall
     f = brick(q_pos);
-  } else if (map.r == 32) { // ' ' - outside
+  } else if (map == 32) { // ' ' - outside
     f = outside(q_pos);
-  } else if (map.r == 42) { // '*' - target
+  } else if (map == 42) { // '*' - target
     f = target(q_pos, b);
-  } else if (map.r == 48) { // '0' - target_box
+  } else if (map == 48) { // '0' - target_box
     f = box(q_pos, b, true);
-  } else if (map.r == 79) { // 'O' - box
+  } else if (map == 79) { // 'O' - box
     f = box(q_pos, b, false);
   } else {
     f = empty(q_pos);
