@@ -109,6 +109,8 @@ int run(char ** args) {
 #define SHADER(src) RUN("glslang", "-V", src, "-o", src ".spv")
 
 static int compile_common() {
+  CC("microui");
+
   HDR("gme", "GME_IMPL");
   HDR("lvl", "LVL_IMPL");
   HDR("mui", "MUI_IMPL");
@@ -124,6 +126,6 @@ static int shaders() {
   return 0;
 }
 
-#define OBJS "gme.o", "mve.o", "sfx.o", "snd.o"
+#define OBJS "gme.o", "lvl.o", "microui.o", "mui.o", "sav.o", "sfx.o", "snd.o"
 
 #endif

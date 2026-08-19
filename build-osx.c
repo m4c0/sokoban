@@ -14,7 +14,7 @@ static int pch() {
 static int link_exe() {
   RUN("clang", "-Wall",
     "-o", APP".app/Contents/MacOS/main", 
-    OBJS, "app-osx.o");
+    OBJS, "sokoban-osx.o");
   return 0;
 }
 
@@ -36,8 +36,7 @@ int main(int argc, char ** argv) {
 
   if (pch()) return 1;
 
-  CC("microui");
-  CM("app-osx");
+  CM("sokoban-osx");
   if (compile_and_link_exe()) return 1;
   if (shaders()) return 1;
   CROSS("bited.frag");
