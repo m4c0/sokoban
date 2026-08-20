@@ -1,4 +1,5 @@
-@import AudioToolbox;
+@import AppKit;
+@import AudioUnit;
 @import MetalKit;
 
 #include "gme.h"
