@@ -6,6 +6,7 @@
 #include "mui.h"
 #include "sav.h"
 #include "sfx.h"
+#include "snd.h"
 #include "tim.h"
 
 #define GLU_BUF_SIZE (LVL_SZ * 4)
@@ -44,12 +45,19 @@ void glu_init(const glu_init_t * t) {
   glu_resize(t->scr_w, t->scr_h);
 
   gme_init();
+
+  mui_init();
+  snd_init(&sfx_filler);
 }
 
 void glu_deinit(void) {
+  snd_deinit();
 }
 
 void glu_load(void * into) {
+  unsigned * d = into;
+  const char * m = gme_map_ptr();
+  for (int i = 0; i < LVL_SZ; i++) d[i] = m[i];
 }
 
 void glu_frame(void) {

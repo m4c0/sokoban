@@ -17,6 +17,7 @@ extern int gme_enabled;
 void gme_init(void);
 void gme_level(int l);
 void gme_move(int dx, int dy);
+const char * gme_map_ptr();
 
 #ifdef GME_IMPL
 #include "lvl.h"
@@ -25,6 +26,8 @@ void gme_move(int dx, int dy);
 
 char gme_map[LVL_SZ];
 int gme_enabled = 1;
+
+const char * gme_map_ptr() { return gme_map; }
 
 void gme_init(void) {
   sav_load();
