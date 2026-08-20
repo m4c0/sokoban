@@ -19,6 +19,8 @@ static id<MTLLibrary> load_library(id<MTLDevice> device, NSString * name) {
 @interface POCStuff : NSObject
 @property (nonatomic,strong) id<MTLCommandQueue> queue;
 @property (nonatomic,strong) id<MTLRenderPipelineState> pipeline;
+@property (nonatomic,strong) id<MTLTexture> txt;
+@property (nonatomic,strong) id<MTLSamplerState> smp;
 @property (nonatomic,strong) id<MTLBuffer> grid;
 + (id)newWithDevice:(id<MTLDevice>)device;
 - (void)resize:(CGSize)size;
@@ -43,6 +45,21 @@ static id<MTLLibrary> load_library(id<MTLDevice> device, NSString * name) {
   d.pipeline = [device newRenderPipelineStateWithDescriptor:pd error:&err];
   if (err) return (NSLog(@"Error creating pipeline: %@", err), nil);
 
+  MTLTextureDescriptor * td = [MTLTextureDescriptor new];
+  td.pixelFormat = MTLPixelFormatR8Unorm;
+  td.width       = 128;
+  td.height      = 32;
+  d.txt = [device newTextureWithDescriptor:td];
+
+  NSString * path = [[NSBundle mainBundle] pathForResource:@"atlas" ofType:@"img"];
+  NSData * data = [NSData dataWithContentsOfFile:path];
+  MTLRegion r = { {0,0,0}, {128,32,1} };
+  [d.txt replaceRegion:r mipmapLevel:0 withBytes:[data bytes] bytesPerRow:128];
+
+  MTLSamplerDescriptor * sd = [MTLSamplerDescriptor new];
+  sd.minFilter = sd.magFilter = MTLSamplerMinMagFilterNearest;
+  d.smp = [device newSamplerStateWithDescriptor:sd];
+
   return d;
 }
 - (void)resize:(CGSize)size {
@@ -61,6 +78,8 @@ static id<MTLLibrary> load_library(id<MTLDevice> device, NSString * name) {
   [enc setVertexBytes:&glu_pc length:sizeof(glu_upc_t) atIndex:0];
   [enc setFragmentBytes:&glu_pc length:sizeof(glu_upc_t) atIndex:0];
   [enc setFragmentBuffer:self.grid offset:0 atIndex:1];
+  [enc setFragmentTexture:self.txt atIndex:0];
+  [enc setFragmentSamplerState:self.smp atIndex:0];
   [enc drawPrimitives:MTLPrimitiveTypeTriangle vertexStart:0 vertexCount:3];
   [enc endEncoding];
 
