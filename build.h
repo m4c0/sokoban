@@ -121,8 +121,10 @@ static int compile_common() {
 }
 
 static int shaders() {
-  SHADER("shader.frag");
-  SHADER("shader.vert");
+  SHADER("mui-vlk.frag");
+  SHADER("mui-vlk.vert");
+  SHADER("sokoban.frag");
+  SHADER("sokoban.vert");
   return 0;
 }
 
