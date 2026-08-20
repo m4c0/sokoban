@@ -12,9 +12,9 @@ enum gme_blocks {
   gme_b_target_box    = '0',
 };
 
-extern char * gme_map;
 extern int gme_enabled;
 
+void gme_init(void);
 void gme_level(int l);
 void gme_move(int dx, int dy);
 
@@ -23,8 +23,13 @@ void gme_move(int dx, int dy);
 #include "sav.h"
 #include "sfx.h"
 
-char * gme_map;
+char gme_map[LVL_SZ];
 int gme_enabled = 1;
+
+void gme_init(void) {
+  sav_load();
+  lvl_load(sav_data.cur_level, gme_map);
+}
 
 void gme_level(int l) {
   if (l < 60) lvl_current = l;

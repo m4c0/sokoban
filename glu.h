@@ -37,15 +37,13 @@ void glu_resize(unsigned w, unsigned h) {
 }
 void glu_init(const glu_init_t * t) {
   glu_pc.cursor_x = glu_pc.cursor_y = 10000;
-  gme_map = t->map;
 
   lvl_init(t->level, t->level_sz);
 
   sfx_init(t->sound);
   glu_resize(t->scr_w, t->scr_h);
 
-  sav_load();
-  lvl_load(sav_data.cur_level, gme_map);
+  gme_init();
 }
 
 void glu_deinit(void) {

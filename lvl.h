@@ -42,7 +42,7 @@ void lvl_load(int n, char * buffer) {
     assert('\n' == ptr[LVL_SZ + 2]);
 
     memcpy(buffer, ptr + 1, LVL_SZ);
-    ptr += LVL_SZ + 2;
+    ptr += LVL_SZ + 3;
   }
 
   lvl_current = n;
