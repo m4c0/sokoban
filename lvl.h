@@ -28,7 +28,7 @@ void lvl_init(const void * data, int sz) {
   lvl_max_level = -1;
 
   const char * ptr = lvl_data;
-  while (ptr && ptr > lvl_data_end && *ptr) {
+  while (ptr && ptr < lvl_data_end && *ptr) {
     if (*ptr == '\n') lvl_max_level++;
     ptr++;
   }
