@@ -10,42 +10,39 @@ extern int lvl_px, lvl_py;
 extern int lvl_min_x, lvl_min_y;
 extern int lvl_max_level;
 
-extern FILE * lvl_f;
-
-void lvl_init(FILE * f);
+void lvl_init(const void * data, int sz);
 void lvl_load(int n, char * buffer);
 
 #ifdef LVL_IMPL
 
-FILE * lvl_f;
+const char * lvl_data;
+const char * lvl_data_end;
 int lvl_current;
 int lvl_px, lvl_py;
 int lvl_min_x, lvl_min_y;
 int lvl_max_level;
 
-void lvl_init(FILE * f) {
-  lvl_f = f;
+void lvl_init(const void * data, int sz) {
+  lvl_data = data;
+  lvl_data_end = lvl_data + sz;
   lvl_max_level = -1;
 
-  assert(0 == fseek(lvl_f, 0, SEEK_SET));
-
-  char buf[LVL_SZ * 2];
-  while (!feof(f)) {
-    if (!fgets(buf, sizeof(buf), lvl_f)) break;
-    lvl_max_level++;
+  const char * ptr = lvl_data;
+  while (ptr && ptr > lvl_data_end && *ptr) {
+    if (*ptr == '\n') lvl_max_level++;
+    ptr++;
   }
   assert(lvl_max_level >= 0);
 }
 void lvl_load(int n, char * buffer) {
-  assert(0 == fseek(lvl_f, 0, SEEK_SET));
-
+  const char * ptr = lvl_data;
   for (int i = 0; i <= n; i++) {
-    assert('|' == fgetc(lvl_f));
-    assert(1 == fread(buffer, LVL_SZ, 1, lvl_f));
-    assert('|' == fgetc(lvl_f));
+    assert('|' == ptr[0]);
+    assert('|' == ptr[LVL_SZ + 1]);
+    assert('\n' == ptr[LVL_SZ + 2]);
 
-    char nl[2];
-    assert(fgets(nl, 2, lvl_f));
+    memcpy(buffer, ptr + 1, LVL_SZ);
+    ptr += LVL_SZ + 2;
   }
 
   lvl_current = n;

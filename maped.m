@@ -125,8 +125,10 @@ void mpd_target() {
 }
 
 void mpd_save() {
-  assert(0 == fseek(lvl_f, (LVL_SZ + 3) * lvl_current + 1, SEEK_SET));
-  assert(1 == fwrite(mpd_ptr, LVL_SZ, 1, lvl_f));
+  FILE * f = fopen("levels.txt", "r+");
+  assert(0 == fseek(f, (LVL_SZ + 3) * lvl_current + 1, SEEK_SET));
+  assert(1 == fwrite(mpd_ptr, LVL_SZ, 1, f));
+  fclose(f);
 }
 
 static id<MTLLibrary> load_library(id<MTLDevice> device, NSString * name) {
@@ -145,6 +147,24 @@ static id<MTLLibrary> load_library(id<MTLDevice> device, NSString * name) {
 static unsigned * mpd_grid_ptr;
 void mpd_update_map() {
   for (int i = 0; i < LVL_SZ; i++) mpd_grid_ptr[i] = mpd_ptr[i];
+}
+
+static inline char * slurp(const char * file, unsigned * osz) {
+  FILE * f = fopen(file, "rb");
+  assert(f);
+
+  assert(0 == fseek(f, 0, SEEK_END));
+  long sz = ftell(f);
+  assert(sz);
+  assert(0 == fseek(f, 0, SEEK_SET));
+
+  char * data = malloc(sz + 1);
+  assert(1 == fread(data, sz, 1, f));
+  data[sz] = 0;
+
+  fclose(f);
+  if (osz) *osz = sz;
+  return data;
 }
 
 @interface POCViewDelegate : MTKView<MTKViewDelegate>
@@ -192,7 +212,10 @@ void mpd_update_map() {
   d.pipeline = [device newRenderPipelineStateWithDescriptor:pd error:&err];
   if (err) return (NSLog(@"Error creating pipeline: %@", err), nil);
 
-  lvl_init(fopen("levels.txt", "r+"));
+  unsigned sz;
+  const char * data = slurp("levels.txt", &sz);
+  lvl_init(data, sz);
+
   mpd_load_map(0);
 
   return d;
