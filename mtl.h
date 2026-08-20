@@ -84,9 +84,6 @@ static id<MTLLibrary> load_library(id<MTLDevice> device, NSString * name) {
   d.delegate   = d;
   return d;
 }
-- (BOOL)acceptsFirstResponder {
-  return YES;
-}
 - (void)mtkView:(MTKView *)view drawableSizeWillChange:(CGSize)size {
   if (self.ready) [self.stuff resize:size];
 }

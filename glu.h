@@ -19,9 +19,27 @@ void glu_init(int sound, unsigned w, unsigned h) {
   sfx_init(sound);
   glu_resize(w, h);
 }
+
+void glu_deinit(void) {
+}
+
 void glu_load(void * into) {
 }
 void glu_frame(void) {
+}
+
+void glu_move(int dx, int dy) {
+  // gme_move(dx, dy);
+}
+
+void glu_mouse_move(int x, int y) {
+  // mu_input_mousemove(&mui_ctx, dx, dy);
+}
+void glu_mouse_down(int x, int y) {
+  // mu_input_mousedown(&mui_ctx, dx, dy, 1);
+}
+void glu_mouse_up(int x, int y) {
+  // mu_input_mouseup(&mui_ctx, dx, dy, 1);
 }
 
 #endif
