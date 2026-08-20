@@ -2,91 +2,60 @@
 @import AudioUnit;
 @import MetalKit;
 
-#include "gme.h"
-#include "mui.h"
-#include "sfx.h"
-#include "vlk-sokoban.h"
+#include "mtl.h"
 
-@interface POCViewDelegate : NSObject<MTKViewDelegate>
-@property (nonatomic) BOOL ready;
+@interface POCWindow : NSWindow
 @end
-@implementation POCViewDelegate
-- (void)mtkView:(MTKView *)view drawableSizeWillChange:(CGSize)size {
-}
-- (void)drawInMTKView:(MTKView *)view {
-  if (!self.ready) {
-    Boolean exists;
-    Boolean res = CFPreferencesGetAppBooleanValue(CFSTR("sound"), kCFPreferencesCurrentApplication, &exists);
-    sfx_init(exists ? res : 1);
-
-    vlk_init();
-    self.ready = YES;
-  }
-  vlk_frame();
-}
-@end
-
-@interface POCView : MTKView
-@end
-@implementation POCView
-- (BOOL)acceptsFirstResponder {
-  return YES;
-}
+@implementation POCWindow
 - (void)keyDown:(NSEvent *)event {
   NSString * chrs = event.charactersIgnoringModifiers;
   if (chrs.length != 1) return;
 
-  unichar c = [chrs characterAtIndex:0];
-  switch (c) {
-    case NSLeftArrowFunctionKey:  return gme_move(-1,  0);
-    case NSRightArrowFunctionKey: return gme_move( 1,  0);
-    case NSUpArrowFunctionKey:    return gme_move( 0, -1);
-    case NSDownArrowFunctionKey:  return gme_move( 0,  1);
-  }
+  //unichar c = [chrs characterAtIndex:0];
+  //switch (c) {
+  //  case NSLeftArrowFunctionKey:  return gme_move(-1,  0);
+  //  case NSRightArrowFunctionKey: return gme_move( 1,  0);
+  //  case NSUpArrowFunctionKey:    return gme_move( 0, -1);
+  //  case NSDownArrowFunctionKey:  return gme_move( 0,  1);
+  //}
 }
 - (void) mouseDown:(NSEvent *)event {
-  CGPoint liw = [event locationInWindow];
-  CGPoint p = [self convertPoint:liw fromView:nil];
-  mu_input_mousedown(&mui_ctx, p.x, self.frame.size.height - p.y, 1);
+  //CGPoint liw = [event locationInWindow];
+  //CGPoint p = [self convertPoint:liw fromView:nil];
+  //mu_input_mousedown(&mui_ctx, p.x, self.frame.size.height - p.y, 1);
 }
 - (void) mouseUp:(NSEvent *)event {
-  CGPoint liw = [event locationInWindow];
-  CGPoint p = [self convertPoint:liw fromView:nil];
-  mu_input_mouseup(&mui_ctx, p.x, self.frame.size.height - p.y, 1);
+  //CGPoint liw = [event locationInWindow];
+  //CGPoint p = [self convertPoint:liw fromView:nil];
+  //mu_input_mouseup(&mui_ctx, p.x, self.frame.size.height - p.y, 1);
 }
 - (void) mouseMoved:(NSEvent *)event {
-  CGPoint liw = [event locationInWindow];
-  CGPoint p = [self convertPoint:liw fromView:nil];
-  mu_input_mousemove(&mui_ctx, p.x, self.frame.size.height - p.y);
+  //CGPoint liw = [event locationInWindow];
+  //CGPoint p = [self convertPoint:liw fromView:nil];
+  //mu_input_mousemove(&mui_ctx, p.x, self.frame.size.height - p.y);
 }
 - (void) mouseDragged:(NSEvent *)event {
-  CGPoint liw = [event locationInWindow];
-  CGPoint p = [self convertPoint:liw fromView:nil];
-  mu_input_mousemove(&mui_ctx, p.x, self.frame.size.height - p.y);
+  //CGPoint liw = [event locationInWindow];
+  //CGPoint p = [self convertPoint:liw fromView:nil];
+  //mu_input_mousemove(&mui_ctx, p.x, self.frame.size.height - p.y);
 }
+@end
+
+@interface POCViewController : NSViewController
+@end
+@implementation POCViewController
 @end
 
 @interface POCAppDelegate : NSObject<NSApplicationDelegate>
 @end
 @implementation POCAppDelegate
 - (void)applicationWillTerminate:(NSApplication *)app {
-  vlk_deinit();
+  // vlk_deinit();
 }
 - (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)app {
   return YES;
 }
 @end
-
-CAMetalLayer * vlk_metal_layer() {
-  return (CAMetalLayer *)[NSApplication sharedApplication].windows[0].contentView.layer;
-}
-
-FILE * vlk_open(const char * name, const char * ext) {
-  NSString * n = [NSString stringWithFormat:@"%s", name];
-  NSString * e = [NSString stringWithFormat:@"%s", ext];
-  NSString * path = [[NSBundle mainBundle] pathForResource:n ofType:e];
-  return fopen(path.UTF8String, "rb");
-}
 
 void sav_get_path(char * buf, unsigned buf_sz) {
   NSArray * arr = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES);
@@ -98,11 +67,6 @@ void sav_get_path(char * buf, unsigned buf_sz) {
   strncpy(buf, dir.UTF8String, buf_sz);
 }
 
-void vlk_log(int r, const char * msg) {
-  NSLog(@"Vulkan call failed (code=%d): %s\n", r, msg);
-  exit(1);
-}
-
 void sfx_save_prefs() {
   CFPropertyListRef value = sfx_enabled() ? kCFBooleanTrue : kCFBooleanFalse;
   CFPreferencesSetAppValue(CFSTR("sound"), value, kCFPreferencesCurrentApplication);
@@ -110,12 +74,12 @@ void sfx_save_prefs() {
 }
 
 static void run() {
-  MTKView * v = [POCView new];
-  v.delegate = [POCViewDelegate new];
+  POCViewController * vc = [POCViewController new];
+  vc.view = [POCViewDelegate new];
 
   NSWindow * w = [NSWindow new];
   w.acceptsMouseMovedEvents = YES;
-  w.contentView = v;
+  w.contentViewController = vc;
   w.styleMask = NSWindowStyleMaskTitled | NSWindowStyleMaskClosable | NSWindowStyleMaskMiniaturizable;
 
   NSRect crect = NSMakeRect(0, 0, 800, 600);

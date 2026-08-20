@@ -3,6 +3,7 @@
 #include "microui.h"
 
 extern mu_Context mui_ctx;
+extern int mui_overlay;
 
 void mui_init();
 void mui_run(unsigned sw, unsigned sh);
@@ -15,9 +16,9 @@ int mui_font_height();
 #include "lvl.h"
 #include "sav.h"
 #include "sfx.h"
-#include "vlk-sokoban.h"
 
 mu_Context mui_ctx = {0};
+int mui_overlay = 0;
 
 int mui_font_width(char c) {
   if ((c | 0x20) == 'i') return 1;
@@ -90,7 +91,7 @@ void mui_run(unsigned sw, unsigned sh) {
       cnt->open = 1 - cnt->open;
     }
     mui_lvl = lvl_current + 1;
-    vlk_overlay(cnt->open);
+    mui_overlay = cnt->open;
     gme_enabled = !cnt->open;
   }
 
@@ -119,7 +120,7 @@ void mui_run(unsigned sw, unsigned sh) {
 
       mu_Container * cnt = mu_get_current_container(&mui_ctx);
       cnt->open = 0;
-      vlk_overlay(0);
+      mui_overlay = 0;
       gme_enabled = 1;
     }
 

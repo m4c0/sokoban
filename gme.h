@@ -22,7 +22,6 @@ void gme_move(int dx, int dy);
 #include "lvl.h"
 #include "sav.h"
 #include "sfx.h"
-#include "vlk-sokoban.h"
 
 char * gme_map;
 int gme_enabled = 1;
@@ -31,7 +30,7 @@ void gme_level(int l) {
   if (l < 60) lvl_current = l;
 
   lvl_load(lvl_current, gme_map);
-  vlk_update_map();
+  //vlk_update_map();
 
   sav_data.cur_level = lvl_current;
   if (sav_data.cur_level >= sav_data.max_level) sav_data.max_level = sav_data.cur_level;
@@ -92,7 +91,7 @@ void gme_move(int dx, int dy) {
       }
       break;
   }
-  vlk_update_map();
+  //vlk_update_map();
 }
 
 #endif
