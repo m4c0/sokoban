@@ -1,10 +1,12 @@
 #ifndef GLU_H
 #define GLU_H
 
-//#include "gme.h"
+#include "gme.h"
 #include "lvl.h"
-//#include "mui.h"
+#include "mui.h"
+#include "sav.h"
 #include "sfx.h"
+#include "tim.h"
 
 #define GLU_BUF_SIZE (LVL_SZ * 4)
 
@@ -31,12 +33,19 @@ typedef struct glu_init_s {
 } glu_init_t;
 
 void glu_resize(unsigned w, unsigned h) {
+  glu_pc.aspect = (float)w / (float)h;
 }
 void glu_init(const glu_init_t * t) {
+  glu_pc.cursor_x = glu_pc.cursor_y = 10000;
+  gme_map = t->map;
+
   lvl_init(t->level, t->level_sz);
 
   sfx_init(t->sound);
   glu_resize(t->scr_w, t->scr_h);
+
+  sav_load();
+  lvl_load(sav_data.cur_level, gme_map);
 }
 
 void glu_deinit(void) {
@@ -44,7 +53,15 @@ void glu_deinit(void) {
 
 void glu_load(void * into) {
 }
+
 void glu_frame(void) {
+  glu_pc.label_pos_x  = lvl_min_x;
+  glu_pc.label_pos_y  = lvl_min_y - 1;
+  glu_pc.overlay      = mui_overlay ? 0.3 : 0.0;
+  glu_pc.player_pos_x = lvl_px;
+  glu_pc.player_pos_y = lvl_py;
+  glu_pc.level        = lvl_current + 1;
+  glu_pc.time         = tim_now();
 }
 
 void glu_move(int dx, int dy) {
