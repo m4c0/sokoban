@@ -91,7 +91,19 @@ static id<MTLLibrary> load_library(id<MTLDevice> device, NSString * name) {
   if (!self.ready) {
     Boolean exists;
     Boolean res = CFPreferencesGetAppBooleanValue(CFSTR("sound"), kCFPreferencesCurrentApplication, &exists);
-    glu_init(exists ? res : 1, view.frame.size.width, view.frame.size.height);
+
+    NSString * path = [[NSBundle mainBundle] pathForResource:@"levels" ofType:@"txt"];
+    NSData * data = [NSData dataWithContentsOfFile:path];
+
+    glu_init_t t = {
+      .level    = [data bytes],
+      .level_sz = [data length],
+      .sound    = exists ? res : 1,
+      .scr_w    = view.frame.size.width,
+      .scr_h    = view.frame.size.height,
+    };
+    glu_init(&t);
+
     self.ready = YES;
   }
 

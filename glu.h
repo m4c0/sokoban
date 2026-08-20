@@ -23,16 +23,20 @@ typedef struct glu_upc_s {
 glu_upc_t glu_pc;
 
 typedef struct glu_init_s {
-  void * level_data;
+  const void * level;
+  unsigned level_sz;
+
   int sound;
   int scr_w, scr_h;
 } glu_init_t;
 
 void glu_resize(unsigned w, unsigned h) {
 }
-void glu_init(int sound, unsigned w, unsigned h) {
-  sfx_init(sound);
-  glu_resize(w, h);
+void glu_init(const glu_init_t * t) {
+  lvl_init(t->level, t->level_sz);
+
+  sfx_init(t->sound);
+  glu_resize(t->scr_w, t->scr_h);
 }
 
 void glu_deinit(void) {
