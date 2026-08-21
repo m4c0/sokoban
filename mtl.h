@@ -19,6 +19,7 @@ static id<MTLLibrary> load_library(id<MTLDevice> device, NSString * name) {
 @interface POCStuff : NSObject
 @property (nonatomic,strong) id<MTLCommandQueue> queue;
 @property (nonatomic,strong) id<MTLRenderPipelineState> pipeline;
+@property (nonatomic,strong) id<MTLRenderPipelineState> pipeline_mui;
 @property (nonatomic,strong) id<MTLTexture> txt;
 @property (nonatomic,strong) id<MTLSamplerState> smp;
 @property (nonatomic,strong) id<MTLBuffer> grid;
@@ -43,6 +44,17 @@ static id<MTLLibrary> load_library(id<MTLDevice> device, NSString * name) {
   pd.colorAttachments[0].pixelFormat = MTLPixelFormatRGBA8Unorm;
   NSError * err;
   d.pipeline = [device newRenderPipelineStateWithDescriptor:pd error:&err];
+  if (err) return (NSLog(@"Error creating pipeline: %@", err), nil);
+
+  vert = load_library(device, @"mui-vlk.vert");
+  frag = load_library(device, @"mui-vlk.frag");
+  if (!vert || !frag) return nil;
+
+  pd = [MTLRenderPipelineDescriptor new];
+  pd.vertexFunction   = [vert newFunctionWithName:@"main0"];
+  pd.fragmentFunction = [frag newFunctionWithName:@"main0"];
+  pd.colorAttachments[0].pixelFormat = MTLPixelFormatRGBA8Unorm;
+  d.pipeline_mui = [device newRenderPipelineStateWithDescriptor:pd error:&err];
   if (err) return (NSLog(@"Error creating pipeline: %@", err), nil);
 
   MTLTextureDescriptor * td = [MTLTextureDescriptor new];
@@ -81,6 +93,10 @@ static id<MTLLibrary> load_library(id<MTLDevice> device, NSString * name) {
   [enc setFragmentTexture:self.txt atIndex:0];
   [enc setFragmentSamplerState:self.smp atIndex:0];
   [enc drawPrimitives:MTLPrimitiveTypeTriangle vertexStart:0 vertexCount:3];
+
+  [enc setRenderPipelineState:self.pipeline_mui];
+  [enc setFragmentTexture:self.txt atIndex:0];
+  [enc setFragmentSamplerState:self.smp atIndex:0];
   [enc endEncoding];
 
   if (drawable) [cb presentDrawable:drawable];
