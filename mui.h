@@ -78,6 +78,36 @@ static void mui_vspace(int n) {
 static float mui_lvl = 1;
 static int mui_first_open_ever = 1;
 
+static float cuv(char c, char base) {
+  float u = 0;
+  for (char cc = base; cc < c; cc++) u += mui_font_width(cc) + 1;
+  return u;
+}
+static void uv(float * uv, char c) {
+  uv[2] = mui_font_width(c) / 128.f;
+  uv[3] = mui_font_height() / 32.f;
+
+  if (c >= 'A' && c <= 'Z') c |= 0x20;
+  if (c >= 'a' && c <= 'z') {
+    uv[0] = (32 + cuv(c, 'a')) / 128.f;
+    uv[1] = 1.f / 32.f;
+    return;
+  }
+
+  if (c >= '0' && c <= '5') {
+    uv[0] = (8 + cuv(c, '0')) / 128.f;
+    uv[1] = 9.f / 32.f;
+    return;
+  }
+  if (c >= '6' && c <= '9') {
+    uv[0] = (8 + cuv(c, '6')) / 128.f;
+    uv[1] = 17.f / 32.f;
+    return;
+  }
+
+  uv[0] = uv[1] = uv[2] = uv[3] = 0;
+}
+
 void mui_run(const mui_api_t * t) {
   mu_begin(&mui_ctx);
 
@@ -147,12 +177,47 @@ void mui_run(const mui_api_t * t) {
   while (mu_next_command(&mui_ctx, &cmd)) {
     switch (cmd->type) {
       case MU_COMMAND_TEXT: {
+        mui_upc_t pc = {
+          .rect   = { cmd->text.pos.x, cmd->text.pos.y, 0, mui_font_height() * 3 },
+          .colour = {
+            cmd->text.color.r / 255.f,
+            cmd->text.color.g / 255.f,
+            cmd->text.color.b / 255.f,
+            0,
+          },
+          .extent = { t->sw, t->sh },
+        };
+        for (char * c = cmd->text.str; *c; c++) {
+          pc.rect[2] = mui_font_width(*c) * 3;
+          uv(pc.uv, *c);
+          t->draw(t->ptr, &pc);
+          pc.rect[0] += pc.rect[2] + 2;
+        }
         break;
       }
       case MU_COMMAND_CLIP: {
+        t->scissor(
+          cmd->clip.rect.x, cmd->clip.rect.y,
+          cmd->clip.rect.w, cmd->clip.rect.h);
         break;
       }
       case MU_COMMAND_RECT: {
+        mui_upc_t pc = {
+          .rect   = {
+            cmd->rect.rect.x,
+            cmd->rect.rect.y,
+            cmd->rect.rect.w,
+            cmd->rect.rect.h,
+          },
+          .colour = {
+            cmd->rect.color.r / 255.f,
+            cmd->rect.color.g / 255.f,
+            cmd->rect.color.b / 255.f,
+            0xFFFF,
+          },
+          .extent = { t->sw, t->sh },
+        };
+        t->draw(t->ptr, &pc);
         break;
       }
       case MU_COMMAND_ICON: {
