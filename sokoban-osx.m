@@ -25,22 +25,22 @@
 - (void) mouseDown:(NSEvent *)event {
   CGPoint liw = [event locationInWindow];
   CGPoint p = [self.contentViewController.view convertPoint:liw fromView:nil];
-  glu_mouse_down(p.x, self.frame.size.height - p.y);
+  glu_mouse_down(p.x, self.contentViewController.view.frame.size.height - p.y);
 }
 - (void) mouseUp:(NSEvent *)event {
   CGPoint liw = [event locationInWindow];
   CGPoint p = [self.contentViewController.view convertPoint:liw fromView:nil];
-  glu_mouse_up(p.x, self.frame.size.height - p.y);
+  glu_mouse_up(p.x, self.contentViewController.view.frame.size.height - p.y);
 }
 - (void) mouseMoved:(NSEvent *)event {
   CGPoint liw = [event locationInWindow];
   CGPoint p = [self.contentViewController.view convertPoint:liw fromView:nil];
-  glu_mouse_move(p.x, self.frame.size.height - p.y);
+  glu_mouse_move(p.x, self.contentViewController.view.frame.size.height - p.y);
 }
 - (void) mouseDragged:(NSEvent *)event {
   CGPoint liw = [event locationInWindow];
   CGPoint p = [self.contentViewController.view convertPoint:liw fromView:nil];
-  glu_mouse_move(p.x, self.frame.size.height - p.y);
+  glu_mouse_move(p.x, self.contentViewController.view.frame.size.height - p.y);
 }
 @end
 
