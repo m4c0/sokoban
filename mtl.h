@@ -3,6 +3,22 @@
 
 #include "glu.h"
 
+void sfx_save_prefs() {
+  CFPropertyListRef value = sfx_enabled() ? kCFBooleanTrue : kCFBooleanFalse;
+  CFPreferencesSetAppValue(CFSTR("sound"), value, kCFPreferencesCurrentApplication);
+  CFPreferencesAppSynchronize(kCFPreferencesCurrentApplication);
+}
+
+void sav_get_path(char * buf, unsigned buf_sz) {
+  NSArray * arr = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES);
+  NSString * dir = [arr firstObject];
+  [[NSFileManager defaultManager] createDirectoryAtPath:dir
+                            withIntermediateDirectories:YES
+                                             attributes:nil
+                                                  error:nil];
+  strncpy(buf, dir.UTF8String, buf_sz);
+}
+
 static id<MTLLibrary> load_library(id<MTLDevice> device, NSString * name) {
   NSString * path = [[NSBundle mainBundle] pathForResource:name ofType:@"metal"];
   NSString * src = [NSString stringWithContentsOfFile:path encoding:NSUTF8StringEncoding error:nil];

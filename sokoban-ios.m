@@ -16,8 +16,7 @@
   glu_mouse_down(p.x, p.y);
 }
 - (void)touchesCancelled:(NSSet<UITouch *> *) touches withEvent:(UIEvent *) event {
-  CGPoint p = [[touches anyObject] locationInView:[self view]];
-  glu_mouse_up(p.x, p.y);
+  glu_mouse_up(10000, 10000);
 }
 - (void)touchesEnded:(NSSet<UITouch *> *) touches withEvent:(UIEvent *) event {
   CGPoint p = [[touches anyObject] locationInView:[self view]];
@@ -93,22 +92,6 @@ configurationForConnectingSceneSession:(UISceneSession *) connectingSceneSession
   glu_deinit();
 }
 @end
-
-void sfx_save_prefs() {
-  CFPropertyListRef value = sfx_enabled() ? kCFBooleanTrue : kCFBooleanFalse;
-  CFPreferencesSetAppValue(CFSTR("sound"), value, kCFPreferencesCurrentApplication);
-  CFPreferencesAppSynchronize(kCFPreferencesCurrentApplication);
-}
-
-void sav_get_path(char * buf, unsigned buf_sz) {
-  NSArray * arr = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES);
-  NSString * dir = [arr firstObject];
-  [[NSFileManager defaultManager] createDirectoryAtPath:dir
-                            withIntermediateDirectories:YES
-                                             attributes:nil
-                                                  error:nil];
-  strncpy(buf, dir.UTF8String, buf_sz);
-}
 
 int main(int argc, char ** argv) {
   @autoreleasepool {

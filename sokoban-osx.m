@@ -60,22 +60,6 @@
 }
 @end
 
-void sav_get_path(char * buf, unsigned buf_sz) {
-  NSArray * arr = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES);
-  NSString * dir = [arr firstObject];
-  [[NSFileManager defaultManager] createDirectoryAtPath:dir
-                            withIntermediateDirectories:YES
-                                             attributes:nil
-                                                  error:nil];
-  strncpy(buf, dir.UTF8String, buf_sz);
-}
-
-void sfx_save_prefs() {
-  CFPropertyListRef value = sfx_enabled() ? kCFBooleanTrue : kCFBooleanFalse;
-  CFPreferencesSetAppValue(CFSTR("sound"), value, kCFPreferencesCurrentApplication);
-  CFPreferencesAppSynchronize(kCFPreferencesCurrentApplication);
-}
-
 static void run() {
   POCViewController * vc = [POCViewController new];
   vc.view = [POCViewDelegate new];
