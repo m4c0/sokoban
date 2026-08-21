@@ -1,34 +1,7 @@
 @import AudioToolbox;
-@import MetalKit;
-@import UIKit;
 
-#include "gme.h"
-#include "mui.h"
-#include "sfx.h"
-#include "vlk-sokoban.h"
-
-CAMetalLayer * g_layer;
-
-@interface POCViewDelegate : NSObject<MTKViewDelegate>
-@property (nonatomic) BOOL ready;
-@end
-@implementation POCViewDelegate
-- (void)mtkView:(MTKView *)view drawableSizeWillChange:(CGSize)size {
-}
-- (void)drawInMTKView:(MTKView *)view {
-  if (!self.ready) {
-    Boolean exists;
-    Boolean res = CFPreferencesGetAppBooleanValue(CFSTR("sound"), kCFPreferencesCurrentApplication, &exists);
-    sfx_init(exists ? res : 1);
-
-    g_layer = (CAMetalLayer *)view.layer;
-
-    vlk_init();
-    self.ready = YES;
-  }
-  vlk_frame();
-}
-@end
+#include "pch.h"
+#include "mtl.h"
 
 @interface POCViewController : UIViewController
 @end
@@ -36,23 +9,23 @@ CAMetalLayer * g_layer;
 - (BOOL)canBecomeFirstResponder {
   return YES;
 }
-- (void) touchesBegan:(NSSet<UITouch *> *) touches withEvent:(UIEvent *) event {
+
+- (void)touchesBegan:(NSSet<UITouch *> *) touches withEvent:(UIEvent *) event {
   CGPoint p = [[touches anyObject] locationInView:[self view]];
-  mu_input_mousemove(&mui_ctx, p.x, p.y);
-  mui_run(self.view.frame.size.width, self.view.frame.size.height);
-  mu_input_mousedown(&mui_ctx, p.x, p.y, 1);
+  glu_mouse_move(p.x, p.y);
+  glu_mouse_down(p.x, p.y);
 }
-- (void) touchesCancelled:(NSSet<UITouch *> *) touches withEvent:(UIEvent *) event {
+- (void)touchesCancelled:(NSSet<UITouch *> *) touches withEvent:(UIEvent *) event {
   CGPoint p = [[touches anyObject] locationInView:[self view]];
-  mu_input_mouseup(&mui_ctx, p.x, p.y, 1);
+  glu_mouse_up(p.x, p.y);
 }
-- (void) touchesEnded:(NSSet<UITouch *> *) touches withEvent:(UIEvent *) event {
+- (void)touchesEnded:(NSSet<UITouch *> *) touches withEvent:(UIEvent *) event {
   CGPoint p = [[touches anyObject] locationInView:[self view]];
-  mu_input_mouseup(&mui_ctx, p.x, p.y, 1);
+  glu_mouse_up(p.x, p.y);
 }
-- (void) touchesMoved:(NSSet<UITouch *> *) touches withEvent:(UIEvent *) event {
+- (void)touchesMoved:(NSSet<UITouch *> *) touches withEvent:(UIEvent *) event {
   CGPoint p = [[touches anyObject] locationInView:[self view]];
-  mu_input_mousemove(&mui_ctx, p.x, p.y);
+  glu_mouse_move(p.x, p.y);
 }
 @end
 
@@ -60,20 +33,17 @@ CAMetalLayer * g_layer;
 @property (nonatomic, strong) UIWindow * window;
 @end
 @implementation POCWindowSceneDelegate
-- (void)swipeLeft   { gme_move(-1,  0); }
-- (void)swipeRight  { gme_move( 1,  0); }
-- (void)swipeTop    { gme_move( 0, -1); }
-- (void)swipeBottom { gme_move( 0,  1); }
+- (void)swipeLeft   { glu_move(-1,  0); }
+- (void)swipeRight  { glu_move( 1,  0); }
+- (void)swipeTop    { glu_move( 0, -1); }
+- (void)swipeBottom { glu_move( 0,  1); }
 
 - (void) scene:(UIScene *) scene willConnectToSession:(UISceneSession *) session options:(UISceneConnectionOptions *) connectionOptions
 {
-  UIWindowScene * windowScene = (UIWindowScene *)scene;
-
-  MTKView * view = [MTKView new];
-  view.delegate = [POCViewDelegate new];
-
   POCViewController * vc = [POCViewController new];
-  vc.view = view;
+  vc.view = [POCViewDelegate new];
+
+  UIWindowScene * windowScene = (UIWindowScene *)scene;
 
   UISwipeGestureRecognizer * left = [UISwipeGestureRecognizer new];
   left.direction = UISwipeGestureRecognizerDirectionLeft;
@@ -119,26 +89,10 @@ configurationForConnectingSceneSession:(UISceneSession *) connectingSceneSession
   return res;
 }
 
-- (void)applicationWillTerminate:(UIApplication *)app 
-{
-  // TODO: is this still the right place in this UIScene world?
-  vlk_deinit();
+- (void)applicationWillTerminate:(UIApplication *)app {
+  glu_deinit();
 }
 @end
-
-CAMetalLayer * vlk_metal_layer() { return g_layer; }
-
-FILE * vlk_open(const char * name, const char * ext) {
-  NSString * n = [NSString stringWithFormat:@"%s", name];
-  NSString * e = [NSString stringWithFormat:@"%s", ext];
-  NSString * path = [[NSBundle mainBundle] pathForResource:n ofType:e];
-  return fopen(path.UTF8String, "rb");
-}
-
-void vlk_log(int r, const char * msg) {
-  NSLog(@"Vulkan call failed (code=%d): %s\n", r, msg);
-  exit(1);
-}
 
 void sfx_save_prefs() {
   CFPropertyListRef value = sfx_enabled() ? kCFBooleanTrue : kCFBooleanFalse;
