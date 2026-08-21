@@ -2,11 +2,24 @@
 #define MUI_H
 #include "microui.h"
 
+typedef struct mui_upc_s {
+  float rect[4];
+  float colour[4];
+  float uv[4];
+  float extent[2];
+} mui_upc_t;
+typedef struct mui_api_s {
+  unsigned sw, sh;
+  void * ptr;
+  void (*draw)(void * ptr, const mui_upc_t * pc);
+  void (*scissor)(unsigned x, unsigned y, unsigned w, unsigned h);
+} mui_api_t;
+
 extern mu_Context mui_ctx;
 extern int mui_overlay;
 
 void mui_init();
-void mui_run(unsigned sw, unsigned sh);
+void mui_run(const mui_api_t * t);
 
 int mui_font_width(char c);
 int mui_font_height();
@@ -65,7 +78,7 @@ static void mui_vspace(int n) {
 static float mui_lvl = 1;
 static int mui_first_open_ever = 1;
 
-void mui_run(unsigned sw, unsigned sh) {
+void mui_run(const mui_api_t * t) {
   mu_begin(&mui_ctx);
 
   mui_ctx.style->padding = 12;
@@ -74,7 +87,7 @@ void mui_run(unsigned sw, unsigned sh) {
   int toggle_options = 0;
 
   int opt = MU_OPT_NOCLOSE | MU_OPT_NOTITLE | MU_OPT_NOFRAME | MU_OPT_NOSCROLL;
-  if (mu_begin_window_ex(&mui_ctx, "!main", mu_rect(0, 0, sw, 70), opt)) {
+  if (mu_begin_window_ex(&mui_ctx, "!main", mu_rect(0, 0, t->sw, 70), opt)) {
     mu_layout_row(&mui_ctx, 2, (int[]) { -56, -1 }, 48);
     mu_layout_next(&mui_ctx);
     if (mu_button_ex(&mui_ctx, "", 0xEE00, opt)) toggle_options = 1;
@@ -95,8 +108,8 @@ void mui_run(unsigned sw, unsigned sh) {
     gme_enabled = !cnt->open;
   }
 
-  int wx = (sw - 300) / 2;
-  int wy = (sh - 200) / 2;
+  int wx = (t->sw - 300) / 2;
+  int wy = (t->sh - 200) / 2;
   opt = MU_OPT_NOCLOSE | MU_OPT_NOTITLE | MU_OPT_CLOSED;
   if (mu_begin_window_ex(&mui_ctx, "!options", mu_rect(wx, wy, 300, 200), opt)) {
     mui_vspace(6);

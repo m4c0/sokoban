@@ -70,6 +70,10 @@ void glu_frame(void) {
   glu_pc.time         = tim_now();
 }
 
+void glu_ui(const mui_api_t * t) {
+  mui_run(t);
+}
+
 void glu_move(int dx, int dy) {
   gme_move(dx, dy);
 }

@@ -97,6 +97,11 @@ static id<MTLLibrary> load_library(id<MTLDevice> device, NSString * name) {
   [enc setRenderPipelineState:self.pipeline_mui];
   [enc setFragmentTexture:self.txt atIndex:0];
   [enc setFragmentSamplerState:self.smp atIndex:0];
+  glu_ui((mui_api_t[]) {{
+    .sw = size.width,
+    .sh = size.height,
+    
+  }});
   [enc endEncoding];
 
   if (drawable) [cb presentDrawable:drawable];
