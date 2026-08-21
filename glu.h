@@ -71,17 +71,17 @@ void glu_frame(void) {
 }
 
 void glu_move(int dx, int dy) {
-  // gme_move(dx, dy);
+  gme_move(dx, dy);
 }
 
 void glu_mouse_move(int x, int y) {
-  // mu_input_mousemove(&mui_ctx, dx, dy);
+  mu_input_mousemove(&mui_ctx, x, y);
 }
 void glu_mouse_down(int x, int y) {
-  // mu_input_mousedown(&mui_ctx, dx, dy, 1);
+  mu_input_mousedown(&mui_ctx, x, y, 1);
 }
 void glu_mouse_up(int x, int y) {
-  // mu_input_mouseup(&mui_ctx, dx, dy, 1);
+  mu_input_mouseup(&mui_ctx, x, y, 1);
 }
 
 #endif
