@@ -141,6 +141,41 @@ void mui_run(const mui_api_t * t) {
   }
 
   mu_end(&mui_ctx);
+
+  // TODO: batch these into fewer calls
+  mu_Command * cmd = NULL;
+  while (mu_next_command(&mui_ctx, &cmd)) {
+    switch (cmd->type) {
+      case MU_COMMAND_TEXT: {
+        break;
+      }
+      case MU_COMMAND_CLIP: {
+        break;
+      }
+      case MU_COMMAND_RECT: {
+        break;
+      }
+      case MU_COMMAND_ICON: {
+        mui_upc_t upc = {
+          .rect   = {
+            cmd->icon.rect.x,
+            cmd->icon.rect.y,
+            cmd->icon.rect.w,
+            cmd->icon.rect.h,
+          },
+          .colour = {
+            cmd->icon.color.r / 255.f,
+            cmd->icon.color.g / 255.f,
+            cmd->icon.color.b / 255.f,
+            cmd->icon.id,
+          },
+          .extent = { t->sw, t->sh },
+        };
+        t->draw(t->ptr, &upc);
+        break;
+      }
+    }
+  }
 }
 
 #endif

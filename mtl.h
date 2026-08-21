@@ -28,6 +28,13 @@ static id<MTLLibrary> load_library(id<MTLDevice> device, NSString * name) {
 - (void)draw:(CGSize)size rpd:(MTLRenderPassDescriptor *)rpd into:(id<CAMetalDrawable>)drawable;
 @end
 
+static void mtl_mui_draw(void * ptr, const mui_upc_t * t) {
+  id<MTLRenderCommandEncoder> enc = ptr;
+  [enc setVertexBytes:t length:sizeof(mui_upc_t) atIndex:0];
+  [enc setFragmentBytes:t length:sizeof(mui_upc_t) atIndex:0];
+  [enc drawPrimitives:MTLPrimitiveTypeTriangleStrip vertexStart:0 vertexCount:4];
+}
+
 @implementation POCStuff
 + (id)newWithDevice:(id<MTLDevice>)device {
   POCStuff * d = [POCStuff new];
@@ -98,9 +105,10 @@ static id<MTLLibrary> load_library(id<MTLDevice> device, NSString * name) {
   [enc setFragmentTexture:self.txt atIndex:0];
   [enc setFragmentSamplerState:self.smp atIndex:0];
   glu_ui((mui_api_t[]) {{
-    .sw = size.width,
-    .sh = size.height,
-    
+    .sw   = size.width,
+    .sh   = size.height,
+    .ptr  = enc,
+    .draw = mtl_mui_draw,
   }});
   [enc endEncoding];
 
