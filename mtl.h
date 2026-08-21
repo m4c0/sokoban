@@ -61,6 +61,11 @@ static void mtl_mui_draw(void * ptr, const mui_upc_t * t) {
   pd.vertexFunction   = [vert newFunctionWithName:@"main0"];
   pd.fragmentFunction = [frag newFunctionWithName:@"main0"];
   pd.colorAttachments[0].pixelFormat = MTLPixelFormatRGBA8Unorm;
+  pd.colorAttachments[0].blendingEnabled = true;
+  pd.colorAttachments[0].sourceRGBBlendFactor = MTLBlendFactorSourceAlpha;
+  pd.colorAttachments[0].destinationRGBBlendFactor = MTLBlendFactorOneMinusSourceAlpha;
+  pd.colorAttachments[0].sourceAlphaBlendFactor = MTLBlendFactorOne;
+  pd.colorAttachments[0].destinationAlphaBlendFactor = MTLBlendFactorOneMinusSourceAlpha;
   d.pipeline_mui = [device newRenderPipelineStateWithDescriptor:pd error:&err];
   if (err) return (NSLog(@"Error creating pipeline: %@", err), nil);
 
