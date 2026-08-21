@@ -34,6 +34,16 @@ static void mtl_mui_draw(void * ptr, const mui_upc_t * t) {
   [enc setFragmentBytes:t length:sizeof(mui_upc_t) atIndex:0];
   [enc drawPrimitives:MTLPrimitiveTypeTriangleStrip vertexStart:0 vertexCount:4];
 }
+static void mtl_mui_scissor(void * ptr, unsigned x, unsigned y, unsigned w, unsigned h) {
+  MTLScissorRect rect = {
+    .x      = x,
+    .y      = y,
+    .width  = w,
+    .height = h,
+  };
+  id<MTLRenderCommandEncoder> enc = ptr;
+  [enc setScissorRect:rect];
+}
 
 @implementation POCStuff
 + (id)newWithDevice:(id<MTLDevice>)device {
@@ -110,10 +120,11 @@ static void mtl_mui_draw(void * ptr, const mui_upc_t * t) {
   [enc setFragmentTexture:self.txt atIndex:0];
   [enc setFragmentSamplerState:self.smp atIndex:0];
   glu_ui((mui_api_t[]) {{
-    .sw   = size.width,
-    .sh   = size.height,
-    .ptr  = enc,
-    .draw = mtl_mui_draw,
+    .sw      = size.width,
+    .sh      = size.height,
+    .ptr     = enc,
+    .draw    = mtl_mui_draw,
+    .scissor = mtl_mui_scissor,
   }});
   [enc endEncoding];
 

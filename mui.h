@@ -12,7 +12,7 @@ typedef struct mui_api_s {
   unsigned sw, sh;
   void * ptr;
   void (*draw)(void * ptr, const mui_upc_t * pc);
-  void (*scissor)(unsigned x, unsigned y, unsigned w, unsigned h);
+  void (*scissor)(void * ptr, unsigned x, unsigned y, unsigned w, unsigned h);
 } mui_api_t;
 
 extern mu_Context mui_ctx;
@@ -196,7 +196,7 @@ void mui_run(const mui_api_t * t) {
         break;
       }
       case MU_COMMAND_CLIP: {
-        t->scissor(
+        t->scissor(t->ptr,
           cmd->clip.rect.x, cmd->clip.rect.y,
           cmd->clip.rect.w, cmd->clip.rect.h);
         break;
