@@ -23,7 +23,10 @@ int lvl_min_x, lvl_min_y;
 int lvl_max_level;
 
 void lvl_init(const void * data, int sz) {
-  lvl_data = data;
+  void * cpy = malloc(sz);
+  memcpy(cpy, data, sz);
+
+  lvl_data = cpy;
   lvl_data_end = lvl_data + sz;
   lvl_max_level = -1;
 
