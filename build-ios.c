@@ -10,7 +10,7 @@
 #include <string.h>
 #include <time.h>
 
-#define CROSS(X) RUN("spirv-cross", "shader."X".spv", "--msl", "--output", "export.xcarchive/Products/Applications/"APP".app/shader."X".metal", "--flip-vert-y", "--msl-ios")
+#define CROSS(X) RUN("spirv-cross", X".spv", "--msl", "--output", "export.xcarchive/Products/Applications/"APP".app/"X".metal", "--flip-vert-y", "--msl-ios")
 
 static time_t bundle_version;
 static int uploading;
@@ -136,7 +136,7 @@ int main(int argc, char ** argv) {
 
   if (apply("export.plist.in",    "export.plist")) return 1;
   if (apply("xcarchive.plist.in", "export.xcarchive/Info.plist")) return 1;
-  if (apply("app.plist.in",       "export.xcarchive/Products/Applications/sokoban.app/Info.plist")) return 1;
+  if (apply("app.plist.in",       "export.xcarchive/Products/Applications/"APP".app/Info.plist")) return 1;
 
   RUN("cp", "atlas.img",  RES_PATH(APP));
   RUN("cp", "levels.txt", RES_PATH(APP));
