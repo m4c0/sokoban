@@ -76,8 +76,8 @@ static id<MTLLibrary> load_library(id<MTLDevice> device, NSString * name) {
   id<MTLRenderCommandEncoder> enc = [cb renderCommandEncoderWithDescriptor:rpd];
   [enc setRenderPipelineState:self.pipeline];
   [enc setVertexBytes:&glu_pc length:sizeof(glu_upc_t) atIndex:0];
-  [enc setFragmentBytes:&glu_pc length:sizeof(glu_upc_t) atIndex:0];
-  [enc setFragmentBuffer:self.grid offset:0 atIndex:1];
+  [enc setFragmentBytes:&glu_pc length:sizeof(glu_upc_t) atIndex:1];
+  [enc setFragmentBuffer:self.grid offset:0 atIndex:0];
   [enc setFragmentTexture:self.txt atIndex:0];
   [enc setFragmentSamplerState:self.smp atIndex:0];
   [enc drawPrimitives:MTLPrimitiveTypeTriangle vertexStart:0 vertexCount:3];
