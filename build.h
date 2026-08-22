@@ -109,7 +109,7 @@ int run(char ** args) {
 #define SHADER(src) RUN("glslang", "-V", src, "-o", src ".spv")
 
 static int compile_common() {
-  CC("microui");
+  CC1("microui.c", "microui.o", CFLAGS);
 
   HDR("gme", "GME_IMPL");
   HDR("lvl", "LVL_IMPL");
