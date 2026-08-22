@@ -570,10 +570,6 @@ int WinMain(HINSTANCE h_instance, HINSTANCE h_prev, LPSTR cmd_line, int cmd_show
 
   if (d3d_init(hwnd)) return 1;
 
-  RECT rect;
-  GetClientRect(hwnd, &rect);
-  btd_init(rect.right - rect.left, rect.bottom - rect.top);
-
   ShowWindow(hwnd, cmd_show);
   UpdateWindow(hwnd);
 
