@@ -13,11 +13,11 @@ static int pch() {
 }
 
 static int bited_exe() {
-  RUN("clang", "-Wall", OPT, "-o", APP".exe", "bited.o", OBJS);
+  RUN("clang", "-Wall", OPT, "-o", "bited.exe", "bited.o");
   return 0;
 }
 static int maped_exe() {
-  RUN("clang", "-Wall", OPT, "-o", APP".exe", "maped.o", OBJS);
+  RUN("clang", "-Wall", OPT, "-o", "maped.exe", "maped.o", OBJS);
   return 0;
 }
 static int link_exe() {
