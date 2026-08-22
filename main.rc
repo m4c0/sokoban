@@ -5,6 +5,8 @@ mui-vlk.vert hlsl "mui-vlk.vert.hlsl"
 sokoban.frag hlsl "sokoban.frag.hlsl"
 sokoban.vert hlsl "sokoban.vert.hlsl"
 
+levels txt "levels.txt"
+
 STRINGTABLE
 BEGIN
   101 "Casually Casual Warehouse Game"

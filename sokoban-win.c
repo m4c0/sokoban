@@ -471,17 +471,28 @@ int WinMain(HINSTANCE h_instance, HINSTANCE h_prev, LPSTR cmd_line, int cmd_show
 
   if (d3d_init(hwnd)) return 1;
 
-  RECT rect;
-  GetClientRect(hwnd, &rect);
-  glu_init(rect.right - rect.left, rect.bottom - rect.top);
-
-  ShowWindow(hwnd, cmd_show);
-  UpdateWindow(hwnd);
-
   uint32_t val = 1;
   DWORD size = sizeof(val);
   RegQueryValueExA(sfx_key(), "sound", NULL, NULL, (void *)&val, &size);
-  sfx_init(val ? 1 : 0);
+
+  HRSRC r = FindResource(NULL, "levels", "txt");
+  HGLOBAL g = LoadResource(NULL, r);
+  void * ptr = LockResource(g);
+  unsigned sz = SizeofResource(NULL, r);
+
+  RECT rect;
+  GetClientRect(hwnd, &rect);
+  glu_init_t t = {
+    .level    = ptr,
+    .level_sz = sz,
+    .sound    = val ? 1 : 0,
+    .scr_w    = rect.right - rect.left,
+    .scr_h    = rect.bottom - rect.top,
+  };
+  glu_init(&t);
+
+  ShowWindow(hwnd, cmd_show);
+  UpdateWindow(hwnd);
 
   MSG msg;
   while (GetMessage(&msg, 0, 0, 0)) {
