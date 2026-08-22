@@ -1,14 +1,3 @@
-typedef struct btd_upc {
-  int x, y;
-} btd_upc_t;
-static btd_upc_t btd_pc;
-
-static void btd_init(int sw, int sh) {}
-static void btd_cursor(int dx, int dy) {}
-static void btd_toggle() {}
-static void btd_load() {}
-static void btd_save() {}
-
 #define WIN32_LEAN_AND_MEAN
 #include <initguid.h> // Should come first
 
@@ -17,6 +6,8 @@ static void btd_save() {}
 #include <dxgi1_6.h>
 #include <stdint.h>
 #include <windows.h>
+
+#include "bited.h"
 
 #pragma comment(lib, "d3dcompiler.lib")
 #pragma comment(lib, "d3d12.lib")
