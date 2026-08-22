@@ -11,9 +11,12 @@
 #include <windows.h>
 #include <shlobj.h>
 
+#pragma comment(lib, "advapi32.lib")
 #pragma comment(lib, "d3dcompiler.lib")
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
+#pragma comment(lib, "ole32.lib")
+#pragma comment(lib, "shell32.lib")
 #pragma comment(lib, "user32.lib")
 
 #define SCR_W 800
