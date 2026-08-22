@@ -39,8 +39,6 @@ int main(int argc, char ** argv) {
   CM("sokoban-osx");
   if (compile_and_link_exe()) return 1;
   if (shaders()) return 1;
-  SHADER("bited.frag");
-  SHADER("bited.vert");
   CROSS("bited.frag");
   CROSS("bited.vert");
   CROSS("mui-vlk.frag");

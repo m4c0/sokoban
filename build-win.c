@@ -1,160 +1,95 @@
-#define _CRT_SECURE_NO_WARNINGS
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
+//#define OPT "-gdwarf"
+#define OPT "-O3"
 
-#include <sys/stat.h>
-#include <assert.h>
-#include <direct.h>
-#include <process.h>
-#include <stdio.h>
-#include <stdlib.h>
+#define CFLAGS OPT
+#define RES_PATH(X) "."
+#include "build.h"
 
-#define OPT "-gdwarf"
-//#define OPT "-O3"
+#define CROSS(X) RUN("spirv-cross", X".spv", "--hlsl", "--output", X".hlsl", "--shader-model", "50", "--flip-vert-y");
 
-static void usage() {
-  fprintf(stderr, "just call 'build' without arguments\n");
-}
-
-static int run(char ** args) {
-  assert(args && args[0]);
-
-  if (0 == _spawnvp(_P_WAIT, args[0], (const char * const *)args)) {
-    return 0;
-  }
-
-  fprintf(stderr, "failed to run child process: %s\n", args[0]);
-  return 1;
-}
-
-static int cp(const char * src, const char * dst) {
-  FILE * f = fopen(src, "rb");
-  assert(f);
-
-  assert(0 == fseek(f, 0, SEEK_END));
-  long sz = ftell(f);
-  assert(sz);
-  assert(0 == fseek(f, 0, SEEK_SET));
-
-  char * data = malloc(sz + 1);
-  assert(1 == fread(data, sz, 1, f));
-  fclose(f);
-
-  FILE * o = fopen(dst, "wb");
-  assert(o);
-  assert(1 == fwrite(data, sz, 1, o));
-  fclose(o);
+static int pch() {
+  RUN("clang", "-Wall", "-x", "c-header", CFLAGS, "-o", "pch.pch", "pch.h");
   return 0;
 }
 
-static int shader(char * name) {
-  char spv[1024]; snprintf(spv, 1024, "app/%s.spv", name);
-
-  char * args[] = { "glslang", "-V", name, "-o", spv, 0 };
-  return run(args);
-}
-
-static int pch() {
-  char * args[] = {
-    "clang", "-Wall", OPT, "-x", "c-header",
-    "-IVulkan-Headers/include",
-    "-D", "VK_USE_PLATFORM_WIN32_KHR",
-    "-D", "VLK_USE_VOLK",
-    "-o", "pch.pch", "pch.h", 0 };
-  return run(args);
-}
-
-static int cc_nopch(char * src, char * o) {
-  char * args[] = {
-    "clang", "-Wall", OPT, "-o", o, "-c", src, 0 };
-  return run(args);
-}
-
-static int cc(char * src, char * o) {
-  char * args[] = {
-    "clang", "-Wall", OPT, "-include-pch", "pch.pch",
-    "-o", o, "-c", src, 0 };
-  return run(args);
-}
-
-static int hdr(char * src, char * o, char * d) {
-  char * args[] = {
-    "clang", "-Wall", "-x", "c", OPT, "-include-pch", "pch.pch",
-    "-D", d, "-o", o, "-c", src, 0
-  };
-  return run(args);
-}
-
 static int bited_exe() {
-  char * args[] = {
-    "clang", "-Wall", OPT,
-    "-o", "app/bited.exe", 
-    "bited.o", "vlk-bited.o", "volk.o",
-    "-luser32",
-    0 };
-  return run(args);
+  RUN("clang", "-Wall", OPT, "-o", APP".exe", "bited.o", OBJS);
+  return 0;
 }
-
 static int maped_exe() {
-  char * args[] = {
-    "clang", "-Wall", OPT,
-    "-o", "app/maped.exe", 
-    "lvl.o", "maped.o", "vlk-maped.o", "volk.o",
-    "-luser32",
-    0 };
-  return run(args);
+  RUN("clang", "-Wall", OPT, "-o", APP".exe", "maped.o", OBJS);
+  return 0;
+}
+static int link_exe() {
+  RUN("clang", "-Wall", OPT, "-o", APP".exe", "main.res", "sokoban-win.o", OBJS);
+  return 0;
 }
 
-static int link_exe() {
-  char * args[] = {
-    "clang", "-Wall", OPT,
-    "-o", "app/sokoban.exe", 
-    "gme.o", "lvl.o", "mui.o", "sav.o", "sfx.o", "snd.o", "volk.o",
-    "microui.o", "vlk-sokoban.o", "sokoban-win.o",
-    "-ladvapi32", "-lole32", "-lshell32", "-luser32",
-    0 };
-  return run(args);
+static void print_key(FILE * f, const char * p) {
+  char * env = getenv(p);
+  if (strncmp(p, "WIN_", 4)) {
+    assert(fprintf(f, "&%s;", p));
+  } else if (env) {
+    assert(fprintf(f, "%s", env));
+  } else {
+    fprintf(stderr, "Missing environment: %s\n", p);
+    exit(1);
+  }
+}
+static int pack() {
+  if (getenv("WIN_BUILD_ONLY")) return 0;
+
+  // https://learn.microsoft.com/en-us/uwp/schemas/appxpackage/how-to-create-a-basic-package-manifest
+  if (apply("AppxManifest.xml.in", "AppxManifest.xml")) return 1;
+
+  unlink(APP".msix");
+
+  char argv0[1024];
+  snprintf(argv0, 1024,
+      "c:\\Program Files (x86)\\Windows Kits\\10\\bin\\%s\\x64\\makeappx.exe",
+      getenv("WIN_KIT_VERSION"));
+
+  char argv1[1024];
+  snprintf(argv1, 1024, "\"%s\"", argv0);
+  return _spawnl(_P_WAIT, argv0, argv1, "pack", "/f", "AppxMapping.ini", "/p", APP".msix", NULL);
+}
+
+int icon() {
+  unsigned sz;
+  char * img = slurp("Assets.xcassets\\AppIcon.appiconset\\Icon-1024.png", &sz);
+
+  FILE * f = fopen("icon.ico", "wb");
+  fwrite("\0\0\1\0\1\0", 6, 1, f); // 0=Reserved; 1=ICO; 1 Image
+  fwrite("\0\0\0\0\0\0\x20\0", 8, 1, f); // W/H/C/Res. Planes/Bits
+
+  fwrite(&sz, 4, 1, f);
+  fwrite("\x16\0\0\0", 4, 1, f); // 20=offset from BOS
+  fwrite(img, sz, 1, f);
+
+  fclose(f);
+  return 0;
 }
 
 int main(int argc, char ** argv) {
-  if (argc != 1) return (usage(), 1);
-
   _mkdir("app");
 
   if (pch()) return 1;
 
-  if (hdr("volk.h", "volk.o", "VOLK_IMPLEMENTATION")) return 1;
+  CC("sokoban-win");
+  if (compile_and_link_exe()) return 1;
+  if (shaders()) return 1;
+  CROSS("bited.frag");
+  CROSS("bited.vert");
+  CROSS("mui-vlk.frag");
+  CROSS("mui-vlk.vert");
+  CROSS("sokoban.frag");
+  CROSS("sokoban.vert");
 
-  if (hdr("gme.h", "gme.o", "GME_IMPL")) return 1;
-  if (hdr("lvl.h", "lvl.o", "LVL_IMPL")) return 1;
-  if (hdr("mui.h", "mui.o", "MUI_IMPL")) return 1;
-  if (hdr("sav.h", "sav.o", "SAV_IMPL")) return 1;
-  if (hdr("sfx.h", "sfx.o", "SFX_IMPL")) return 1;
-  if (hdr("snd.h", "snd.o", "SND_IMPL")) return 1;
-
-  if (cc_nopch("microui.c", "microui.o")) return 1;
-
-  if (cc("sokoban-win.c", "sokoban-win.o")) return 1;
-  if (hdr("vlk-sokoban.h", "vlk-sokoban.o", "VLK_IMPL")) return 1;
-  if (link_exe()) return 1;
-
-  if (cc("bited.c", "bited.o")) return 1;
-  if (hdr("vlk-bited.h", "vlk-bited.o", "VLK_IMPL")) return 1;
+  CC("bited");
   if (bited_exe()) return 1;
 
-  if (cc("maped.c", "maped.o")) return 1;
-  if (hdr("vlk-maped.h", "vlk-maped.o", "VLK_IMPL")) return 1;
+  CC("maped");
   if (maped_exe()) return 1;
-
-  if (shader("bited.frag")) return 1;
-  if (shader("bited.vert")) return 1;
-  if (shader("mui-vlk.frag")) return 1;
-  if (shader("mui-vlk.vert")) return 1;
-  if (shader("sokoban.frag")) return 1;
-  if (shader("sokoban.vert")) return 1;
-
-  if (cp("atlas.img",  "app/atlas.img"))  return 1;
-  if (cp("levels.txt", "app/levels.txt")) return 1;
 
   return 0;
 }

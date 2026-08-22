@@ -121,6 +121,8 @@ static int compile_common() {
 }
 
 static int shaders() {
+  SHADER("bited.frag");
+  SHADER("bited.vert");
   SHADER("mui-vlk.frag");
   SHADER("mui-vlk.vert");
   SHADER("sokoban.frag");
