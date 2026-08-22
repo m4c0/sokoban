@@ -5,9 +5,12 @@ export
 *.app
 *.dylib
 *.exe
+*.hlsl
+*.ico
 *.pch
 *.plist
 *.o
+*.res
 *.spv
 *.xcarchive
 *.xcframework

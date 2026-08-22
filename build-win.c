@@ -75,8 +75,7 @@ int main(int argc, char ** argv) {
 
   if (pch()) return 1;
 
-  CC("sokoban-win");
-  if (compile_and_link_exe()) return 1;
+  if (icon())    return 1;
   if (shaders()) return 1;
   CROSS("bited.frag");
   CROSS("bited.vert");
@@ -84,6 +83,10 @@ int main(int argc, char ** argv) {
   CROSS("mui-vlk.vert");
   CROSS("sokoban.frag");
   CROSS("sokoban.vert");
+  RUN("llvm-rc", "/FO", "main.res", "main.rc");
+
+  CC("sokoban-win");
+  if (compile_and_link_exe()) return 1;
 
   CC("bited");
   if (bited_exe()) return 1;
@@ -91,5 +94,6 @@ int main(int argc, char ** argv) {
   CC("maped");
   if (maped_exe()) return 1;
 
+  if (pack()) return 1;
   return 0;
 }
