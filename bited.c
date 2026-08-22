@@ -312,9 +312,9 @@ static int d3d_init_txt(void) {
   };
   D3D12_RESOURCE_DESC res = {
     .Dimension        = D3D12_RESOURCE_DIMENSION_TEXTURE2D,
-    .Format           = DXGI_FORMAT_R8G8B8A8_UNORM,
-    .Width            = 1024,
-    .Height           = 1024,
+    .Format           = DXGI_FORMAT_R8_UNORM,
+    .Width            = 128,
+    .Height           = 32,
     .DepthOrArraySize = 1,
     .MipLevels        = 1,
     .SampleDesc       = (DXGI_SAMPLE_DESC) {
@@ -356,7 +356,7 @@ static int d3d_init_txt(void) {
       &heap, D3D12_HEAP_FLAG_NONE, &res, D3D12_RESOURCE_STATE_GENERIC_READ, NULL, 
       &IID_ID3D12Resource, (void **)&d3d_txt_upload);
 
-  COM_CHK(d3d_txt_upload, Map, 0, NULL, &d3d_txt_data);
+  COM_CHK(d3d_txt_upload, Map, 0, NULL, &btd_atlas);
 
   return 0;
 }
@@ -459,11 +459,11 @@ int d3d_frame(void) {
     .pResource = d3d_txt_upload,
     .PlacedFootprint = {
       .Footprint = {
-        .Format   = DXGI_FORMAT_R8G8B8A8_UNORM,
-        .Width    = 1024,
-        .Height   = 1024,
+        .Format   = DXGI_FORMAT_R8_UNORM,
+        .Width    = 128,
+        .Height   = 32,
         .Depth    = 1,
-        .RowPitch = 1024 * 4,
+        .RowPitch = 128,
       },
     },
   };
@@ -504,6 +504,8 @@ int d3d_frame(void) {
 
   return 0;
 }
+
+void btd_replace_atlas() {}
 
 static LRESULT window_proc(HWND hwnd, UINT msg, WPARAM w_param, LPARAM l_param) {
   switch (msg) {
